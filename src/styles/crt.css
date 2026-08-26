@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Effet vieille télé.
+
+   Trois couches indépendantes, empruntées au montage du site de référence
+   (voir CREDITS.md) :
+
+     1. `.crt-soft` — un flou très léger sur TOUT ce qui est dessous. Un tube
+        cathodique n'a pas de pixel net : c'est ce qui fait « vieux » avant
+        même les rayures.
+
+        C'est un `backdrop-filter` sur un calque, pas un `filter` sur un
+        conteneur : envelopper l'application dans un `filter` force la
+        ré-rastérisation de tout l'arbre à chaque frame d'animation. Mesuré :
+        les sons partaient 83 ms après le début de l'animation au lieu des
+        38 ms programmés, parce que le `setTimeout` attendait le thread
+        principal. Le `backdrop-filter` travaille sur le résultat déjà
+        rastérisé et ne touche pas à la source.
+     2. `.crt-scanlines` — le masque de lignes cyan / rouge / noir, en
+        `mix-blend-mode: screen` à 20 %. Le motif source a 3 px de période et
+        est étiré en `cover` : à 1920 de large ça donne 9 px, exactement le
+        rapport relevé sur les captures de référence (12 px pour 2530 de large).
+     3. `.crt-frame` — le cadre : coins arrondis, bord noir, vignette.
+
+   Les rayures et le cadre restent NETS (ils ne sont pas dans l'élément flouté) :
+   sur un vrai tube, c'est l'image qui est molle, pas la grille d'ouverture.
+   ========================================================================== */
+
+:root {
+  --crt-blur: 0.5px;
+  --crt-scanline-opacity: 0.2;
+}
+
+.crt-soft,
+.crt-scanlines,
+.crt-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
+
+.crt-soft {
+  z-index: 100000;
+  -webkit-backdrop-filter: blur(var(--crt-blur)) saturate(1.06);
+  backdrop-filter: blur(var(--crt-blur)) saturate(1.06);
+}
+
+.crt-scanlines,
+.crt-frame {
+  animation: crt-fade-in 600ms ease-out;
+}
+
+.crt-scanlines {
+  z-index: 100001;
+  background-image: url('/nxe/CRT_Scanlines_Colored.png');
+  background-size: cover;
+  mix-blend-mode: screen;
+  opacity: var(--crt-scanline-opacity);
+}
+
+.crt-frame {
+  z-index: 100002;
+  background-image: url('/nxe/CRT_FrameOnly.png');
+  background-size: 100% 100%;
+}
+
+@keyframes crt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Plein écran : on retire l'habillage, sinon on encadre un cadre. */
+:fullscreen ~ .crt-frame,
+:fullscreen ~ .crt-scanlines,
+body:has(:fullscreen) .crt-frame,
+body:has(:fullscreen) .crt-scanlines {
+  display: none !important;
+}
+
+/* Le scintillement des rayures peut gêner ; on garde le flou et le cadre,
+   qui sont statiques, et on calme le reste. */
+@media (prefers-reduced-motion: reduce) {
+  .crt-scanlines,
+  .crt-frame {
+    animation: none;
+  }
+
+  .crt-scanlines {
+    opacity: 0.1;
+  }
+}

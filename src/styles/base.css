@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Base — police, réinitialisation, variables de scène.
+   Les valeurs numériques viennent de SPEC.md (relevés sur reference/).
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Convection';
+  src: url('/fonts/Convection.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* — Scène. Tout est en unités de hauteur : une projection perspective se
+       dimensionne sur le champ de vision vertical, pas sur la largeur. — */
+  --tile-h: 41.9vh;          /* 559 px sur 1334 (image4) */
+  --tile-ratio: 1.3125;      /* 420 / 320 — ratio de BlankGreen.jpg */
+  --tile-w: calc(var(--tile-h) * var(--tile-ratio));
+  --row-cy: 57.8vh;          /* les tuiles sont centrées sur la ligne d'horizon */
+  --margin-x: 12.97vh;       /* 173 px sur 1334 */
+  --tile-radius: 0.45vh;     /* 7 px pour 736 px de large */
+
+  /* — Typographie.
+       Méthode : le corps vient de la HAUTEUR DE CAPITALE relevée sur image4
+       (mesurée sur le « 1 » de « mopo1o » : 37 px, et sur les hampes du « m » :
+       27 px de hauteur d'x), et l'interlettrage vient de l'écart entre la
+       largeur réelle du mot et sa largeur naturelle en Convection.
+       Ce recoupement donne 0.09 em de tracking sur l'en-tête et le pseudo —
+       cohérent sur trois chaînes indépendantes — et zéro sur les tuiles. — */
+  --fs-crumb-1: 2.36vh;
+  --fs-crumb-2: 3.36vh;
+  --fs-crumb-3: 4.38vh;
+  --fs-gamertag: 4.02vh;
+  --fs-score: 3.5vh;
+  --fs-counter: 2.82vh;
+  --fs-legend: 2.47vh;
+  --fs-tile-title: 2.47vh;
+  --fs-tile-sub: 1.72vh;
+  --track-ui: 0.098em;
+  --ink-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+
+  /* — Couleurs relevées — */
+  --ink: #ffffff;
+  --ink-dim: #c9d0d4;
+  /* Les deux lignes hautes du fil d'Ariane sont OPAQUES dans l'original, pas des
+     blancs translucides. Résolu en inversant la composition sur les canaux R et
+     B des pixels les plus clairs d'image4 : le vert du fond passait au travers
+     de mes `rgba(255,255,255,…)` et verdissait le texte — mesuré #829b5a chez
+     moi contre #adbd92 côté référence, sur la même ligne. */
+  --ink-dimmer: #f5f5f5;
+  --ink-faint: #cccccc;
+  /* Relevés sur image10, en moyennant huit lignes pour annuler les rayures CRT
+     de la capture (elles font ±5 unités et faussent une lecture au pixel). */
+  --panel: #2d353d; /* fond de lame, entre deux entrées de menu */
+  --panel-lite: #33383d; /* bloc d'infos, haut ; il s'assombrit vers le bas */
+  --panel-lite-bas: #2e3439;
+  /* Le bandeau titre est presque plat : #e7a215 en haut, #e8a819 en bas.
+     J'avais mis un dégradé bien plus contrasté (#f2b93b → #e88f0a) au jugé. */
+  --orange-1: #e7a215;
+  --orange-2: #e8a416;
+  --orange-3: #e8a819;
+  /* Bouton sélectionné : reflet clair en haut, creux à 55 %, remontée en bas. */
+  --green-hi-1: #bad38f;
+  --green-hi-2: #76ad25;
+  --green-hi-3: #8dbd3d;
+  /* Filet entre les entrées de menu : #636a75 mesuré. */
+  --panel-rule: rgba(255, 255, 255, 0.22);
+  --focus: #cfe86a;
+
+  --ease-nxe: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-slide: 340ms;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #223c02;
+  color: var(--ink);
+  font-family: 'Convection', 'Exo 2', 'Titillium Web', 'Segoe UI', system-ui, sans-serif;
+
+  /* Convection n'a qu'une graisse (400) : le navigateur SYNTHÉTISE ce 600.
+     C'est délibéré, et c'est ce que fait l'original — j'avais interdit le gras
+     synthétique par principe, la mesure dit l'inverse. Densité d'encre relevée
+     sur image4, à hauteur et largeur calées, pour quatre chaînes indépendantes :
+
+       « Gabriel's Portfolio »  cible 0.336   poids 400 → 0.248   poids 600 → 0.346
+       « Projects »             cible 0.329   poids 400 → 0.220   poids 600 → 0.290
+       « Testimonials »         cible 0.192   poids 400 → 0.131   poids 600 → 0.278
+       « mopo1o »               cible 0.284   poids 400 → 0.233   poids 600 → 0.302
+
+     La cible tombe systématiquement du côté du gras. */
+  font-weight: 600;
+
+  /* Le site de référence pose `-webkit-font-smoothing: none`. Vérifié : c'est
+     une propriété macOS, sans effet sous Windows/Linux — elle n'explique donc
+     pas l'écart de rendu, et je ne la garde pas pour ne pas laisser croire
+     qu'elle fait quelque chose. `geometricPrecision` reste utile : elle désactive
+     le hinting, donc les chasses ne sont plus arrondies au pixel. */
+  text-rendering: geometricPrecision;
+
+  /* Ombre portée nette, décalée en bas à droite — pas un flou. Reprise telle
+     quelle du site de référence, qui la pose globalement. */
+  text-shadow: var(--ink-shadow);
+}
+
+/* Pas de sur-graisse au-delà du 600 global. */
+b,
+strong {
+  font-weight: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Focus clavier — jamais supprimé. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 4px rgba(124, 184, 33, 0.35);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

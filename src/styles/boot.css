@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Écran d'accueil (cf. image1) : fond blanc, console 3D, « Cliquer pour
+   continuer ». Au clic, la console pivote sur sa face avant en zoomant, puis
+   tout s'efface dans le blanc.
+   ========================================================================== */
+
+/* Le panneau est blanc et opaque dès la première frame : c'est du blanc qu'on
+   émerge. Faire un fondu sur `.boot` lui-même laisserait voir le fond vert du
+   `body` au travers — on fait donc apparaître son CONTENU, pas le panneau. */
+.boot {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+@keyframes boot-content-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* La scène occupe tout l'écran et sert de surface de glissé ; le curseur passe
+   à `pointer` uniquement au survol de la console (piloté depuis BootScreen). */
+.boot-stage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  cursor: default;
+  touch-action: none; /* le glissé ne doit pas faire défiler la page */
+  -webkit-user-select: none;
+  user-select: none;
+  animation: boot-content-in 1100ms ease-out backwards;
+}
+
+.boot-stage:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -6px;
+  box-shadow: inset 0 0 0 6px rgba(124, 184, 33, 0.25);
+}
+
+/* Simple indication : non cliquable, et hors de la couche d'interaction.
+   Le clignotement est un fondu long — les consoles de l'époque respiraient,
+   elles ne clignotaient pas comme un avertissement. */
+.boot-cta {
+  position: absolute;
+  left: 50%;
+  bottom: 4.2vh;
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: 2.6vh;
+  letter-spacing: 0.6px;
+  color: #8a8a8a;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Entrée après la console, puis respiration lente. */
+  animation: boot-content-in 800ms ease-out 500ms backwards,
+    cta-breathe 3.2s ease-in-out 1100ms infinite;
+}
+
+@keyframes cta-breathe {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Au clic, l'indication s'efface d'elle-même : elle n'a plus rien à dire. */
+.boot-cta.is-leaving {
+  animation: cta-leave 380ms ease-out forwards;
+}
+
+@keyframes cta-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Fondu au blanc final. */
+.boot-flash {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot.is-flash .boot-flash {
+  animation: boot-flash 620ms ease-in forwards;
+}
+
+@keyframes boot-flash {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Entrée du dashboard depuis le blanc. */
+.dash.is-entering {
+  animation: dash-in 520ms ease-out;
+}
+
+@keyframes dash-in {
+  from {
+    opacity: 0;
+    filter: brightness(3.2) saturate(0.2);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-stage,
+  .boot-cta,
+  .dash.is-entering {
+    animation: none;
+  }
+
+  .boot-cta {
+    opacity: 0.75;
+  }
+}

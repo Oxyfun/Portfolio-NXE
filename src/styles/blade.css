@@ -1,0 +1,391 @@
+/* ==========================================================================
+   Panneau de détail — la « lame » NXE (cf. image3, image5)
+   ========================================================================== */
+
+.blade-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+}
+
+.blade-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  animation: fade-in 200ms ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.blade {
+  position: absolute;
+  left: 7.9%;
+  top: 15.6vh;
+  width: 41.8%;
+  min-height: 69.4vh;
+  border-radius: 1.2vh;
+  background-color: var(--panel);
+  /* BackgroundPanel.png est un dégradé 75x75 (#465056 → #262f38) : il est fait
+     pour être ÉTIRÉ sur toute la lame, pas répété — le répéter donne un
+     matelassage qui n'existe nulle part dans les références. */
+  background-image: var(--panel-texture);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: 0 1.8vh 5vh rgba(0, 0, 0, 0.55);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3vh;
+  /* Le NXE déplie la lame depuis son bandeau titre. */
+  transform-origin: 50% 0;
+  animation: blade-unfold 260ms var(--ease-nxe);
+}
+
+.blade.is-secondary {
+  /* Relevé sur image5 : le panneau arrière commence à 22.7vh.
+     Sa HAUTEUR, en revanche, n'est pas fixe : sur image8 comme sur image10 il
+     s'arrête juste après son contenu. Elle l'était ici (54.4vh + overflow
+     hidden), et le texte se faisait couper net au milieu d'une phrase sans
+     aucun moyen de lire la suite. Il se dimensionne maintenant sur son contenu,
+     et ne défile que s'il dépasse la hauteur utile. */
+  left: 48.5%;
+  top: 22.7vh;
+  width: 33%;
+  height: auto;
+  min-height: 0;
+  max-height: 62vh;
+  display: flex;
+  z-index: -1;
+  /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
+     sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
+     contre #2d353d pour la lame de devant. */
+  background-color: #282f36;
+  animation: blade-unfold 260ms var(--ease-nxe) 120ms backwards,
+    blade-slide-in 320ms var(--ease-nxe) 120ms backwards;
+}
+
+/* Le panneau arrière est une colonne : bandeau et pied fixes, corps défilant. */
+.blade.is-secondary .blade-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+@keyframes blade-unfold {
+  from {
+    transform: scaleY(0.04);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes blade-slide-in {
+  from {
+    margin-left: 4vh;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0;
+    opacity: 1;
+  }
+}
+
+.blade-sheet {
+  display: contents;
+}
+
+.blade-inner {
+  animation: fade-in 220ms ease-out 90ms backwards;
+}
+
+.blade-title {
+  height: 6.02vh;
+  display: flex;
+  align-items: center;
+  padding: 0 1.8vh;
+  border-radius: 0.5vh;
+  background: linear-gradient(to bottom, var(--orange-1) 0%, var(--orange-2) 55%, var(--orange-3) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-size: 4.14vh;
+  /* Ni capitales ni interlettrage : la référence affiche « mopo1o » et
+     « TTS.Mom » dans leur casse d'origine, sans espacement ajouté. */
+  letter-spacing: 0;
+  color: #eef2f4;
+  text-shadow: 0 1px 2px rgba(120, 60, 0, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blade-stats {
+  display: flex;
+  gap: 1.6vh;
+  margin-top: 1.4vh;
+  padding: 1.5vh;
+  border-radius: 0.8vh;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.blade-thumb {
+  width: 9.5vh;
+  height: 9.5vh;
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  display: grid;
+  place-items: center;
+  background: #10161a;
+  overflow: hidden;
+}
+
+.blade-thumb svg,
+.blade-thumb img {
+  width: 72%;
+  height: 72%;
+}
+
+/* Les PNG NXE embarquent leur reflet : on ne montre que la partie haute. */
+.glyph-mark-png {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.glyph-mark-png img {
+  width: 96%;
+  height: auto;
+  margin: 6% auto 0;
+  display: block;
+}
+
+.blade-stat-list {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  gap: 0.35vh 1vh;
+  font-size: 3.2vh;
+}
+
+.blade-stat-list dt {
+  color: #d3d9dc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blade-stat-list dd {
+  margin: 0;
+  text-align: right;
+  color: #eef2f4;
+  white-space: nowrap;
+}
+
+.blade-stars {
+  display: flex;
+  gap: 0.5vh;
+  justify-content: flex-end;
+}
+
+.blade-stars img {
+  width: 3vh;
+  height: 3vh;
+}
+
+.blade-rows {
+  margin-top: 2vh;
+  list-style: none;
+  padding: 0;
+}
+
+.blade-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 8.2vh;
+  text-align: left;
+  padding: 0 1.8vh;
+  font-size: 4.3vh;
+  color: #b9c0c4;
+  text-decoration: none;
+  border-radius: 0.6vh;
+  border-bottom: 1px solid var(--panel-rule);
+  transition: color 120ms linear;
+}
+
+.blade-row:last-child {
+  border-bottom: 0;
+}
+
+.blade-row.is-active {
+  color: var(--ink);
+  border-bottom-color: transparent;
+  background: linear-gradient(
+    to bottom,
+    var(--green-hi-1) 0%,
+    var(--green-hi-2) 60%,
+    var(--green-hi-3) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 2px 5px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(30, 60, 0, 0.5);
+}
+
+.blade-body {
+  margin-top: 2vh;
+  padding: 0 0.4vh;
+  /* Dernier recours quand le texte dépasse : il défile, il ne disparaît pas.
+     `min-height: 0` est indispensable — sans lui un enfant flex refuse de
+     rétrécir sous sa hauteur de contenu et l'`overflow` ne sert à rien. */
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+
+/* Barre de défilement discrète, dans le langage du panneau : pas la barre
+   grise du navigateur au milieu d'un dashboard de 2008. */
+.blade-body::-webkit-scrollbar {
+  width: 0.8vh;
+}
+
+.blade-body::-webkit-scrollbar-thumb {
+  border-radius: 0.4vh;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.blade-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 0.4vh;
+}
+
+.blade-body p {
+  margin: 0 0 1.3vh;
+  /* Interligne relevé sur image8 : trois lignes consécutives à 51 px d'écart
+     exactement, soit 3.78 vh. Le nôtre en faisait 4.50 (2.9 × 1.55), 19 % de
+     trop — et c'est une bonne part de la raison pour laquelle le texte
+     débordait. Recoupement : la référence loge ~56 caractères par ligne dans un
+     panneau large de 30 % d'écran, nous 37 dans 33 %.
+     Je mesure l'interligne, pas le corps : la répartition entre taille et
+     interligne ci-dessous est un choix conventionnel (1.5), pas un relevé. */
+  font-size: 2.52vh;
+  line-height: 1.5;
+  color: #ccd3d7;
+}
+
+.blade-foot {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.6vh;
+  padding-top: 1.2vh;
+  border-top: 1px solid var(--panel-rule);
+  font-size: 2.6vh;
+  color: #9fa8ad;
+}
+
+.blade-foot span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 0.6vh;
+  color: #dfe4e7;
+}
+
+.blade-foot img {
+  width: 2.2vh;
+  height: 2.2vh;
+}
+
+.blade-hero {
+  flex: none;
+  height: 13vh;
+  margin: -3vh -3vh 0;
+  border-radius: 1.2vh 1.2vh 0 0;
+  background-color: #0d1207;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.4vh 2vh;
+  font-size: 3.6vh;
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Le voile va sous le titre, pas par-dessus : l'image est posée en style inline
+   (elle vient des données), donc elle écrasait un `background-image` qui aurait
+   porté le dégradé. Un pseudo-élément règle le conflit sans dupliquer l'URL. */
+.blade-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.82));
+}
+
+.blade-hero > span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Sans image : le titre porte seul le haut du panneau (image10). */
+.blade-heading {
+  flex: none;
+  margin: 0;
+  font-size: 3.6vh;
+  font-weight: inherit;
+  color: var(--ink);
+  text-shadow: var(--ink-shadow);
+}
+
+.blade-about {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 1.3vh;
+  margin: 1.6vh 0 0;
+  padding: 1.2vh 1.4vh;
+  border-radius: 0.7vh;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.blade-about-mark {
+  width: 5.4vh;
+  height: 5.4vh;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.blade-about-mark svg {
+  width: 76%;
+  height: 76%;
+}
+
+.blade-about strong {
+  display: block;
+  font-size: 3vh;
+  color: #eef2f4;
+}
+
+.blade-about em {
+  display: block;
+  font-style: normal;
+  font-size: 2.3vh;
+  color: #a8b1b6;
+  margin-top: 0.2vh;
+}

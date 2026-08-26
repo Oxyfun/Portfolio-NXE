@@ -1,0 +1,3 @@
+- [Nolan](user-nolan.md) — alternant cloud Carrefour/OneCloud, Bachelor ESGI, travaille en français, ton direct.
+- [Méthode de travail validée](feedback-methode-mesure.md) — mesurer plutôt qu'estimer, itérer seul, dire les écarts ; figée dans le CLAUDE.md du projet.
+- [Portfolio NXE](projet-portfolio-nxe.md) — reproduire le dashboard Xbox 360 ; fidélité visuelle prioritaire, assets Microsoft utilisés en connaissance de cause.

@@ -1,0 +1,12 @@
+# Fins de ligne normalisées : le projet est travaillé depuis plusieurs machines,
+# sans ça chaque aller-retour Windows/autre ferait apparaître tout le fichier
+# comme modifié.
+* text=auto eol=lf
+
+# Binaires : jamais de conversion, elle les corromprait.
+*.png binary
+*.jpg binary
+*.wav binary
+*.glb binary
+*.ttf binary
+*.jsonl binary

@@ -1,0 +1,11 @@
+# Réinstallables ou reconstructibles : tout le reste est versionné
+# volontairement, y compris shots/, reference/ et assets-source/, pour que le
+# projet puisse être repris tel quel sur une autre machine.
+node_modules/
+dist/
+tsconfig.tsbuildinfo
+*.local
+.DS_Store
+
+# Scripts de mise au point temporaires (cf. CLAUDE.md).
+*.tmp.mjs
