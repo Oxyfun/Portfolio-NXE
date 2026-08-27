@@ -50,15 +50,17 @@ export default function App() {
      de flash depuis qu'il n'anime plus l'opacité. */
   const entreeTimer = useRef(0)
   const rejouerEntree = useCallback(() => {
-    setEntering(false)
+    /* On pose la classe TOUT DE SUITE, sans l'éteindre d'abord.
+       Le cycle éteindre → cadre d'arrêt → rallumer sert à redémarrer une
+       animation CSS sur un élément qui reste en place. Ici il est inutile :
+       chaque section a ses propres identifiants de tuiles, donc React les
+       remonte et l'animation repart d'elle-même sur des éléments neufs.
+       Pire, il cassait le switch rapide — l'image sans la classe faisait sauter
+       les cartes à leur position finale avant que l'animation ne reprenne
+       depuis la pile. */
     window.clearTimeout(entreeTimer.current)
-    /* Un cadre d'arrêt avant de remettre la classe : sans ça React regroupe les
-       deux mises à jour, la classe n'est jamais retirée du DOM et l'animation ne
-       redémarre pas. */
-    requestAnimationFrame(() => {
-      setEntering(true)
-      entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
-    })
+    setEntering(true)
+    entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
   }, [])
 
   /* Retour depuis une lame : simple coulissement, pas de dépilement. Les cartes

@@ -245,6 +245,41 @@ await p.evaluate(() => {
 await p.keyboard.press('ArrowDown')
 await p.waitForTimeout(900)
 await p.evaluate(() => (window.__surveille = false))
+/* Switch rapide : l'animation ne doit JAMAIS s'interrompre. Le cycle
+   éteindre → rallumer qui servait à la relancer laissait une image sans la
+   classe, et les cartes sautaient à leur position finale avant de repartir de
+   la pile. Inutile ici : chaque section a ses propres identifiants de tuiles,
+   React les remonte et l'animation repart d'elle-même. */
+/* On note la section de départ pour la restaurer : un bloc de test ne doit pas
+   laisser l'application ailleurs qu'il ne l'a trouvée, sinon il casse tout ce
+   qui suit. */
+const secAvantSwitch = (await p.locator('.crumb-3').innerText()).trim()
+await p.evaluate(() => {
+  window.__trous = 0
+  window.__suit = true
+  const d = document.querySelector('.dash')
+  const b = () => {
+    if (!d.classList.contains('is-entering')) window.__trous++
+    if (window.__suit) requestAnimationFrame(b)
+  }
+  requestAnimationFrame(b)
+})
+for (let i = 0; i < 4; i++) {
+  await p.keyboard.press('ArrowDown')
+  await p.waitForTimeout(100)
+}
+await p.evaluate(() => (window.__suit = false))
+step(
+  "un changement de section rapide n'interrompt pas l'animation",
+  (await p.evaluate(() => window.__trous)) === 0,
+)
+// on restaure exactement la section de départ
+while ((await p.locator('.crumb-3').innerText()).trim() !== secAvantSwitch) {
+  await p.keyboard.press('ArrowDown')
+  await p.waitForTimeout(700)
+}
+await p.waitForTimeout(600)
+
 step(
   "changer de section ne surexpose pas l'écran",
   (await p.evaluate(() => window.__filtres)) === 0,

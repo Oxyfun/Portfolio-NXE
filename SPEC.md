@@ -454,6 +454,20 @@ disparaît en une image, et les cartes mettaient 220 ms à réapparaître : le f
 clair restait nu entre les deux. La rangée revient donc d'un coup et ne
 s'efface en fondu qu'à l'aller. Pic ramené à **+0.1**.
 
+### Le switch rapide cassait l'animation
+
+En enchaînant les changements de section, les cartes sautaient. Relevé image par
+image : à chaque switch il y avait **une image sans la classe `is-entering`**,
+animation à `none` — les cartes atterrissaient d'un coup à leur place finale
+avant que l'animation ne reprenne depuis la pile.
+
+Ça venait du cycle éteindre → cadre d'arrêt → rallumer, qui sert normalement à
+relancer une animation CSS. Il est **inutile ici** : chaque section a ses
+propres identifiants de tuiles (vérifié, aucun doublon), donc React les remonte
+et l'animation repart d'elle-même sur des éléments neufs. La classe est
+maintenant posée directement. Quatre switchs en 400 ms : zéro image sans la
+classe.
+
 ### Le flash venait d'ailleurs
 
 Après avoir retiré l'opacité du dépilement, le changement de section

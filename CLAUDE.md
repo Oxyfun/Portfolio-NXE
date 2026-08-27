@@ -144,8 +144,11 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut d'une tuile
   n'a aucun contraste, le coin bas en a beaucoup. Et un agrandissement au plus proche voisin
   se lit directement, sans détecteur.
-- Pour rejouer une animation CSS, la classe doit être **réellement retirée du DOM** entre-temps :
-  sans un cadre d'arrêt, React regroupe les deux états et rien ne redémarre.
+- Pour rejouer une animation CSS sur un élément QUI RESTE EN PLACE, la classe doit être
+  **réellement retirée du DOM** entre-temps (un cadre d'arrêt, sinon React regroupe les deux
+  états). Mais si l'élément est **remonté** — clé React différente — l'animation repart seule,
+  et ce cycle devient nuisible : l'image sans la classe fait sauter l'élément à sa position
+  finale. Visible dès qu'on enchaîne les changements.
 - **Ne valide jamais un défilement sans l'avoir fait déborder** : injecte du texte, puis
   regarde `scrollTop` bouger aux flèches ET à la molette.
 - Dans un `transform`, un **pourcentage se rapporte à l'élément**, pas à la fenêtre :
