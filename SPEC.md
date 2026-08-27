@@ -401,6 +401,37 @@ après le premier, en glissant de la droite.
 
 ---
 
+### 5 quinquies. Le voile passait devant le panneau de détail
+
+Le panneau arrière est en `z-index: -1` pour passer derrière la lame de devant.
+Mais `.blade-scrim` — le voile plein écran qui ferme la lame — n'avait aucun
+`z-index`, donc il se retrouvait **au-dessus** : tout clic sur le détail
+l'atteignait et refermait la lame. Ordre explicite désormais : voile 0,
+détail 1, lame de devant 2.
+
+Deuxième fois que ce voile vole des clics, après la légende. Un calque plein
+écran qui ferme quelque chose doit avoir un `z-index` explicite.
+
+### 5 sexies. Deux corrections d'animation
+
+**La surbrillance arrivait en deux temps.** Transitionner `color` ET
+`background` ne suffisait pas : un `linear-gradient` **ne s'interpole pas**
+depuis `transparent`, donc le vert continuait d'apparaître d'un coup pendant
+que le texte mettait 120 ms. Les deux sont maintenant instantanés — c'est de
+toute façon ce que fait la sélection du NXE.
+
+**Le retour d'une lame produisait un flash.** Mesuré : la luminance moyenne de
+l'écran passait de 126.8 à **133.2** à 110 ms, puis retombait à 127.7. Le voile
+disparaît en une image, et les cartes mettaient 220 ms à réapparaître : le fond
+clair restait nu entre les deux. La rangée revient donc d'un coup et ne
+s'efface en fondu qu'à l'aller. Pic ramené à **+0.1**.
+
+Le retour utilise aussi une animation distincte : les cartes **coulissent**
+(`is-returning`) au lieu de se dépiler. Le dépilement fait partir toutes les
+cartes de la position de la première, donc on voyait la grande carte de gauche
+pendant toute l'animation — ce qui n'a aucun sens au retour, puisqu'elles n'ont
+jamais quitté leur place.
+
 ### 5 quater. La colonne de détail prend la main
 
 Flèche droite ou clic : le panneau de détail s'éclaircit (#2d353d → #414c58),

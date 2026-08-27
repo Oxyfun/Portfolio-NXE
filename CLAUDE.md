@@ -67,11 +67,10 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   que la lumière ; un miroir produit une bande sombre qui n'existe pas.
 - `Box3.setFromObject` renvoie une boîte **monde**. Neutralise les transformations parentes
   avant de calculer une boîte locale.
-- Pour faire tourner un objet à la souris **sur deux axes**, orbite la caméra en sphériques,
-  ne le fais pas tourner en Euler : incliné, un glissé horizontal ne tourne plus autour de la
-  verticale de l'écran et un cercle ne rend pas un cercle (test : un cercle fermé doit
-  ramener à la pose de départ, mesuré 0.54/255). Pour un **seul** axe, tourner l'objet est
-  plus juste — l'avatar pivote en lacet, ce qui garde ses pieds au sol.
+- Pour faire tourner un objet à la souris **sur deux axes**, orbite la caméra en sphériques :
+  incliné, un glissé horizontal ne tourne plus autour de la verticale de l'écran (test : un
+  cercle fermé doit ramener à la pose de départ, 0.54/255). Pour un **seul** axe, tourner
+  l'objet est plus juste — l'avatar pivote en lacet, ses pieds restent au sol.
 - Un gain de rotation **s'indexe sur la dimension que le geste parcourt**. `OrbitControls`
   prend la hauteur du canevas ; sur l'avatar (160 × 384) ça demandait 766 px pour un tour.
   Recoupe par le mapping physique arc = r·θ : ici 320 contre 346 px, ils convergent.
@@ -97,23 +96,17 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - **Un seuil de luminance ne sait pas isoler un glyphe en dégradé** (les icônes NXE vont du
   blanc au vert-jaune, la tache de la tuile monte à un bleu de 160). Règle générale : si une
   mesure sature sur les bords de ta zone de recherche, elle est fausse — ne conclus pas.
-- **Un voile plein écran vole les clics de tout ce qui passe dessous.** Les boutons de
-  légende ne faisaient rien : ils étaient sous `.blade-scrim`. Deux causes empilées (des
-  `<span>` non cliquables ET un `z-index` trop bas) — corriger une seule ne changeait rien.
-  Playwright désigne ce genre de coupable tout seul : « X intercepts pointer events ».
-- **Masquer le curseur natif efface la valeur qu'on voulait lire.** `cursor: none !important`
-  écrase le `cursor` calculé de tous les éléments : impossible ensuite d'en déduire la forme
-  du curseur personnalisé. Et un raycast (console, avatar) n'est de toute façon pas dans le
-  DOM — expose-le en classe.
-- **Avant d'inventer une animation, cherche-la dans les dépôts de `reference/Site`.**
-  Le fond du NXE est un **système de particules** (`Background.qml` du thème Pegasus NPE),
-  pas un calque qui dérive : anneaux émis 2/s, vie 10 s ± 4, angle 320°, opacité 0.15. Six
-  anneaux fixes qui glissent ensemble ne rendent rien — ce qui fait vivre ce fond, c'est que
-  chaque anneau naisse et meure avec ses propres valeurs. Ces dépôts contiennent aussi les
-  huit motifs de carte (420 × 320, même vert à 5 unités près : le motif change, pas la teinte).
-- Un accumulateur de molette est **faux dans les deux sens** : une souris qui envoie 100 d'un
-  coup franchit deux fois le seuil et saute une carte, un pavé tactile qui envoie 3 n'en
-  franchit jamais aucun. Prends le SIGNE du premier événement et verrouille ~320 ms.
+- **Un voile plein écran vole les clics de tout ce qui passe dessous.** Deux causes empilées
+  sur la légende (`<span>` non cliquables ET `z-index` trop bas) : corriger une seule ne
+  changeait rien. Playwright désigne ce coupable seul (« X intercepts pointer events »).
+- **Masquer le curseur natif efface la valeur qu'on voulait lire** : `cursor: none !important`
+  écrase le `cursor` calculé partout. Et un raycast n'est pas dans le DOM — expose-le en classe.
+- **Avant d'inventer une animation, cherche-la dans les dépôts de `reference/Site`.** Le fond
+  du NXE est un **système de particules** (`Background.qml`, thème Pegasus NPE), pas un calque
+  qui dérive. Ces dépôts contiennent aussi les huit motifs de carte : le motif change d'une
+  carte à l'autre, pas la teinte.
+- Un accumulateur de molette est **faux dans les deux sens** (une souris saute une carte, un
+  pavé tactile n'en franchit aucune). Prends le SIGNE du premier événement, verrouille 320 ms.
 - `e.target` **n'est pas toujours un `Element`** : sur `window` ou `document`, `?.closest()`
   lève une exception et le gestionnaire cesse de fonctionner. `instanceof Element`.
 - Une **boîte encastrée plus sombre** au milieu d'un panneau se lit comme un trou. La
@@ -127,23 +120,20 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une **ombre au sol se centre sur la ligne de contact**, mesurée au rendu. Trop haut elle
   disparaît derrière les jambes, trop bas le personnage flotte au-dessus. Ce qui la rend
   visible c'est sa taille, pas son décalage.
-- Un élément qui **réapparaît** n'a pas besoin du même fondu que pour disparaître : au retour
-  d'un panneau, 220 ms de fondu laissaient le fond nu et produisaient un flash (mesuré
-  +6.4 unités de luminance moyenne, ramené à +0.1).
-- Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut-gauche d'une
-  tuile n'a aucun contraste (vert sur vert), le coin bas en a beaucoup (vert sur gris). Et un
-  agrandissement au plus proche voisin se lit directement, sans détecteur.
-- Pour rejouer une animation CSS, il faut que la classe soit **réellement retirée du DOM**
-  entre-temps : sans un cadre d'arrêt, React regroupe les deux états et rien ne redémarre.
-- **Ne valide jamais un défilement sans l'avoir fait déborder.** Un panneau qui tient dans sa
-  boîte ne prouve rien : injecte du texte, puis regarde `scrollTop` bouger aux flèches ET à
-  la molette.
+- Un élément qui **réapparaît** n'a pas besoin du même fondu que pour disparaître : 220 ms de
+  fondu laissaient le fond nu et produisaient un flash (+6.4 unités mesurées, ramené à +0.1).
+- Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut d'une tuile
+  n'a aucun contraste, le coin bas en a beaucoup. Et un agrandissement au plus proche voisin
+  se lit directement, sans détecteur.
+- Pour rejouer une animation CSS, la classe doit être **réellement retirée du DOM** entre-temps :
+  sans un cadre d'arrêt, React regroupe les deux états et rien ne redémarre.
+- **Ne valide jamais un défilement sans l'avoir fait déborder** : injecte du texte, puis
+  regarde `scrollTop` bouger aux flèches ET à la molette.
 - Dans un `transform`, un **pourcentage se rapporte à l'élément**, pas à la fenêtre :
   `translate(calc(100% - …))` collait l'avatar au bord gauche. Utilise `100vw`.
-- Deux objets qui doivent bouger ensemble ont besoin de la **même `transform-origin`**.
-  L'avatar (`50% 100%`) et les tuiles (`0 0`) divergeaient à chaque changement d'échelle.
-  Et une position relative à une tuile se calcule sur sa largeur **à sa profondeur**
-  (`tileW × Kʳ`), pas sur sa largeur pleine : 126 px d'erreur, corrigés à 3 px du relevé.
+- Deux objets qui bougent ensemble ont besoin de la **même `transform-origin`**, et une
+  position relative à une tuile se calcule sur sa largeur **à sa profondeur** (`tileW × Kʳ`),
+  pas sur sa largeur pleine : 126 px d'erreur, ramenés à 3 px du relevé.
 - Un test qui vise une **tuile dépassée** vise le vide : elles sortent par la gauche, avec
   une abscisse négative. Cible toujours une tuile encore à l'écran.
 - Dans une animation qui enchaîne mouvement et fondu, **vérifie que le fondu ne démarre pas
@@ -157,20 +147,18 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - **Un code HTTP 200 ne prouve pas qu'un fichier existe** : Vite en dev comme nginx renvoient
   la page HTML pour tout chemin inconnu. Contrôle le `content-type`. Et `firstAvailable`
   sonde avec `new Image()` : hors images, utilise `firstFileAvailable`.
-- Pour cadrer un modèle 3D, mesure-le **dans sa pose animée**, pas sur sa boîte de repos. Et
-  s'il peut pivoter, ce qu'il faut c'est son **rayon** horizontal max, pas sa largeur de face.
-  Ses **semelles ne touchent pas le bas du cadre** non plus (3.5 % mesurés) : sans ça il
-  flotte et son ombre tombe sous lui.
+- Pour cadrer un modèle 3D, mesure-le **dans sa pose animée**. S'il pivote, ce qu'il faut est
+  son **rayon** horizontal max, pas sa largeur de face. Et ses **semelles ne touchent pas le
+  bas du cadre** (3.5 % mesurés) : sans ça il flotte.
 - Les modèles 3D sortis d'IA arrivent avec une **texture 2048² de plusieurs mégaoctets qui
   fait 80 % du poids**. Réencoder en JPEG 1024 suffit et ne se voit pas. Le nombre de
   polygones n'est presque jamais le problème.
 - Un matériau `metalness: 1, roughness: 1` **n'a aucune composante diffuse**. Sans environment
   map il ne peut rendre que du gris terne. Le `.glb` de la console arrive comme ça : repasse
   en diélectrique (`metalness: 0`) pour retrouver du blanc.
-- Avant d'inventer un réglage d'interaction, **regarde ce que fait le site de référence** :
-  son bundle est lisible et ses constantes sont les bonnes (`<OrbitControls rotateSpeed=0.5
-  dampingFactor=0.05>` pour la console, `background-size: cover` pour les rayures CRT).
-  Trois réglages devinés ont été corrigés comme ça, dont le choix orbite/Euler.
+- Avant d'inventer un réglage d'interaction, **lis le bundle du site de référence** : ses
+  constantes sont les bonnes (`OrbitControls rotateSpeed=0.5 dampingFactor=0.05`). Plusieurs
+  réglages devinés ont été corrigés comme ça.
 
 ---
 
@@ -219,10 +207,9 @@ typographie et pastilles inchangés.
 - Les scripts jetables vont dans le scratchpad ou en `*.tmp.mjs` supprimé après usage.
 - **Un test qui échoue une fois sur six est un bug, pas du bruit.** Cherche la course (état
   transitoire lu après coup, position relevée avant que la scène bouge), n'allonge pas les délais.
-- **N'échantillonne pas une grandeur bruitée une seule fois.** Un `setTimeout` sous charge
-  donnait 115 ms pour une médiane réelle de 50. Prends la médiane de cinq et **garde la borne
-  intacte** — on fiabilise la mesure, on ne relâche pas l'exigence. Et avant de conclure à
-  une régression, mesure la cause en isolation.
+- **N'échantillonne pas une grandeur bruitée une seule fois** (115 ms lus pour une médiane
+  réelle de 50). Médiane de cinq, **borne intacte**. Et avant de conclure à une régression,
+  mesure la cause en isolation.
 - Pour comparer une typographie, **rends la MÊME chaîne**, même résolution, même boîte.
   Compare la largeur du mot et la densité d'encre. Même principe pour un glyphe : force la
   même icône des deux côtés, sinon tu compares des formes, pas des tailles.
