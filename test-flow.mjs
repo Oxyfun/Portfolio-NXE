@@ -192,24 +192,45 @@ step('← rend la main à la liste', !(await estActif()))
    changement de section — pas seulement à l'arrivée depuis l'écran d'accueil. */
 await p.evaluate(() => {
   window.__entrees = 0
+  window.__retours = 0
   new MutationObserver(() => {
     if (document.querySelector('.dash.is-entering')) window.__entrees++
+    if (document.querySelector('.dash.is-returning')) window.__retours++
   }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] })
 })
 
 await p.keyboard.press('Escape')
 await p.waitForTimeout(1400)
 step('Échap referme la lame', (await p.locator('.blade').count()) === 0)
+/* Au retour d'une lame, les cartes COULISSENT (`is-returning`) au lieu de se
+   dépiler : elles n'ont jamais quitté leur place, les faire repartir du paquet
+   montrait la grande carte de gauche pendant toute l'animation. */
 step(
-  "sortir d'une carte rejoue l'animation des cartes",
-  (await p.evaluate(() => window.__entrees)) > 0,
+  "sortir d'une carte fait coulisser les cartes",
+  (await p.evaluate(() => window.__retours)) > 0,
 )
-await p.evaluate(() => (window.__entrees = 0))
+step(
+  "sortir d'une carte ne rejoue PAS le dépilement",
+  (await p.evaluate(() => window.__entrees)) === 0,
+)
+await p.evaluate(() => {
+  window.__entrees = 0
+  window.__retours = 0
+})
 await p.keyboard.press('ArrowDown')
 await p.waitForTimeout(1400)
 step(
-  'changer de section la rejoue aussi',
+  'changer de section rejoue bien le dépilement',
   (await p.evaluate(() => window.__entrees)) > 0,
+)
+
+/* Le « flash » au retour : le voile de la lame disparaît d'un coup, et si les
+   cartes mettaient du temps à réapparaître le fond restait nu. Mesuré avant
+   correction : +6.4 unités de luminance moyenne. On vérifie que la rangée
+   revient SANS fondu. */
+step(
+  'la rangée revient sans fondu (pas de flash)',
+  (await p.locator('.row').evaluate((e) => getComputedStyle(e).transitionDuration)) === '0s',
 )
 await p.keyboard.press('ArrowUp')
 await p.waitForTimeout(1400)

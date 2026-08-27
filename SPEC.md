@@ -863,6 +863,23 @@ droite — centre à 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écr
 taille × 1.04. Il passe aussi **devant** le panneau, sinon son bras se fait
 manger par le bord.
 
+### 8 octies. Placer une ombre au sol
+
+Le centre de l'ellipse va **exactement sur la ligne des semelles**, mesurée au
+rendu sur 16 instants : 14 px sur un canevas de 405, soit 3.46 % de la hauteur
+du bloc. Pour une ellipse haute de 15 %, `bottom = 3.46 − 7.5 = −4 %`.
+
+Deux erreurs faites avant d'y arriver, opposées :
+
+- centrée trop **haut**, les deux tiers de l'ellipse passent derrière les
+  jambes. Elle assombrit pourtant bien le sol — mesuré 68 unités — mais on n'en
+  voit que les bords, et elle paraît absente ;
+- descendue **sous** la ligne des semelles « pour qu'on la voie mieux », le
+  personnage se met à flotter au-dessus de son ombre.
+
+Ce qui la rend visible, c'est sa **taille** (84 % × 15 % du bloc), pas son
+décalage.
+
 ### 8 septies. Les semelles ne touchent pas le bas du cadre
 
 Mesuré au rendu sur 12 instants d'animation : **14 à 15 px sur 405, soit 3.5 %

@@ -119,7 +119,17 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une **boîte encastrée plus sombre** au milieu d'un panneau se lit comme un trou. La
   référence pose son contenu à même la surface quand il n'y a pas d'image.
 - Quand deux propriétés composent un même changement d'état (fond + couleur du texte),
-  **transitionne les deux** : n'en animer qu'une donne un effet en deux temps qui se voit.
+  **transitionne les deux** — et vérifie qu'elles sont interpolables : un `linear-gradient`
+  ne s'anime pas depuis `transparent`, il saute. Le plus sûr est de tout rendre instantané.
+- **Un calque plein écran qui ferme quelque chose doit avoir un `z-index` explicite**, sinon
+  il vole les clics de ses voisins. `.blade-scrim` l'a fait deux fois : à la légende, puis au
+  panneau de détail (qui est en `z-index: -1` pour passer derrière la lame).
+- Une **ombre au sol se centre sur la ligne de contact**, mesurée au rendu. Trop haut elle
+  disparaît derrière les jambes, trop bas le personnage flotte au-dessus. Ce qui la rend
+  visible c'est sa taille, pas son décalage.
+- Un élément qui **réapparaît** n'a pas besoin du même fondu que pour disparaître : au retour
+  d'un panneau, 220 ms de fondu laissaient le fond nu et produisaient un flash (mesuré
+  +6.4 unités de luminance moyenne, ramené à +0.1).
 - Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut-gauche d'une
   tuile n'a aucun contraste (vert sur vert), le coin bas en a beaucoup (vert sur gris). Et un
   agrandissement au plus proche voisin se lit directement, sans détecteur.

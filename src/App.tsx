@@ -22,6 +22,7 @@ export default function App() {
   const { play, unlock } = useSounds()
   const [booted, setBooted] = useState(skipBoot)
   const [entering, setEntering] = useState(false)
+  const [retour, setRetour] = useState(false)
 
   const [sectionIdx, setSectionIdx] = useState(0)
   const [tileIdx, setTileIdx] = useState(0)
@@ -56,6 +57,18 @@ export default function App() {
     requestAnimationFrame(() => {
       setEntering(true)
       entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
+    })
+  }, [])
+
+  /* Retour depuis une lame : simple coulissement, pas de dépilement. Les cartes
+     n'ont jamais bougé, les faire repartir du paquet n'aurait aucun sens. */
+  const retourTimer = useRef(0)
+  const rejouerRetour = useCallback(() => {
+    setRetour(false)
+    window.clearTimeout(retourTimer.current)
+    requestAnimationFrame(() => {
+      setRetour(true)
+      retourTimer.current = window.setTimeout(() => setRetour(false), 800)
     })
   }, [])
 
@@ -100,8 +113,8 @@ export default function App() {
     setOpenIdx(null)
     setZone('liste')
     play('back')
-    rejouerEntree()
-  }, [play, rejouerEntree])
+    rejouerRetour()
+  }, [play, rejouerRetour])
 
   const activateRow = useCallback(
     (i: number) => {
@@ -281,7 +294,11 @@ export default function App() {
 
   return (
     <>
-      <main className={`dash${entering ? ' is-entering' : ''}${openTile ? ' has-blade' : ''}`}>
+      <main
+        className={`dash${entering ? ' is-entering' : ''}${retour ? ' is-returning' : ''}${
+          openTile ? ' has-blade' : ''
+        }`}
+      >
       <Background />
       <Header previous={previousLabel} current={section.label} hidden={!!openTile} />
       <Profile />

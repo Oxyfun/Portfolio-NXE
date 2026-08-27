@@ -8,9 +8,13 @@
   z-index: 60;
 }
 
+/* Sous les deux panneaux. Il était au-dessus du panneau de détail, qui est en
+   `z-index: -1` pour passer derrière la lame de devant : tout clic sur le
+   détail atteignait donc le voile et refermait la lame. */
 .blade-scrim {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background: rgba(0, 0, 0, 0.28);
   animation: fade-in 200ms ease-out;
 }
@@ -26,6 +30,7 @@
 
 .blade {
   position: absolute;
+  z-index: 2;
   left: 7.9%;
   top: 15.6vh;
   width: 41.8%;
@@ -60,7 +65,8 @@
   min-height: 0;
   max-height: 62vh;
   display: flex;
-  z-index: -1;
+  /* Derrière la lame de devant (2) mais DEVANT le voile (0). */
+  z-index: 1;
   /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
      sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
      contre #2d353d pour la lame de devant. */
@@ -226,14 +232,12 @@
   text-decoration: none;
   border-radius: 0.6vh;
   border-bottom: 1px solid var(--panel-rule);
-  /* Le fond ET la couleur du texte changent ensemble. Seule la couleur était
-     transitionnée : le vert apparaissait d'un coup et le texte blanchissait
-     120 ms plus tard, ce qui se voyait comme deux étapes distinctes. */
-  background: linear-gradient(to bottom, transparent, transparent);
-  transition:
-    color 120ms linear,
-    background 120ms linear,
-    box-shadow 120ms linear;
+  /* AUCUNE transition : le fond et la couleur changent dans la même image.
+     Transitionner les deux ne suffisait pas — un `linear-gradient` ne
+     s'interpole pas depuis `transparent`, donc le vert continuait d'apparaître
+     d'un coup pendant que le texte mettait 120 ms. La sélection du NXE est de
+     toute façon instantanée. */
+  transition: none;
 }
 
 .blade-row:last-child {

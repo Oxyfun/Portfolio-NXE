@@ -707,12 +707,25 @@
   /* Sous les SEMELLES, pas sous le cadre : dans sa pose animée le personnage
      ne pose pas ses pieds au bas du canevas mais 3.5 % plus haut (mesuré au
      rendu sur 12 instants). L'ombre était donc décrochée sous lui. */
-  bottom: 3.5%;
+  /* Le CENTRE de l'ellipse tombe sous la ligne des pieds, pas dessus : au sol,
+     vu en perspective, une ombre s'étale vers l'observateur. Centrée sur les
+     semelles elle passait pour moitié derrière le personnage et on n'en voyait
+     presque rien.
+     Semelles à 3.5 % du bas, ellipse haute de 13 % : `bottom: -3%` place son
+     centre 3.5 points sous elles. */
+  /* Le centre de l'ellipse tombe EXACTEMENT sur la ligne des semelles, mesurée
+     au rendu sur 16 instants d'animation : 14 px sur un canevas de 405, soit
+     3.46 % de la hauteur du bloc. Pour une ellipse haute de 15 %, cela donne
+     `bottom = 3.46 − 7.5 = −4 %`.
+     Descendre le centre sous cette ligne « pour qu'on la voie mieux » est une
+     fausse bonne idée : le personnage se met à flotter au-dessus de son ombre.
+     Ce qui la rend visible, c'est sa taille, pas son décalage. */
+  bottom: -4%;
   /* Plus large et plus dense qu'au relevé : la référence n'en montre presque
      pas, mais notre sol est plus clair et une ombre discrète y disparaissait
      complètement. Écart assumé, au bénéfice de la lisibilité. */
-  width: 62%;
-  height: 10%;
+  width: 84%;
+  height: 15%;
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse 50% 50% at 50% 50%,
@@ -785,11 +798,20 @@
 }
 
 /* Lame ouverte : la rangée s'efface. Ni image8 ni image10 ne laissent voir de
-   carte derrière les panneaux — seulement le fond. */
+   carte derrière les panneaux — seulement le fond.
+   Elle DISPARAÎT en fondu mais REVIENT d'un coup : au retour, le voile de la
+   lame s'efface instantanément, et si les cartes mettaient 220 ms à réapparaître
+   le fond clair restait nu pendant ce temps. Mesuré : un pic de +6.4 unités de
+   luminance moyenne à 110 ms, puis retour à la normale — c'est le « flash ».
+   Les cartes sont là tout de suite ; c'est leur glissement qui fait l'animation. */
+.row {
+  transition: opacity 0ms;
+}
+
 .dash.has-blade .row {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms ease-out;
+  transition: opacity 200ms ease-out;
 }
 
 /* ── Arrivée dans le dashboard ───────────────────────────────────────────
@@ -805,6 +827,25 @@
      trop rapide pour se lire — on voyait le résultat, pas le geste. */
   animation: carte-depile 640ms var(--ease-nxe) backwards;
   animation-delay: calc(var(--tile-i, 0) * 165ms);
+}
+
+/* Retour depuis une lame : les cartes ne se dépilent pas, elles coulissent
+   simplement jusqu'à leur place, à pleine opacité. Le dépilement fait partir
+   toutes les cartes de la position de la première, donc on voyait la grande
+   carte de gauche pendant toute l'animation — ce qui n'a pas de sens au retour,
+   puisqu'elles n'ont jamais quitté leur place. */
+.dash.is-returning .tile {
+  animation: carte-revient 420ms var(--ease-nxe) backwards;
+  animation-delay: calc(var(--tile-i, 0) * 70ms);
+}
+
+@keyframes carte-revient {
+  from {
+    transform: translate(var(--x), var(--y)) scale(var(--s)) translateX(14%);
+  }
+  to {
+    transform: translate(var(--x), var(--y)) scale(var(--s));
+  }
 }
 
 @keyframes carte-depile {
@@ -843,7 +884,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dash.is-entering .tile {
+  .dash.is-entering .tile,
+  .dash.is-returning .tile {
     animation: none;
   }
   .legend-item:active,
