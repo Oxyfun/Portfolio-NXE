@@ -160,6 +160,8 @@
    Fil d'Ariane à trois lignes : section précédente / nom du site / section
    courante. Les lignes remontent quand on change de section. */
 
+/* Les lignes sont des boutons depuis qu'elles naviguent : le conteneur laisse
+   donc passer les clics, mais chaque ligne les reçoit. */
 .header {
   position: absolute;
   left: var(--margin-x);
@@ -167,6 +169,12 @@
   line-height: 1;
   pointer-events: none;
   z-index: 40;
+}
+
+.crumb-titre {
+  margin: 0;
+  font: inherit;
+  font-weight: inherit;
 }
 
 /* Chaque ligne est positionnée par sa hauteur de capitale relevée sur image4
@@ -179,6 +187,16 @@
   white-space: nowrap;
   letter-spacing: var(--track-ui);
   margin: 0;
+  /* On neutralise le style natif du bouton mais on garde le focus clavier. */
+  pointer-events: auto;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-shadow: var(--ink-shadow);
   transition: transform var(--dur-slide) var(--ease-nxe),
     opacity var(--dur-slide) var(--ease-nxe);
 }
@@ -203,6 +221,12 @@
 
 .crumb.is-entering {
   animation: crumb-rise var(--dur-slide) var(--ease-nxe);
+}
+
+/* Le survol n'éclaircit que la ligne visée : c'est le seul indice qu'elle est
+   cliquable, le fil d'Ariane n'ayant l'air de rien d'autre qu'un titre. */
+.crumb:hover {
+  color: #ffffff;
 }
 
 @keyframes crumb-rise {
@@ -505,11 +529,24 @@
   white-space: nowrap;
   background: none;
   border: 0;
-  padding: 0.4vh 0.8vh;
-  margin: -0.4vh -0.8vh;
+  /* NI padding NI marge : `measure.mjs` calcule la hauteur de capitale depuis
+     le bord de la boîte, et un padding de 0.4 vh la faisait remonter de 3.4 px
+     — hors tolérance sans que rien ne bouge à l'écran. La zone cliquable est
+     élargie par un pseudo-élément, qui ne touche pas à la mise en page.
+     `line-height: 1` explicite : un bouton n'hérite pas de celui du corps, et
+     `normal` fausse le même calcul. */
+  padding: 0;
+  margin: 0;
   font: inherit;
+  line-height: 1;
+  position: relative;
   cursor: pointer;
-  border-radius: 0.6vh;
+}
+
+.legend-item::after {
+  content: '';
+  position: absolute;
+  inset: -0.7vh -1.1vh;
 }
 
 .legend-item:hover {

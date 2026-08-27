@@ -87,6 +87,20 @@ export default function App() {
     [play, rejouerRetour],
   )
 
+  /* Saut direct à une section, pour le nom du site qui ramène à l'accueil. */
+  const allerSection = useCallback(
+    (i: number) => {
+      setSectionIdx((cur) => {
+        if (i === cur) return cur
+        play('section')
+        setTileIdx(0)
+        rejouerRetour()
+        return i
+      })
+    },
+    [play, rejouerRetour],
+  )
+
   const open = useCallback(
     (i: number) => {
       setOpenIdx(i)
@@ -290,7 +304,14 @@ export default function App() {
         }`}
       >
       <Background />
-      <Header previous={previousLabel} current={section.label} hidden={!!openTile} />
+      <Header
+        previous={previousLabel}
+        current={section.label}
+        hidden={!!openTile}
+        onPrevious={() => moveSection(-1)}
+        onNext={() => moveSection(1)}
+        onHome={() => allerSection(0)}
+      />
       <Profile />
 
       <TileRow tiles={tiles} selected={tileIdx} onSelect={selectTile} onOpen={open} />

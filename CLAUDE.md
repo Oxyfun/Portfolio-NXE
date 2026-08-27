@@ -114,6 +114,11 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Quand deux propriétés composent un même changement d'état (fond + couleur du texte),
   **transitionne les deux** — et vérifie qu'elles sont interpolables : un `linear-gradient`
   ne s'anime pas depuis `transparent`, il saute. Le plus sûr est de tout rendre instantané.
+- Transformer un `<span>` en `<button>` **déplace la géométrie** : `padding` et
+  `line-height: normal` faussent la hauteur de capitale que `measure.mjs` calcule depuis le
+  bord de la boîte. Élargis la zone cliquable par un pseudo-élément. Et **lance
+  `measure.mjs`** après tout changement de balise : je ne l'avais pas fait, l'écart est resté
+  deux commits.
 - **Un calque plein écran qui ferme quelque chose doit avoir un `z-index` explicite**, sinon
   il vole les clics de ses voisins. `.blade-scrim` l'a fait deux fois : à la légende, puis au
   panneau de détail (qui est en `z-index: -1` pour passer derrière la lame).

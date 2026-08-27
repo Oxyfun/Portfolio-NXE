@@ -308,6 +308,29 @@ await p.keyboard.press('ArrowUp')
 await p.waitForTimeout(700)
 step("↑ ramène à l'accueil", (await p.locator('.crumb-3').innerText()).trim() === 'Accueil')
 
+/* Le fil d'Ariane navigue : c'était le seul endroit du dashboard où l'on ne
+   pouvait rien cliquer, et la flèche du haut était la seule façon de changer
+   de section. Chaque ligne va dans le sens que sa position indique. */
+const sectionCourante = () => p.locator('.crumb-3').innerText()
+step(
+  "les trois lignes du fil d'Ariane sont des boutons",
+  await p.evaluate(() => [...document.querySelectorAll('.crumb')].every((e) => e.tagName === 'BUTTON')),
+)
+const secDepart = await sectionCourante()
+await p.locator('.crumb-3').click()
+await p.waitForTimeout(900)
+const secSuivante = await sectionCourante()
+step(`cliquer la ligne du bas avance (${secDepart} → ${secSuivante})`, secSuivante !== secDepart)
+await p.locator('.crumb-1').click()
+await p.waitForTimeout(900)
+step(`cliquer la ligne du haut recule (→ ${await sectionCourante()})`, (await sectionCourante()) === secDepart)
+await p.locator('.crumb-3').click()
+await p.waitForTimeout(900)
+await p.locator('.crumb-2').click()
+await p.waitForTimeout(900)
+step("cliquer le nom du site ramène à l'accueil", (await sectionCourante()).trim() === 'Accueil')
+
+
 /* Le survol ne doit plus sélectionner : passer la souris au-dessus de la rangée
    faisait défiler les cartes sans qu'on l'ait demandé. */
 await p.keyboard.press('ArrowRight')

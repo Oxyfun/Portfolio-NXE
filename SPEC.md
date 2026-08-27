@@ -356,6 +356,27 @@ ligne 3 `#ffffff`. Ombre `0 2px 5px rgba(0,0,0,.45)` sur les trois.
 
 ---
 
+### 3 bis. Le fil d'Ariane navigue
+
+C'était le seul endroit du dashboard où rien n'était cliquable, et la flèche du
+haut restait la seule façon de changer de section. Les trois lignes sont
+désormais des boutons, chacune dans le sens que sa position indique — le fil
+remonte quand on avance, donc la ligne du haut recule et celle du bas avance.
+Le nom du site ramène à l'accueil, comme un logo.
+
+**Écart assumé** : les références ne montrent aucune interaction ici, et pour
+cause, c'est une console. Rien ne change à l'écran, seul le survol éclaircit la
+ligne visée.
+
+**Piège déjà payé une fois sur la légende, évité ici** : un `<span>` devenu
+`<button>` ne doit recevoir ni `padding` ni `line-height: normal`. `measure.mjs`
+calcule la hauteur de capitale depuis le bord de la boîte : 0.4 vh de padding la
+faisait remonter de 3.4 px et sortait de la tolérance sans que rien ne bouge à
+l'écran. La zone cliquable s'élargit par un pseudo-élément, qui ne touche pas à
+la mise en page. Géométrie du fil après coup : +0.8, +0.1, +0.4 px.
+
+---
+
 ## 4. Pied de page
 
 Relevés sur image4 (distances depuis le bas du contenu, H = 1334) :

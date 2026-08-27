@@ -31,18 +31,52 @@ export function Header({
   previous,
   current,
   hidden,
+  onPrevious,
+  onNext,
+  onHome,
 }: {
   previous: string
   current: string
   hidden?: boolean
+  onPrevious(): void
+  onNext(): void
+  onHome(): void
 }) {
   // image3 et image5 : quand une lame est ouverte, le fil d'Ariane disparaît.
   if (hidden) return null
+  /* Les trois lignes naviguent, chacune dans le sens que sa position indique :
+     le fil d'Ariane remonte quand on avance, donc la ligne du haut ramène en
+     arrière et celle du bas fait avancer. Le nom du site ramène à l'accueil,
+     comme un logo. Sans ça, seule la flèche du haut permettait de changer de
+     section. */
   return (
     <header className="header" key={current}>
-      <span className="crumb crumb-1 is-entering">{previous}</span>
-      <span className="crumb crumb-2 is-entering">{siteName}</span>
-      <h1 className="crumb crumb-3 is-entering">{current}</h1>
+      <button
+        type="button"
+        className="crumb crumb-1 is-entering"
+        onClick={onPrevious}
+        aria-label={`Aller à la section précédente : ${previous}`}
+      >
+        {previous}
+      </button>
+      <button
+        type="button"
+        className="crumb crumb-2 is-entering"
+        onClick={onHome}
+        aria-label="Revenir à l'accueil"
+      >
+        {siteName}
+      </button>
+      <h1 className="crumb-titre">
+        <button
+          type="button"
+          className="crumb crumb-3 is-entering"
+          onClick={onNext}
+          aria-label={`${current} — aller à la section suivante`}
+        >
+          {current}
+        </button>
+      </h1>
     </header>
   )
 }
