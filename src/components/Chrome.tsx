@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react'
 import { Anneaux } from './Anneaux'
 import { firstAvailable } from '../lib/assets'
-import { profile, siteName } from '../data/content'
+import { profile } from '../data/content'
 
 export function Background() {
   return (
@@ -28,55 +28,50 @@ export function Background() {
  * rejouent leur remontée.
  */
 export function Header({
-  previous,
-  current,
+  sections: libelles,
+  index,
   hidden,
-  onPrevious,
-  onNext,
-  onHome,
+  onAller,
 }: {
-  previous: string
-  current: string
+  sections: string[]
+  index: number
   hidden?: boolean
-  onPrevious(): void
-  onNext(): void
-  onHome(): void
+  onAller(i: number): void
 }) {
   // image3 et image5 : quand une lame est ouverte, le fil d'Ariane disparaît.
   if (hidden) return null
-  /* Les trois lignes naviguent, chacune dans le sens que sa position indique :
-     le fil d'Ariane remonte quand on avance, donc la ligne du haut ramène en
-     arrière et celle du bas fait avancer. Le nom du site ramène à l'accueil,
-     comme un logo. Sans ça, seule la flèche du haut permettait de changer de
-     section. */
+
+  /* Une roue de sections : la ligne du BAS est la page courante, les deux
+     au-dessus sont celles qui la précèdent, dans l'ordre. Cliquer une ligne
+     mène à la section qu'elle nomme — on va où c'est écrit, rien à deviner.
+     Avant, la ligne du milieu portait le nom du site : mélangée à deux sections,
+     elle rendait le fil illisible dès qu'on essayait de cliquer dedans. */
+  const n = libelles.length
+  const roue = [(index - 2 + n * 2) % n, (index - 1 + n) % n, index]
+
   return (
-    <header className="header" key={current}>
-      <button
-        type="button"
-        className="crumb crumb-1 is-entering"
-        onClick={onPrevious}
-        aria-label={`Aller à la section précédente : ${previous}`}
-      >
-        {previous}
-      </button>
-      <button
-        type="button"
-        className="crumb crumb-2 is-entering"
-        onClick={onHome}
-        aria-label="Revenir à l'accueil"
-      >
-        {siteName}
-      </button>
-      <h1 className="crumb-titre">
-        <button
-          type="button"
-          className="crumb crumb-3 is-entering"
-          onClick={onNext}
-          aria-label={`${current} — aller à la section suivante`}
-        >
-          {current}
-        </button>
-      </h1>
+    <header className="header" key={index}>
+      {roue.map((sec, rang) => {
+        const courant = rang === 2
+        const bouton = (
+          <button
+            type="button"
+            className={`crumb crumb-${rang + 1} is-entering`}
+            onClick={() => onAller(sec)}
+            aria-current={courant ? 'page' : undefined}
+            aria-label={courant ? `Section courante : ${libelles[sec]}` : `Aller à ${libelles[sec]}`}
+          >
+            {libelles[sec]}
+          </button>
+        )
+        return courant ? (
+          <h1 className="crumb-titre" key={sec}>
+            {bouton}
+          </h1>
+        ) : (
+          <span key={sec}>{bouton}</span>
+        )
+      })}
     </header>
   )
 }

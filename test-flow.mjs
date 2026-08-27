@@ -219,17 +219,14 @@ await p.evaluate(() => {
 })
 await p.keyboard.press('ArrowDown')
 await p.waitForTimeout(1400)
-/* Changement de section : coulissement lui aussi, pas dépilement. Le
-   dépilement fait apparaître les cartes en fondu et laisse le fond nu pendant
-   le décalage — le même flash qu'au retour d'une lame. Il est réservé à la
-   toute première arrivée depuis l'écran d'accueil. */
+/* Changement de section : DÉPILEMENT, comme à l'arrivée sur le site — les
+   cartes partent empilées sur la première et s'étalent vers la droite. Il ne
+   produit plus de flash depuis qu'il n'anime plus l'opacité : c'était elle qui
+   laissait le fond nu pendant le décalage. Seul le retour d'une lame utilise
+   le coulissement, parce que les cartes n'ont pas bougé entre-temps. */
 step(
-  'changer de section fait coulisser les cartes',
-  (await p.evaluate(() => window.__retours)) > 0,
-)
-step(
-  'changer de section ne rejoue pas le dépilement',
-  (await p.evaluate(() => window.__entrees)) === 0,
+  'changer de section rejoue le dépilement',
+  (await p.evaluate(() => window.__entrees)) > 0,
 )
 
 /* Le « flash » au retour : le voile de la lame disparaît d'un coup, et si les
@@ -308,27 +305,41 @@ await p.keyboard.press('ArrowUp')
 await p.waitForTimeout(700)
 step("↑ ramène à l'accueil", (await p.locator('.crumb-3').innerText()).trim() === 'Accueil')
 
-/* Le fil d'Ariane navigue : c'était le seul endroit du dashboard où l'on ne
-   pouvait rien cliquer, et la flèche du haut était la seule façon de changer
-   de section. Chaque ligne va dans le sens que sa position indique. */
+/* Le fil d'Ariane est une ROUE de sections : la ligne du bas est la page
+   courante, les deux au-dessus celles qui la précèdent, dans l'ordre. Cliquer
+   une ligne mène à la section qu'elle nomme — on va où c'est écrit.
+   Avant, la ligne du milieu portait le nom du site : mélangée à deux sections,
+   cliquer dedans n'avait aucune logique. */
+const roue = () =>
+  p.evaluate(() => [...document.querySelectorAll('.crumb')].map((e) => e.textContent.trim()))
 const sectionCourante = () => p.locator('.crumb-3').innerText()
+
 step(
   "les trois lignes du fil d'Ariane sont des boutons",
-  await p.evaluate(() => [...document.querySelectorAll('.crumb')].every((e) => e.tagName === 'BUTTON')),
+  await p.evaluate(() =>
+    [...document.querySelectorAll('.crumb')].every((e) => e.tagName === 'BUTTON'),
+  ),
 )
-const secDepart = await sectionCourante()
-await p.locator('.crumb-3').click()
-await p.waitForTimeout(900)
-const secSuivante = await sectionCourante()
-step(`cliquer la ligne du bas avance (${secDepart} → ${secSuivante})`, secSuivante !== secDepart)
-await p.locator('.crumb-1').click()
-await p.waitForTimeout(900)
-step(`cliquer la ligne du haut recule (→ ${await sectionCourante()})`, (await sectionCourante()) === secDepart)
-await p.locator('.crumb-3').click()
-await p.waitForTimeout(900)
-await p.locator('.crumb-2').click()
-await p.waitForTimeout(900)
-step("cliquer le nom du site ramène à l'accueil", (await sectionCourante()).trim() === 'Accueil')
+step(
+  'la ligne du bas est la section courante',
+  (await roue())[2] === (await sectionCourante()).trim(),
+)
+
+// Cliquer une ligne mène EXACTEMENT à la section qu'elle nomme.
+for (const rang of [1, 2]) {
+  const avant = await roue()
+  await p.locator(`.crumb-${rang}`).click()
+  await p.waitForTimeout(900)
+  const apres = await roue()
+  step(`cliquer « ${avant[rang - 1]} » y mène (bas → ${apres[2]})`, apres[2] === avant[rang - 1])
+}
+
+// On repasse sur l'accueil pour la suite du parcours.
+while ((await sectionCourante()).trim() !== 'Accueil') {
+  await p.locator('.crumb-2').click()
+  await p.waitForTimeout(800)
+}
+step("retour à l'accueil par le fil d'Ariane", (await sectionCourante()).trim() === 'Accueil')
 
 
 /* Le survol ne doit plus sélectionner : passer la souris au-dessus de la rangée

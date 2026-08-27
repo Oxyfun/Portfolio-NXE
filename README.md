@@ -42,7 +42,7 @@ Autres scripts :
 | **Entrée** | ouvrir la tuile / valider la ligne |
 | **Échap**, **Retour arrière** | revenir |
 | **Molette** | tuile précédente / suivante (le survol ne sélectionne plus) |
-| **Fil d'Ariane** | les trois lignes en haut à gauche naviguent : la ligne du haut recule d'une section, celle du bas avance, le nom du site ramène à l'accueil |
+| **Fil d'Ariane** | les trois lignes en haut à gauche sont trois sections : celle du bas est la page courante, les deux au-dessus la précèdent. Cliquer une ligne mène à la section qu'elle nomme |
 | Souris | clic sur une tuile pour la sélectionner, clic sur la tuile sélectionnée pour l'ouvrir |
 | **Tab** | parcourt tuiles, boutons de légende et entrées de la lame |
 | **Espace** | comme Entrée |

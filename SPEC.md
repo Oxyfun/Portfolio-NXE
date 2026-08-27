@@ -356,13 +356,20 @@ ligne 3 `#ffffff`. Ombre `0 2px 5px rgba(0,0,0,.45)` sur les trois.
 
 ---
 
-### 3 bis. Le fil d'Ariane navigue
+### 3 bis. Le fil d'Ariane est une roue de sections
 
 C'était le seul endroit du dashboard où rien n'était cliquable, et la flèche du
-haut restait la seule façon de changer de section. Les trois lignes sont
-désormais des boutons, chacune dans le sens que sa position indique — le fil
-remonte quand on avance, donc la ligne du haut recule et celle du bas avance.
-Le nom du site ramène à l'accueil, comme un logo.
+haut restait la seule façon de changer de section.
+
+Les trois lignes portent désormais **trois sections** : la ligne du bas est la
+page courante, les deux au-dessus celles qui la précèdent, dans l'ordre.
+Cliquer une ligne mène à la section qu'elle nomme — on va où c'est écrit.
+
+Premier essai : ligne du haut → précédente, milieu → nom du site → accueil,
+bas → suivante. Illisible à l'usage, parce que la ligne du milieu n'était pas
+une page et que les deux autres ne menaient pas où elles étaient écrites. Le
+nom du site quitte donc l'en-tête — **écart avec les références**, où il occupe
+la ligne du bas.
 
 **Écart assumé** : les références ne montrent aucune interaction ici, et pour
 cause, c'est une console. Rien ne change à l'écran, seul le survol éclaircit la

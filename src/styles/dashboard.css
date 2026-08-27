@@ -885,17 +885,17 @@
   }
 }
 
+/* AUCUNE variation d'opacité : c'est elle qui produisait le flash. Pendant le
+   décalage, les cartes pas encore apparues laissaient le fond clair à nu, et la
+   luminance moyenne montait de 6.4 unités avant de retomber. Les cartes sont
+   là dès la première image, empilées sur la première ; c'est leur dépilement
+   seul qui fait l'animation. */
 @keyframes carte-depile {
   from {
     transform: translate(var(--x0), var(--y0)) scale(1);
-    opacity: 0;
-  }
-  22% {
-    opacity: 1;
   }
   to {
     transform: translate(var(--x), var(--y)) scale(var(--s));
-    opacity: 1;
   }
 }
 

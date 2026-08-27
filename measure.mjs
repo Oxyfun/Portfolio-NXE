@@ -55,7 +55,12 @@ await page.goto(BASE + '/?boot=0', { waitUntil: 'networkidle' })
 await page.evaluate(() => document.fonts.ready)
 await page.waitForTimeout(800)
 await page.keyboard.press('ArrowDown')
-await page.waitForTimeout(700)
+/* On ATTEND LA FIN de la mise en scène d'entrée au lieu d'un délai fixe : elle
+   dure 640 ms plus 165 par carte, et un `waitForTimeout(700)` mesurait les
+   dernières tuiles en plein vol — 36 px d'écart sur `tile2.right`, sans que
+   rien n'ait bougé dans la mise en page. */
+await page.waitForFunction(() => !document.querySelector('.dash.is-entering'), { timeout: 6000 })
+await page.waitForTimeout(250)
 
 const got = await page.evaluate(() => {
   const out = {}

@@ -35,13 +35,27 @@ export default function App() {
 
   const section = sections[sectionIdx]
   const tiles = section.tiles
-  const previousLabel = useMemo(
-    () => sections[(sectionIdx - 1 + sections.length) % sections.length].label,
-    [sectionIdx],
-  )
+  const libelles = useMemo(() => sections.map((s) => s.label), [])
 
   useEffect(() => {
     void installSceneAssets()
+  }, [])
+
+  /* Dépilement : les cartes partent empilées sur la première et s'étalent vers
+     la droite. Sert à l'arrivée depuis l'écran d'accueil ET à chaque changement
+     de section — c'est un nouveau jeu de cartes à chaque fois. Il ne fait plus
+     de flash depuis qu'il n'anime plus l'opacité. */
+  const entreeTimer = useRef(0)
+  const rejouerEntree = useCallback(() => {
+    setEntering(false)
+    window.clearTimeout(entreeTimer.current)
+    /* Un cadre d'arrêt avant de remettre la classe : sans ça React regroupe les
+       deux mises à jour, la classe n'est jamais retirée du DOM et l'animation ne
+       redémarre pas. */
+    requestAnimationFrame(() => {
+      setEntering(true)
+      entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
+    })
   }, [])
 
   /* Retour depuis une lame : simple coulissement, pas de dépilement. Les cartes
@@ -75,30 +89,27 @@ export default function App() {
         if (next !== cur) {
           play('section')
           setTileIdx(0)
-          /* Coulissement, pas dépilement : le dépilement fait apparaître les
-             cartes en fondu, et pendant le décalage le fond reste nu — même
-             flash qu'au retour d'une lame. Le dépilement est réservé à la
-             toute première arrivée depuis l'écran d'accueil. */
-          rejouerRetour()
+          rejouerEntree()
         }
         return next
       })
     },
-    [play, rejouerRetour],
+    [play, rejouerEntree],
   )
 
-  /* Saut direct à une section, pour le nom du site qui ramène à l'accueil. */
+  /* Saut direct à une section : c'est ce que fait le fil d'Ariane, où chaque
+     ligne mène à la section qu'elle nomme. */
   const allerSection = useCallback(
     (i: number) => {
       setSectionIdx((cur) => {
         if (i === cur) return cur
         play('section')
         setTileIdx(0)
-        rejouerRetour()
+        rejouerEntree()
         return i
       })
     },
-    [play, rejouerRetour],
+    [play, rejouerEntree],
   )
 
   const open = useCallback(
@@ -305,12 +316,10 @@ export default function App() {
       >
       <Background />
       <Header
-        previous={previousLabel}
-        current={section.label}
+        sections={libelles}
+        index={sectionIdx}
         hidden={!!openTile}
-        onPrevious={() => moveSection(-1)}
-        onNext={() => moveSection(1)}
-        onHome={() => allerSection(0)}
+        onAller={allerSection}
       />
       <Profile />
 

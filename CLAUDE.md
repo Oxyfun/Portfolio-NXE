@@ -125,6 +125,12 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une **ombre au sol se centre sur la ligne de contact**, mesurée au rendu. Trop haut elle
   disparaît derrière les jambes, trop bas le personnage flotte au-dessus. Ce qui la rend
   visible c'est sa taille, pas son décalage.
+- Une animation d'entrée ne doit **pas toucher à l'opacité** si le décalage est long : les
+  cartes pas encore apparues laissent le fond à nu et ça se voit comme un flash. Le seul
+  mouvement suffit.
+- **Allonger une animation dérègle les outils qui mesurent après un délai fixe.** `measure.mjs`
+  attendait 700 ms là où le dépilement en dure 970 : 36 px d'écart sur une tuile, sans que rien
+  n'ait bougé. Attends la FIN (`waitForFunction`), pas une durée.
 - Un élément qui **réapparaît** n'a pas besoin du même fondu que pour disparaître : 220 ms de
   fondu laissaient le fond nu et produisaient un flash (+6.4 unités mesurées, ramené à +0.1).
 - Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut d'une tuile
