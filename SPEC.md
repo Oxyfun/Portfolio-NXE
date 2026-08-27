@@ -401,6 +401,22 @@ après le premier, en glissant de la droite.
 
 ---
 
+### 5 ter. Le voile de la lame volait les clics
+
+Les trois boutons de légende faisaient tous la même chose : ils ne faisaient
+rien, et le clic atteignait `.blade-scrim` — le voile plein écran qui ferme la
+lame. D'où « Sélectionner » sans effet, et « Ouvrir » comme « Retour » qui
+fermaient tous les deux.
+
+Deux causes empilées, il fallait corriger les deux :
+
+1. c'étaient des `<span>`, donc purement décoratifs ;
+2. même transformés en `<button>`, le pied de page était en `z-index: 40`
+   sous `.blade-layer` (60) : le voile continuait d'intercepter le clic.
+
+Le pied est passé à 80. C'est Playwright qui a désigné le coupable, en
+rapportant `<button class="blade-scrim"> intercepts pointer events`.
+
 ### 5 bis. Ce qu'image8 et image10 ont corrigé
 
 La lame était le défaut le plus visible du site. Quatre corrections, toutes
@@ -847,6 +863,43 @@ se voit pas sur une respiration lente, mais très bien sur un objet qui suit la
 souris : c'est le décalage curseur/personnage qui devient saccadé. Le plafond ne
 protège l'ordonnancement des sons que pendant la navigation au clavier — or on
 ne navigue pas au clavier en faisant tourner l'avatar à la souris.
+
+---
+
+### 8 sexies. Ce que le bundle du site de référence a tranché
+
+Trois points où j'ai relevé plutôt qu'inventé, en lisant son CSS et ses chunks.
+
+**Le fond n'a PAS d'animation d'ambiance.** `.bg` et `.bgFloor` sont deux
+images fixes, sans `animation` ni `transition` en CSS. Ce qu'on prend pour un
+fond animé est une **mise en scène d'entrée** : le sol est un composant piloté
+par un état, `transform: translateY(100vh) → translateY(0)`, avec quatre
+durées selon le sens et la vitesse —
+
+| sens | transition |
+|---|---|
+| descente lente | `transform 1.4s cubic-bezier(0.25, 0.1, 0.25, 1)` |
+| remontée lente | `transform 1.0s cubic-bezier(0.65, 0, 0.35, 1)` |
+| descente rapide | `transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)` |
+| remontée rapide | `transform 0.6s cubic-bezier(0.65, 0, 0.35, 1)` |
+
+On reprend la remontée lente (1 s) à l'arrivée dans le dashboard, et les cartes
+se posent l'une après l'autre avec 90 ms de décalage.
+
+**Le curseur est un élément DOM, pas une propriété CSS.** `.custom-cursor` :
+`position: fixed`, `z-index: 100010`, `pointer-events: none`,
+`image-rendering: pixelated`, `filter: drop-shadow(2px 2px 2px rgba(0,0,0,.5))`,
+et deux PNG de 17 × 22 (`default`, `pointer`), la variante « pointer » décalée
+de −5 px pour aligner les deux pointes. Couleur échantillonnée sur les
+fichiers : **#a6ff00 cerné de noir**.
+
+**Piège payé dessus.** Masquer le curseur natif avec `cursor: none !important`
+écrase la valeur calculée de *tous* les éléments. Or je lisais justement cette
+valeur pour choisir la forme — la variante « pointer » ne pouvait donc jamais
+s'afficher, et le test de parcours, qui localisait la console de la même façon,
+échouait. La forme se déduit maintenant de la nature de l'élément survolé, et
+les deux cas 3D (console, silhouette de l'avatar) exposent leur état de raycast
+sous forme de classe — un raycast ne se lit pas dans le DOM.
 
 ---
 

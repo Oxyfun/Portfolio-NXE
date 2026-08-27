@@ -53,13 +53,13 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - `reference/image4.png` a **34 px de barre navigateur en haut** : retranche-les. Les captures
   sont en ratio ~1.90, pas 16:9 — les mesures en « % de largeur » ne sont pas transposables,
   d'où la scène décrite en `vh`.
-- Le **corps d'un texte se déduit de la hauteur de capitale**, pas de sa largeur (19 % d'écart,
-  dû à l'interlettrage). À défaut, l'**interligne** est un relevé fiable et indépendant.
+- Le **corps d'un texte se déduit de la hauteur de capitale**, pas de sa largeur. À défaut,
+  l'**interligne** est un relevé fiable et indépendant.
 - Les **PNG d'icônes NXE contiennent le glyphe dans leurs 58 % supérieurs** et son reflet en
   dessous. Dimensionne sur le fichier entier. L'inclinaison y est déjà dessinée : pas de
   `rotate`.
-- Un `<svg>` en `width: auto` dans un conteneur en largeur « shrink-to-fit » **ne prend pas le
-  ratio de son `viewBox`**. Mets un `aspect-ratio` explicite.
+- Un `<svg>` en `width: auto` dans un conteneur « shrink-to-fit » **ne prend pas le ratio de
+  son `viewBox`**. Mets un `aspect-ratio` explicite.
 - `fill-rule="evenodd"` ne perce **que dans un même attribut `d`**. Des `<path>` séparés sont
   remplis isolément.
 - `BackgroundPanel.png` est un **dégradé 75×75 à étirer**, pas un motif à répéter.
@@ -76,11 +76,11 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   prend la hauteur du canevas ; sur l'avatar (160 × 384) ça demandait 766 px pour un tour.
   Recoupe par le mapping physique arc = r·θ : ici 320 contre 346 px, ils convergent.
 - **Un élément qui flotte au-dessus d'autres ne doit pas leur voler leurs clics.** Garde-le en
-  `pointer-events: none`, écoute sur la fenêtre, et ne le rends cliquable qu'une fois le
-  raycast confirmé. `Raycaster` ignore `visible` : la boîte de sélection peut être invisible.
-- **Un glissé qui sort de sa boîte survole ce qu'il traverse** (l'avatar déplaçait la
-  sélection de la tuile 0 à la 2). Un bouclier plein écran pendant le geste — et qui survit
-  au relâchement, sinon le survol reprend sous un curseur qui a bougé de 320 px.
+  `pointer-events: none` et ne le rends cliquable qu'après confirmation du raycast.
+  `Raycaster` ignore `visible` : la boîte de sélection peut être invisible.
+- **Un glissé qui sort de sa boîte survole ce qu'il traverse.** Un bouclier plein écran
+  pendant le geste, qui survit au relâchement — sinon le survol reprend sous un curseur qui
+  a bougé de 320 px.
 - **`prefers-reduced-motion` ne coupe pas la réponse à une manipulation directe.** Si la
   boucle est arrêtée, applique le geste et redessine à la demande. On retire l'inertie, pas
   la réaction.
@@ -97,13 +97,29 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - **Un seuil de luminance ne sait pas isoler un glyphe en dégradé** (les icônes NXE vont du
   blanc au vert-jaune, la tache de la tuile monte à un bleu de 160). Règle générale : si une
   mesure sature sur les bords de ta zone de recherche, elle est fausse — ne conclus pas.
+- **Un voile plein écran vole les clics de tout ce qui passe dessous.** Les boutons de
+  légende ne faisaient rien : ils étaient sous `.blade-scrim`. Deux causes empilées (des
+  `<span>` non cliquables ET un `z-index` trop bas) — corriger une seule ne changeait rien.
+  Playwright désigne ce genre de coupable tout seul : « X intercepts pointer events ».
+- **Masquer le curseur natif efface la valeur qu'on voulait lire.** `cursor: none !important`
+  écrase le `cursor` calculé de tous les éléments : impossible ensuite d'en déduire la forme
+  du curseur personnalisé. Et un raycast (console, avatar) n'est de toute façon pas dans le
+  DOM — expose-le en classe.
+- Dans un `transform`, un **pourcentage se rapporte à l'élément**, pas à la fenêtre :
+  `translate(calc(100% - …))` collait l'avatar au bord gauche. Utilise `100vw`.
+- Deux objets qui doivent bouger ensemble ont besoin de la **même `transform-origin`**.
+  L'avatar (`50% 100%`) et les tuiles (`0 0`) divergeaient à chaque changement d'échelle.
+  Et une position relative à une tuile se calcule sur sa largeur **à sa profondeur**
+  (`tileW × Kʳ`), pas sur sa largeur pleine : 126 px d'erreur, corrigés à 3 px du relevé.
+- Un test qui vise une **tuile dépassée** vise le vide : elles sortent par la gauche, avec
+  une abscisse négative. Cible toujours une tuile encore à l'écran.
 - Dans une animation qui enchaîne mouvement et fondu, **vérifie que le fondu ne démarre pas
   avant la fin du mouvement**. Le cas court (partir du repos) masque le bug.
 - Un zoom se **dose en géométrique**, pas en linéaire (la taille apparente varie en
   1/distance). Et sinusoïde plutôt que cubique : pente max 1.57 contre 3, c'est ce pic à
   mi-course qui fait « d'un coup ça bouge ».
-- **`filter` sur un conteneur qui enveloppe l'app ré-rastérise tout l'arbre à chaque frame.**
-  Mesuré : les sons partaient à 83 ms au lieu de 38. Utilise `backdrop-filter` sur un calque.
+- **`filter` ré-rastérise tout le sous-arbre à chaque frame** (sons à 83 ms au lieu de 38).
+  Sur un calque plein écran, `backdrop-filter` ; sur un panneau, un fond suffit.
 - Un `useRef` **ne redéclenche pas de rendu**. Pour piloter une classe CSS, il faut un état.
 - **Un code HTTP 200 ne prouve pas qu'un fichier existe** : Vite en dev comme nginx renvoient
   la page HTML pour tout chemin inconnu. Contrôle le `content-type`. Et `firstAvailable`
@@ -162,31 +178,25 @@ typographie et pastilles inchangés.
 
 - **Itère seul.** Boucle construire → capturer → regarder → lister les écarts → corriger,
   jusqu'à ce que ce soit difficile à distinguer de la référence.
-- **Vérifie empiriquement plutôt qu'au jugé.** Quand un signe ou une direction est ambigu,
-  fabrique le cas où il est évident plutôt que de raisonner en boucle. Idem quand une mesure
-  te surprend : instrumente et regarde la valeur, ne théorise pas deux fois de suite.
-- **Écris l'outil quand il fera gagner du temps** (`pose.mjs`, `measure.mjs`, la prise de
-  mesure `window.__avatar` en dev). Un script jetable en une passe vaut trois allers-retours.
-- Les scripts de mise au point temporaires vont dans le scratchpad ou en `*.tmp.mjs`
-  supprimé après usage. Ne laisse pas de déchets à la racine.
-- **Un test qui échoue une fois sur six est un bug, pas du bruit.** Cherche la course
-  (un état transitoire échantillonné après coup, une position relevée avant que la scène
-  bouge) plutôt que d'allonger les délais.
+- **Vérifie empiriquement plutôt qu'au jugé.** Fabrique le cas où le signe est évident, et
+  quand une mesure surprend, instrumente — ne théorise pas deux fois de suite.
+- **Écris l'outil quand il fera gagner du temps** (`pose.mjs`, `window.__avatar` en dev).
+- Les scripts jetables vont dans le scratchpad ou en `*.tmp.mjs` supprimé après usage.
+- **Un test qui échoue une fois sur six est un bug, pas du bruit.** Cherche la course (état
+  transitoire lu après coup, position relevée avant que la scène bouge), n'allonge pas les délais.
 - **N'échantillonne pas une grandeur bruitée une seule fois.** Un `setTimeout` sous charge
   donnait 115 ms pour une médiane réelle de 50. Prends la médiane de cinq et **garde la borne
   intacte** — on fiabilise la mesure, on ne relâche pas l'exigence. Et avant de conclure à
   une régression, mesure la cause en isolation.
-- Pour comparer une typographie, **rends la MÊME chaîne que la référence**, même résolution,
-  même boîte. Compare la largeur du mot et la densité d'encre — pas l'épaisseur d'un fût.
-  Même principe pour un glyphe : force la même icône des deux côtés, sinon tu compares des
-  formes et pas des tailles.
-- **Dis les écarts qui subsistent.** Ne présente jamais comme identique ce qui ne l'est pas.
-  La section « Écarts assumés » de `SPEC.md` doit rester à jour et honnête.
+- Pour comparer une typographie, **rends la MÊME chaîne**, même résolution, même boîte.
+  Compare la largeur du mot et la densité d'encre. Même principe pour un glyphe : force la
+  même icône des deux côtés, sinon tu compares des formes, pas des tailles.
+- **Dis les écarts qui subsistent.** « Écarts assumés » dans `SPEC.md` doit rester honnête.
 - **N'induis pas une règle générale d'un seul cas de référence.** image3 déplaçait l'avatar
   quand une lame s'ouvre, image5 non. J'ai retenu le comportement le plus simple, documenté
   comme écart — et image10, arrivée plus tard, a tranché. Attendre valait mieux qu'inventer.
-- Quand une consigne repose sur une prémisse fausse (ex. « ces assets sont libres de droit »),
-  dis-le en une phrase, propose l'atténuation, **et fais quand même le travail demandé**.
+- Quand une consigne repose sur une prémisse fausse, dis-le en une phrase, propose
+  l'atténuation, **et fais quand même le travail demandé**.
 
 ---
 

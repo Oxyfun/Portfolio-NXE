@@ -250,6 +250,15 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
       const pointer = { x: 0, y: 0 }
       const par = { theta: 0, phi: 0 }
       /* `pt` / `pp` : orbite en attente, que l'amortissement consomme. */
+      /* Le survol est le résultat d'un RAYCAST : il n'existe nulle part dans le
+         DOM. On l'expose donc en classe, pas seulement en `cursor` — le curseur
+         personnalisé masque le curseur natif et ne peut pas le relire, et le
+         test de parcours a besoin du même signal pour localiser la console. */
+      const marquerSurvol = (dessus: boolean) => {
+        host.style.cursor = dessus ? 'pointer' : 'default'
+        host.classList.toggle('is-over', dessus)
+      }
+
       const drag = {
         active: false, id: -1, x: 0, y: 0, moved: 0, button: 0,
         pt: 0, pp: 0,
@@ -305,7 +314,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
         // Parallaxe douce hors glissé.
         pointer.x = (e.clientX / innerWidth) * 2 - 1
         pointer.y = (e.clientY / innerHeight) * 2 - 1
-        host.style.cursor = hitsConsole(e.clientX, e.clientY) ? 'pointer' : 'default'
+        marquerSurvol(hitsConsole(e.clientX, e.clientY))
       }
 
       const endDrag = (e: PointerEvent) => {
@@ -313,7 +322,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
         drag.active = false
         if (host.hasPointerCapture(e.pointerId)) host.releasePointerCapture(e.pointerId)
         const wasClick = drag.moved < DRAG_THRESHOLD && drag.button === 0
-        host.style.cursor = hitsConsole(e.clientX, e.clientY) ? 'pointer' : 'default'
+        marquerSurvol(hitsConsole(e.clientX, e.clientY))
         if (wasClick && hitsConsole(e.clientX, e.clientY)) startRef.current()
       }
 

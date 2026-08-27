@@ -130,7 +130,10 @@ export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose 
             </span>
           </div>
 
-          <div className="blade-body">
+          {/* `tabIndex` pour que le corps soit atteignable au clavier : une
+              fois focalisé, les flèches le font défiler nativement, et la
+              molette marche déjà grâce à `overflow-y: auto`. */}
+          <div className="blade-body" tabIndex={0}>
             {detail.body.map((p, i) => (
               <p key={i}>{p}</p>
             ))}

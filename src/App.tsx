@@ -9,6 +9,7 @@ import { DetailBlade } from './components/DetailBlade'
 import { BootScreen } from './components/BootScreen'
 import { CrtOverlay, CrtSoftness } from './components/Crt'
 import { Avatar3D } from './components/Avatar3D'
+import { Cursor } from './components/Cursor'
 
 /** `?boot=0` saute l'écran d'accueil — utilisé par compare.mjs. */
 function skipBoot(): boolean {
@@ -88,23 +89,8 @@ export default function App() {
     [tiles, openIdx, play],
   )
 
-  /* Le survol ne sélectionne qu'à partir du moment où la souris a bougé sur le
-     dashboard. Sinon, cliquer sur la console au centre de l'écran ouvrait le
-     dashboard avec la tuile qui se trouvait sous le curseur déjà sélectionnée. */
-  const pointerMoved = useRef(false)
-  useEffect(() => {
-    if (!booted) return
-    pointerMoved.current = false
-    const onMove = () => {
-      pointerMoved.current = true
-    }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onMove)
-  }, [booted])
-
   const selectTile = useCallback(
     (i: number) => {
-      if (!pointerMoved.current) return
       setTileIdx((cur) => {
         if (i === cur) return cur
         play(i > cur ? 'moveRight' : 'moveLeft')
@@ -114,11 +100,45 @@ export default function App() {
     [play],
   )
 
+  /* Molette : un cran = une tuile. Le survol ne sélectionne plus — passer la
+     souris au-dessus de la rangée faisait défiler les cartes sans qu'on ait
+     rien demandé. On accumule le delta plutôt que de réagir à chaque
+     événement : un pavé tactile en émet des dizaines par geste, et sans seuil
+     on traverserait toute la rangée d'un coup. */
+  const wheelAcc = useRef(0)
+  useEffect(() => {
+    if (!booted) return
+    const SEUIL = 90
+    const onWheel = (e: WheelEvent) => {
+      // Une zone qui peut défiler d'elle-même (le corps de la lame) garde la molette.
+      const cible = e.target as Element | null
+      if (cible?.closest('.blade-body')) return
+      e.preventDefault()
+      if (openIdx !== null) return
+      wheelAcc.current += e.deltaY + e.deltaX
+      while (Math.abs(wheelAcc.current) >= SEUIL) {
+        const sens = Math.sign(wheelAcc.current)
+        wheelAcc.current -= sens * SEUIL
+        moveTile(sens)
+      }
+    }
+    window.addEventListener('wheel', onWheel, { passive: false })
+    return () => window.removeEventListener('wheel', onWheel)
+  }, [booted, openIdx, moveTile])
+
   // ── Clavier ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!booted) return
     const onKey = (e: KeyboardEvent) => {
       const isOpen = openIdx !== null
+      /* Un bouton qui a le focus gère lui-même Entrée et Espace : on ne les
+         intercepte pas, sinon la navigation au clavier déclencherait deux
+         actions à la fois. Idem pour le corps de la lame, qui doit pouvoir
+         défiler aux flèches quand il a le focus. */
+      const cible = e.target as Element | null
+      if (cible?.closest('.blade-body') && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) return
+      if (cible instanceof HTMLElement && cible.matches('button, a, [tabindex]') &&
+          (e.key === 'Enter' || e.key === ' ')) return
       switch (e.key) {
         case 'ArrowRight':
           e.preventDefault()
@@ -148,6 +168,7 @@ export default function App() {
           } else moveSection(-1)
           break
         case 'Enter':
+        case ' ':
           e.preventDefault()
           if (isOpen) activateRow(rowIdx)
           else open(tileIdx)
@@ -199,6 +220,7 @@ export default function App() {
           }}
         />
         <CrtSoftness />
+        <Cursor />
       </>
     )
   }
@@ -213,13 +235,20 @@ export default function App() {
       <Profile />
 
       <TileRow tiles={tiles} selected={tileIdx} onSelect={selectTile} onOpen={open} />
-      <Avatar3D selected={tileIdx} lameOuverte={openIdx !== null} />
+      <Avatar3D selected={tileIdx} lameOuverte={openIdx !== null} actif={sectionIdx === 0} />
 
       <Footer
         index={tileIdx}
         total={tiles.length}
         showCounter={!openTile}
-        actions={openTile ? { a: 'Ouvrir', b: 'Retour' } : { a: 'Sélectionner' }}
+        actions={
+          openTile
+            ? {
+                a: { label: 'Ouvrir', onPress: () => activateRow(rowIdx) },
+                b: { label: 'Retour', onPress: close },
+              }
+            : { a: { label: 'Sélectionner', onPress: () => open(tileIdx) } }
+        }
       />
       <GuideOrb />
 
@@ -238,6 +267,7 @@ export default function App() {
           l'image est molle, la grille d'ouverture et le cadre ne le sont pas. */}
       <CrtSoftness />
       <CrtOverlay />
+      <Cursor />
     </>
   )
 }

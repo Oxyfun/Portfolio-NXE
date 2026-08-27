@@ -96,19 +96,29 @@ function choisirAttente(clips: THREE.AnimationClip[]): THREE.AnimationClip | nul
  * une mise à l'échelle autour de ce point ne les décolle jamais.
  */
 function geometrie(r: number) {
-  const hauteurCanevas = (CADRE.hauteurPerso * 41.9) / (1.736 / CADRE.hauteurMonde)
-  const largeurCanevas = hauteurCanevas * CADRE.largeurSurHauteur
+  const H0 = (CADRE.hauteurPerso * 41.9) / (1.736 / CADRE.hauteurMonde)
+  const W0 = H0 * CADRE.largeurSurHauteur
+  const s = r <= 0 ? 1 : Math.pow(K, r)
+  const av = advanceCoef(r)
+
+  /* Même repère que la tuile, au signe près : elle est en `transform-origin:
+     0 0` avec `translate(x,y) scale(s)`, le bloc est donc placé à (0,0) et tout
+     passe par la translation. C'est la correction du décalage : l'avatar avait
+     son origine sur ses pieds (50% 100%) et la tuile la sienne en haut à
+     gauche, donc à chaque changement d'échelle les deux partaient sur des
+     trajectoires différentes et le personnage « rattrapait » la carte.
+     Ici les deux transformations sont littéralement la même, ils ne peuvent
+     plus se désynchroniser.
+
+       bord gauche = bord gauche de la tuile 1 + 0.98 × sa largeur − W0·s/2
+       bord haut   = pieds − H0·s,  pieds = centre de rangée + 0.56 × h_tuile·s */
+  const x = `calc(var(--margin-x) + var(--tile-w) * ${(av + CADRE.centreDansTuile * s).toFixed(4)} - ${(W0 * s) / 2}vh)`
+  const y = `calc(var(--row-cy) + var(--tile-h) * ${(CADRE.piedsSousRangee * s).toFixed(4)} - ${H0 * s}vh)`
+
   return {
-    largeurCanevas,
-    hauteurCanevas,
-    // bord gauche du canevas à la profondeur 0
-    gauche: `calc(var(--margin-x) + var(--tile-w) * ${CADRE.centreDansTuile} - ${largeurCanevas / 2}vh)`,
-    // le bas du canevas est le sol : les pieds y reposent
-    haut: `calc(var(--row-cy) + var(--tile-h) * ${CADRE.piedsSousRangee} - ${hauteurCanevas}vh)`,
-    // avancée et grossissement, exactement comme la tuile 1
-    transform:
-      `translateX(calc(var(--tile-w) * ${(advanceCoef(r) - advanceCoef(0)).toFixed(4)}))` +
-      ` scale(${Math.pow(K, Math.max(0, r)).toFixed(4)})`,
+    largeurCanevas: W0,
+    hauteurCanevas: H0,
+    transform: `translate(${x}, ${y}) scale(${s.toFixed(4)})`,
   }
 }
 
@@ -135,9 +145,15 @@ interface Props {
   selected: number
   /** Une lame est ouverte : l'avatar sort de la rangée et passe à droite. */
   lameOuverte?: boolean
+  /**
+   * L'avatar n'appartient qu'à la section d'accueil. Ailleurs il n'a pas de
+   * tuile 1 à laquelle s'arrimer — sur Contact, qui n'a qu'une carte, il se
+   * retrouvait planté seul au milieu de l'écran sans rien derrière lui.
+   */
+  actif: boolean
 }
 
-export function Avatar3D({ selected, lameOuverte = false }: Props) {
+export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const [src, setSrc] = useState<string | null | undefined>(undefined)
   const [visible, setVisible] = useState(false)
@@ -146,15 +162,19 @@ export function Avatar3D({ selected, lameOuverte = false }: Props) {
   const geo = geometrie(r)
   // r < 0 : la tuile 1 est sortie par la gauche, l'avatar sort avec elle.
   // Sauf lame ouverte : là il ne dépend plus de la rangée.
-  const sorti = r < 0 && !lameOuverte
+  const sorti = !actif || (r < 0 && !lameOuverte)
 
   const pose = lameOuverte
     ? {
-        left: `calc(100% - ${CADRE_LAME.droiteVh}vh - ${geo.largeurCanevas / 2}vh)`,
-        top: `calc(${CADRE_LAME.piedsPourcent}vh - ${geo.hauteurCanevas}vh)`,
-        transform: `scale(${CADRE_LAME.echelle})`,
+        /* `100vw` et non `100%` : dans un `translate`, un pourcentage se
+           rapporte à la taille de l'ÉLÉMENT, pas à celle de la fenêtre — avec
+           `100%` l'avatar se retrouvait collé au bord gauche. */
+        transform:
+          `translate(calc(100vw - ${CADRE_LAME.droiteVh}vh - ${geo.largeurCanevas / 2}vh),` +
+          ` calc(${CADRE_LAME.piedsPourcent}vh - ${geo.hauteurCanevas}vh))` +
+          ` scale(${CADRE_LAME.echelle})`,
       }
-    : { left: geo.gauche, top: geo.haut, transform: geo.transform }
+    : { transform: geo.transform }
 
   // 1. Sonde le fichier, sans rien charger d'autre.
   useEffect(() => {
@@ -488,8 +508,6 @@ export function Avatar3D({ selected, lameOuverte = false }: Props) {
       className={`avatar3d${visible && !sorti ? ' is-visible' : ''}${lameOuverte ? ' is-blade' : ''}`}
       aria-hidden
       style={{
-        left: pose.left,
-        top: pose.top,
         width: `${geo.largeurCanevas}vh`,
         height: `${geo.hauteurCanevas}vh`,
         transform: pose.transform,

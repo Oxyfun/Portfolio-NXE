@@ -22,7 +22,13 @@ step("le texte d'accroche n'est pas cliquable", (await p.locator('.boot-cta').ev
 const cursorAt = async (x, y) => {
   await p.mouse.move(x, y)
   await p.waitForTimeout(40)
-  return p.locator('.boot-stage').evaluate((e) => getComputedStyle(e).cursor)
+  /* On lit la classe posée par le raycast et non le `cursor` calculé : le
+     curseur vert personnalisé masque le curseur natif, ce qui rendait cette
+     valeur inutilisable. La classe est de toute façon le signal le plus
+     direct — c'est le résultat du raycast, pas un effet de style. */
+  return (await p.locator('.boot-stage').evaluate((e) => e.classList.contains('is-over')))
+    ? 'pointer'
+    : 'default'
 }
 const vp = p.viewportSize()
 /* On renvoie le CENTROÏDE des points survolés, pas le premier trouvé : la
@@ -170,6 +176,71 @@ if (delais.length) {
   step(`son à ${median} ms de la frappe en médiane (38 programmés)`, median >= 20 && median <= 110)
   console.log(`  · fichier joué : ${premierSon} — mesures : ${delais.join(', ')} ms`)
 }
+
+/* ── Interactions signalées comme cassées, désormais couvertes ───────────── */
+const selTuile = () =>
+  p.evaluate(() =>
+    [...document.querySelectorAll('.tile')].findIndex((e) => e.getAttribute('aria-current') === 'true'),
+  )
+const lameOuverte = () => p.evaluate(() => !!document.querySelector('.blade'))
+
+// On revient sur l'Accueil : l'avatar n'y est arrimé que là.
+await p.keyboard.press('ArrowUp')
+await p.waitForTimeout(700)
+step("↑ ramène à l'accueil", (await p.locator('.crumb-3').innerText()).trim() === 'Accueil')
+
+/* Le survol ne doit plus sélectionner : passer la souris au-dessus de la rangée
+   faisait défiler les cartes sans qu'on l'ait demandé. */
+await p.keyboard.press('ArrowRight')
+await p.waitForTimeout(500)
+const avantSurvol = await selTuile()
+/* On vise une tuile ENCORE À L'ÉCRAN. Les tuiles dépassées sortent par la
+   gauche : à la sélection 1, la tuile 0 a une abscisse négative et y déplacer
+   la souris la mettait hors de la page — la molette ne partait donc nulle
+   part, ce qui ressemblait à une régression alors que le test visait le vide. */
+const boiteVoisine = await p.evaluate(() => {
+  const tuiles = [...document.querySelectorAll('.tile')]
+  const cur = tuiles.findIndex((e) => e.getAttribute('aria-current') === 'true')
+  const t = (tuiles[cur + 1] ?? tuiles[cur]).getBoundingClientRect()
+  return { x: t.left + t.width / 2, y: t.top + t.height / 2 }
+})
+await p.mouse.move(boiteVoisine.x, boiteVoisine.y)
+await p.waitForTimeout(400)
+step('le survol ne sélectionne plus une tuile', (await selTuile()) === avantSurvol)
+
+// La molette navigue à la place.
+await p.mouse.wheel(0, 150)
+await p.waitForTimeout(600)
+const apresMolette = await selTuile()
+step(`la molette change de tuile (${avantSurvol} → ${apresMolette})`, apresMolette !== avantSurvol)
+await p.mouse.wheel(0, -150)
+await p.waitForTimeout(600)
+
+/* Les trois boutons de légende faisaient tous la même chose : ils n'étaient pas
+   cliquables et le clic atteignait le voile de la lame, qui fermait. */
+await p.locator('.legend-item').first().click()
+await p.waitForTimeout(800)
+step('« Sélectionner » ouvre la lame', await lameOuverte())
+await p.locator('.legend-item').first().click()
+await p.waitForTimeout(700)
+step('« Ouvrir » ne referme PAS la lame', await lameOuverte())
+await p.locator('.legend-item').nth(1).click()
+await p.waitForTimeout(700)
+step('« Retour » referme la lame', !(await lameOuverte()))
+
+// L'avatar n'appartient qu'à l'accueil.
+await p.keyboard.press('ArrowDown')
+await p.waitForTimeout(800)
+step(
+  "l'avatar disparaît hors de l'accueil",
+  await p.evaluate(() => !document.querySelector('.avatar3d')?.classList.contains('is-visible')),
+)
+await p.keyboard.press('ArrowUp')
+await p.waitForTimeout(800)
+step(
+  "l'avatar revient sur l'accueil",
+  await p.evaluate(() => !!document.querySelector('.avatar3d')?.classList.contains('is-visible')),
+)
 
 /* Rotation de l'avatar. Trois choses à protéger, dans cet ordre d'importance :
    il tourne, il ne vole pas les clics des tuiles qu'il recouvre, et son geste

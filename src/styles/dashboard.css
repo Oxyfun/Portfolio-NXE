@@ -443,11 +443,16 @@
 
 /* ── Pied de page ─────────────────────────────────────────────────────── */
 
+/* Au-dessus de `.blade-layer` (60). En dessous, le voile de fermeture de la
+   lame — qui couvre tout l'écran — interceptait les clics sur la légende :
+   « Ouvrir » comme « Retour » atteignaient le voile et fermaient la lame. Les
+   passer en vrais boutons ne suffisait pas, il fallait aussi qu'ils reçoivent
+   le clic. */
 .footer {
   position: absolute;
   left: var(--margin-x);
   bottom: 0;
-  z-index: 40;
+  z-index: 80;
 }
 
 /* « 1 of 4 » : bas de texte à 15.3vh du bas de l'écran (image4). */
@@ -472,6 +477,8 @@
   gap: 3.6vh;
 }
 
+/* Ce sont de vrais boutons depuis qu'ils sont câblés : on neutralise le style
+   natif mais on garde le focus clavier visible. */
 .legend-item {
   display: flex;
   align-items: center;
@@ -480,6 +487,17 @@
   letter-spacing: 0.07em;
   color: var(--ink);
   white-space: nowrap;
+  background: none;
+  border: 0;
+  padding: 0.4vh 0.8vh;
+  margin: -0.4vh -0.8vh;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 0.6vh;
+}
+
+.legend-item:hover {
+  color: #fff;
 }
 
 .legend-item img {
@@ -608,10 +626,16 @@
    ensemble ou le truc se voit. */
 .avatar3d {
   position: absolute;
+  /* Placé à (0,0) et déplacé uniquement par `transform`, avec la MÊME origine
+     que les tuiles. Sans ça les deux se désynchronisaient à chaque changement
+     d'échelle : le personnage semblait se recoller à la carte au lieu d'avancer
+     avec elle. */
+  left: 0;
+  top: 0;
   z-index: 30;
   pointer-events: none;
   opacity: 0;
-  transform-origin: 50% 100%;
+  transform-origin: 0 0;
   transition:
     transform var(--dur-slide) var(--ease-nxe),
     opacity var(--dur-slide) var(--ease-nxe);
@@ -624,12 +648,6 @@
 /* `pointer-events` n'est activé que lorsque le curseur est réellement sur la
    silhouette (décidé par raycast) : sinon l'avatar créerait une zone morte
    devant les tuiles qu'il recouvre. */
-/* Lame ouverte : l'avatar passe DEVANT le panneau. Sur image10 sa silhouette
-   est entière ; derrière, son bras se fait manger par le bord du panneau. */
-.avatar3d.is-blade {
-  z-index: 70;
-}
-
 .avatar3d.is-hot {
   pointer-events: auto;
   cursor: grab;
@@ -680,5 +698,136 @@
 @media (prefers-reduced-motion: reduce) {
   .avatar3d {
     transition: none;
+  }
+}
+
+/* ── Curseur vert ────────────────────────────────────────────────────────
+   Relevé sur le site de référence : élément suivi à la souris, deux PNG de
+   17 × 22, rendu pixelisé, ombre portée. Le curseur natif n'est masqué que si
+   le nôtre a bien pu être chargé (classe posée par le composant) — sinon on se
+   retrouverait sans aucun curseur. */
+.curseur {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 17px;
+  height: 22px;
+  z-index: 100010;
+  pointer-events: none;
+  opacity: 0;
+  background-image: var(--curseur-default, url('/cursor/default.png'));
+  background-repeat: no-repeat;
+  background-size: 17px 22px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+  image-rendering: pixelated;
+}
+
+/* Le PNG « pointer » a sa pointe 5 px plus à droite : le décalage vient du
+   site de référence, il aligne les deux formes sur le même point actif. */
+.curseur.is-pointer {
+  background-image: var(--curseur-pointer, url('/cursor/pointer.png'));
+  margin-left: -5px;
+}
+
+@media (pointer: fine) {
+  body.a-curseur,
+  body.a-curseur * {
+    cursor: none !important;
+  }
+}
+
+/* ── Variation de tuile à tuile ──────────────────────────────────────────
+   Une seule texture existe dans les assets NXE (BlankGreen.jpg), donc toutes
+   les cartes sortaient identiques alors que dans les références chacune porte
+   son propre visuel. À défaut d'images, on décale la tache lumineuse et on
+   fait varier la teinte selon l'indice. Assez pour qu'on distingue les cartes,
+   assez peu pour rester dans la gamme du NXE. */
+.tile-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* La tache glisse de 26 % à 74 % de la largeur au fil des cartes. */
+  background: radial-gradient(
+    58% 46% at var(--tile-spot, 50%) 4%,
+    rgba(255, 255, 235, 0.5) 0%,
+    rgba(255, 255, 235, 0) 68%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* Rotation de teinte discrète : quelques degrés suffisent à séparer deux cartes
+   voisines sans sortir de la gamme du NXE. Calculée en JS et non avec `mod()`
+   en CSS, qui n'est pas encore assez répandu pour qu'on en dépende. */
+.tile-face {
+  filter: hue-rotate(var(--tile-hue, 0deg));
+}
+
+/* ── Arrivée dans le dashboard ───────────────────────────────────────────
+   Relevé sur le site de référence : le sol remonte depuis le bas
+   (`translateY(100vh)` → `0`) en `transform 1.0s cubic-bezier(0.65,0,0.35,1)`,
+   et les cartes se posent l'une après l'autre. C'est ça, le « fond animé » —
+   une mise en scène d'entrée, pas une animation d'ambiance. */
+.dash.is-entering .bg-floor {
+  animation: sol-monte 1s cubic-bezier(0.65, 0, 0.35, 1) backwards;
+}
+
+@keyframes sol-monte {
+  from {
+    transform: translateY(100vh);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Chaque carte glisse depuis la droite, décalée de 90 ms sur la précédente.
+   Le délai est porté par `--tile-i`, déjà posé pour la variation de fond. */
+.dash.is-entering .tile {
+  animation: carte-entre 520ms var(--ease-nxe) backwards;
+  animation-delay: calc(var(--tile-i, 0) * 90ms);
+}
+
+@keyframes carte-entre {
+  from {
+    opacity: 0;
+    /* Décalage en pourcentage de la tuile : indépendant de sa profondeur. */
+    translate: 42% 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ── Retour tactile des boutons ──────────────────────────────────────────
+   Un enfoncement franc et court : on doit sentir le clic sans que ça traîne. */
+.legend-item,
+.blade-row,
+.tile {
+  transition:
+    transform var(--dur-slide) var(--ease-nxe),
+    opacity var(--dur-slide) var(--ease-nxe),
+    filter 120ms ease-out;
+}
+
+.legend-item:active,
+.blade-row:active {
+  transform: scale(0.965);
+  filter: brightness(1.15);
+}
+
+.tile:active .tile-face {
+  filter: brightness(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash.is-entering .bg-floor,
+  .dash.is-entering .tile {
+    animation: none;
+  }
+  .legend-item:active,
+  .blade-row:active {
+    transform: none;
   }
 }

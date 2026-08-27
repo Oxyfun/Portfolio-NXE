@@ -95,6 +95,15 @@ function LegendDot({ button }: { button: 'a' | 'b' }) {
   )
 }
 
+/**
+ * Légende A/B du pied de page.
+ *
+ * C'étaient des `<span>` : décoratifs, donc « Sélectionner » ne faisait rien et
+ * le clic traversait jusqu'au voile de la lame — ce qui la fermait. D'où
+ * l'impression que « Ouvrir » et « Retour » faisaient la même chose : les deux
+ * ne faisaient que fermer. Ce sont maintenant de vrais boutons câblés à leur
+ * action, focusables au clavier et actionnables à Entrée comme à Espace.
+ */
 export function Footer({
   index,
   total,
@@ -103,7 +112,7 @@ export function Footer({
 }: {
   index: number
   total: number
-  actions: { a: string; b?: string }
+  actions: { a: { label: string; onPress(): void }; b?: { label: string; onPress(): void } }
   showCounter?: boolean
 }) {
   return (
@@ -115,15 +124,15 @@ export function Footer({
         </div>
       )}
       <div className="legend">
-        <span className="legend-item">
+        <button type="button" className="legend-item" onClick={actions.a.onPress}>
           <LegendDot button="a" />
-          {actions.a}
-        </span>
+          {actions.a.label}
+        </button>
         {actions.b && (
-          <span className="legend-item">
+          <button type="button" className="legend-item" onClick={actions.b.onPress}>
             <LegendDot button="b" />
-            {actions.b}
-          </span>
+            {actions.b.label}
+          </button>
         )}
       </div>
     </div>

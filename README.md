@@ -41,7 +41,10 @@ Autres scripts :
 | **↑ ↓** | section précédente / suivante (et lignes du panneau quand il est ouvert) |
 | **Entrée** | ouvrir la tuile / valider la ligne |
 | **Échap**, **Retour arrière** | revenir |
-| Souris | survol pour sélectionner, clic sur la tuile sélectionnée pour ouvrir |
+| **Molette** | tuile précédente / suivante (le survol ne sélectionne plus) |
+| Souris | clic sur une tuile pour la sélectionner, clic sur la tuile sélectionnée pour l'ouvrir |
+| **Tab** | parcourt tuiles, boutons de légende et entrées de la lame |
+| **Espace** | comme Entrée |
 | Manette | stick gauche et croix directionnelle, **A** valider, **B** revenir (API Gamepad) |
 
 ### Écran d'accueil

@@ -64,7 +64,12 @@
   /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
      sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
      contre #2d353d pour la lame de devant. */
-  background-color: #282f36;
+  /* Éclairci : à #282f36 le panneau se fondait dans le fond sombre et se
+     lisait mal. Un liseré clair en haut et une ombre franche lui redonnent un
+     bord, ce qui manquait autant que la luminosité. */
+  background-color: #313943;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1.4vh 4vh rgba(0, 0, 0, 0.5);
   animation: blade-unfold 260ms var(--ease-nxe) 120ms backwards,
     blade-slide-in 320ms var(--ease-nxe) 120ms backwards;
 }
@@ -241,6 +246,15 @@
   text-shadow: 0 1px 2px rgba(30, 60, 0, 0.5);
 }
 
+/* Focalisable : une fois le corps focalisé, les flèches le font défiler
+   nativement. Le contour ne s'affiche qu'au clavier pour ne pas encadrer le
+   texte à chaque clic. */
+.blade-body:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 3px;
+  border-radius: 0.4vh;
+}
+
 .blade-body {
   margin-top: 2vh;
   padding: 0 0.4vh;
@@ -280,7 +294,7 @@
      interligne ci-dessous est un choix conventionnel (1.5), pas un relevé. */
   font-size: 2.52vh;
   line-height: 1.5;
-  color: #ccd3d7;
+  color: #dde3e7;
 }
 
 .blade-foot {

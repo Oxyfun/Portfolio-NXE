@@ -104,13 +104,25 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
             className={`tile${r === 0 ? ' is-selected' : ''}`}
             style={{
               transform: `translate(${x}, ${y}) scale(${scale.toFixed(4)})`,
+              /* Une seule texture existe (BlankGreen.jpg), donc toutes les
+                 tuiles étaient rigoureusement identiques. Dans les références
+                 chaque carte porte son propre visuel ; à défaut, on décale la
+                 tache lumineuse et la teinte d'une carte à l'autre pour qu'on
+                 les distingue. Renseigner `image` sur une tuile reste la vraie
+                 réponse et l'emporte sur ce repli. */
+              ['--tile-i' as string]: String(i),
+              ['--tile-spot' as string]: `${26 + (i % 4) * 16}%`,
+              ['--tile-hue' as string]: `${(i % 4) * 4 - 6}deg`,
               zIndex: 1000 - i,
               opacity: r < 0 ? 0 : 1,
               pointerEvents: r < 0 ? 'none' : 'auto',
             }}
             aria-current={r === 0 ? 'true' : undefined}
-            onMouseEnter={() => r !== 0 && onSelect(i)}
+            /* Plus de sélection au survol : passer la souris au-dessus de la
+               rangée faisait défiler les cartes sans qu'on l'ait demandé. On
+               sélectionne au clic, à la molette ou aux flèches. */
             onClick={() => (r === 0 ? onOpen(i) : onSelect(i))}
+            onFocus={() => r !== 0 && onSelect(i)}
           >
             <span className="sr-only">
               {tile.title} — {tile.subtitle}
