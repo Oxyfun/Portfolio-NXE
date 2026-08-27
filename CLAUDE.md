@@ -135,8 +135,10 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   cartes pas encore apparues laissent le fond à nu et ça se voit comme un flash. Le seul
   mouvement suffit.
 - **Allonger une animation dérègle les outils qui mesurent après un délai fixe.** `measure.mjs`
-  attendait 700 ms là où le dépilement en dure 970 : 36 px d'écart sur une tuile, sans que rien
-  n'ait bougé. Attends la FIN (`waitForFunction`), pas une durée.
+  attendait 700 ms là où le dépilement en dure 970 : 36 px d'écart sans que rien n'ait bougé.
+  Mais attendre la seule DISPARITION d'une classe est pire : au premier sondage React ne l'a pas
+  encore posée, la condition est vraie tout de suite et on mesure encore plus tôt (427 px).
+  Attends qu'elle apparaisse, PUIS qu'elle disparaisse.
 - Un élément qui **réapparaît** n'a pas besoin du même fondu que pour disparaître : 220 ms de
   fondu laissaient le fond nu et produisaient un flash (+6.4 unités mesurées, ramené à +0.1).
 - Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut d'une tuile

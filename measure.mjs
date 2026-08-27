@@ -54,11 +54,21 @@ const page = await ctx.newPage()
 await page.goto(BASE + '/?boot=0', { waitUntil: 'networkidle' })
 await page.evaluate(() => document.fonts.ready)
 await page.waitForTimeout(800)
+/* On ATTEND LA FIN de la mise en scène d'entrée, en deux temps.
+   Un délai fixe ne marche pas : elle dure 640 ms plus 165 par carte, et
+   `waitForTimeout(700)` mesurait les dernières tuiles en plein vol.
+   Attendre seulement la DISPARITION de la classe ne marche pas non plus :
+   au premier sondage React ne l'a pas encore posée, la condition est donc
+   vraie immédiatement et on mesure encore plus tôt. Il faut la voir
+   apparaître, PUIS disparaître. */
+await page.evaluate(() => {
+  window.__vue = false
+  new MutationObserver(() => {
+    if (document.querySelector('.dash.is-entering')) window.__vue = true
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] })
+})
 await page.keyboard.press('ArrowDown')
-/* On ATTEND LA FIN de la mise en scène d'entrée au lieu d'un délai fixe : elle
-   dure 640 ms plus 165 par carte, et un `waitForTimeout(700)` mesurait les
-   dernières tuiles en plein vol — 36 px d'écart sur `tile2.right`, sans que
-   rien n'ait bougé dans la mise en page. */
+await page.waitForFunction(() => window.__vue, { timeout: 6000 })
 await page.waitForFunction(() => !document.querySelector('.dash.is-entering'), { timeout: 6000 })
 await page.waitForTimeout(250)
 
