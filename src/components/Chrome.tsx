@@ -3,10 +3,10 @@
  * pied de page (compteur + légende A/B), orbe Guide.
  */
 
-import { useEffect, useState } from 'react'
-import { Anneaux } from './Anneaux'
-import { firstAvailable } from '../lib/assets'
-import { profile } from '../data/content'
+import { useEffect, useState } from "react";
+import { Anneaux } from "./Anneaux";
+import { firstAvailable } from "../lib/assets";
+import { profile } from "../data/content";
 
 export function Background() {
   return (
@@ -18,7 +18,7 @@ export function Background() {
       <div className="bg-floor" aria-hidden />
       <div className="bg-vignette" aria-hidden />
     </>
-  )
+  );
 }
 
 /**
@@ -33,61 +33,67 @@ export function Header({
   hidden,
   onAller,
 }: {
-  sections: string[]
-  index: number
-  hidden?: boolean
-  onAller(i: number): void
+  sections: string[];
+  index: number;
+  hidden?: boolean;
+  onAller(i: number): void;
 }) {
   // image3 et image5 : quand une lame est ouverte, le fil d'Ariane disparaît.
-  if (hidden) return null
+  if (hidden) return null;
 
   /* Une roue de sections : la ligne du BAS est la page courante, les deux
      au-dessus sont celles qui la précèdent, dans l'ordre. Cliquer une ligne
      mène à la section qu'elle nomme — on va où c'est écrit, rien à deviner.
      Avant, la ligne du milieu portait le nom du site : mélangée à deux sections,
      elle rendait le fil illisible dès qu'on essayait de cliquer dedans. */
-  const n = libelles.length
-  const roue = [(index - 2 + n * 2) % n, (index - 1 + n) % n, index]
+  const n = libelles.length;
+  const roue = [(index - 2 + n * 2) % n, (index - 1 + n) % n, index];
 
   return (
     <header className="header" key={index}>
       {roue.map((sec, rang) => {
-        const courant = rang === 2
+        const courant = rang === 2;
         const bouton = (
           <button
             type="button"
             className={`crumb crumb-${rang + 1} is-entering`}
             onClick={() => onAller(sec)}
-            aria-current={courant ? 'page' : undefined}
-            aria-label={courant ? `Section courante : ${libelles[sec]}` : `Aller à ${libelles[sec]}`}
+            aria-current={courant ? "page" : undefined}
+            aria-label={
+              courant
+                ? `Section courante : ${libelles[sec]}`
+                : `Aller à ${libelles[sec]}`
+            }
           >
             {libelles[sec]}
           </button>
-        )
+        );
         return courant ? (
           <h1 className="crumb-titre" key={sec}>
             {bouton}
           </h1>
         ) : (
           <span key={sec}>{bouton}</span>
-        )
+        );
       })}
     </header>
-  )
+  );
 }
 
 export function Profile() {
-  const [gscore, setGscore] = useState<string | null>(null)
-  const [avatar, setAvatar] = useState<string | null>(null)
+  const [gscore, setGscore] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
-    let alive = true
-    firstAvailable('/nxe/GScore.png').then((r) => alive && setGscore(r))
-    firstAvailable(profile.avatar, '/nxe/AvatarShadow.png').then((r) => alive && setAvatar(r))
+    let alive = true;
+    firstAvailable("/nxe/GScore.png").then((r) => alive && setGscore(r));
+    firstAvailable(profile.avatar, "/nxe/AvatarShadow.png").then(
+      (r) => alive && setAvatar(r),
+    );
     return () => {
-      alive = false
-    }
-  }, [])
+      alive = false;
+    };
+  }, []);
 
   return (
     <div className="profile">
@@ -104,28 +110,28 @@ export function Profile() {
         <div className="profile-avatar" aria-hidden />
       )}
     </div>
-  )
+  );
 }
 
 /** Pastille A ou B : PNG d'origine, sinon sphère CSS. */
-function LegendDot({ button }: { button: 'a' | 'b' }) {
-  const [src, setSrc] = useState<string | null | undefined>(undefined)
+function LegendDot({ button }: { button: "a" | "b" }) {
+  const [src, setSrc] = useState<string | null | undefined>(undefined);
   useEffect(() => {
-    let alive = true
-    firstAvailable(button === 'a' ? '/nxe/Legend_A.png' : '/nxe/Legend_B.png').then(
-      (r) => alive && setSrc(r),
-    )
+    let alive = true;
+    firstAvailable(
+      button === "a" ? "/nxe/Legend_A.png" : "/nxe/Legend_B.png",
+    ).then((r) => alive && setSrc(r));
     return () => {
-      alive = false
-    }
-  }, [button])
+      alive = false;
+    };
+  }, [button]);
 
-  if (src) return <img src={src} alt="" draggable={false} />
+  if (src) return <img src={src} alt="" draggable={false} />;
   return (
     <span className={`legend-dot is-${button}`} aria-hidden>
       {button.toUpperCase()}
     </span>
-  )
+  );
 }
 
 /**
@@ -143,10 +149,13 @@ export function Footer({
   actions,
   showCounter = true,
 }: {
-  index: number
-  total: number
-  actions: { a: { label: string; onPress(): void }; b?: { label: string; onPress(): void } }
-  showCounter?: boolean
+  index: number;
+  total: number;
+  actions: {
+    a: { label: string; onPress(): void };
+    b?: { label: string; onPress(): void };
+  };
+  showCounter?: boolean;
 }) {
   return (
     <div className="footer">
@@ -157,31 +166,39 @@ export function Footer({
         </div>
       )}
       <div className="legend">
-        <button type="button" className="legend-item" onClick={actions.a.onPress}>
+        <button
+          type="button"
+          className="legend-item"
+          onClick={actions.a.onPress}
+        >
           <LegendDot button="a" />
           {actions.a.label}
         </button>
         {actions.b && (
-          <button type="button" className="legend-item" onClick={actions.b.onPress}>
+          <button
+            type="button"
+            className="legend-item"
+            onClick={actions.b.onPress}
+          >
             <LegendDot button="b" />
             {actions.b.label}
           </button>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function GuideOrb() {
-  const [src, setSrc] = useState<string | null>(null)
+  const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
-    let alive = true
-    firstAvailable('/nxe/Legend_Menu.png').then((r) => alive && setSrc(r))
+    let alive = true;
+    firstAvailable("/nxe/Legend_Menu.png").then((r) => alive && setSrc(r));
     return () => {
-      alive = false
-    }
-  }, [])
-  if (!src) return null
+      alive = false;
+    };
+  }, []);
+  if (!src) return null;
   return (
     <div className="guide-orb" aria-hidden>
       {/* La flaque : l'orbe repose sur une eau immobile où tombe une goutte, et
@@ -189,12 +206,12 @@ export function GuideOrb() {
           anneaux décalés d'un quart de cycle suffisent à ce que l'émission
           paraisse continue. */}
       <div className="guide-ripple">
-        <span style={{ animationDelay: '0s' }} />
-        <span style={{ animationDelay: '-2.2s' }} />
-        <span style={{ animationDelay: '-4.4s' }} />
-        <span style={{ animationDelay: '-6.6s' }} />
+        <span style={{ animationDelay: "0s" }} />
+        <span style={{ animationDelay: "-2.2s" }} />
+        <span style={{ animationDelay: "-4.4s" }} />
+        <span style={{ animationDelay: "-6.6s" }} />
       </div>
       <img src={src} alt="" draggable={false} />
     </div>
-  )
+  );
 }
