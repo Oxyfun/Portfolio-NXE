@@ -22,6 +22,9 @@ export default function App() {
   const { play, unlock } = useSounds()
   const [booted, setBooted] = useState(skipBoot)
   const [entering, setEntering] = useState(false)
+  /* Le fondu depuis le blanc de l'allumage, une seule fois. Séparé du
+     dépilement des cartes, qui lui rejoue à chaque changement de section. */
+  const [booting, setBooting] = useState(false)
   const [retour, setRetour] = useState(false)
 
   const [sectionIdx, setSectionIdx] = useState(0)
@@ -295,6 +298,8 @@ export default function App() {
             unlock()
             setBooted(true)
             setEntering(true)
+            setBooting(true)
+            window.setTimeout(() => setBooting(false), 560)
             /* 1200 ms : le dépilement dure 640 ms plus 165 par carte. À 560 la
                classe tombait avant la fin et les dernières cartes sautaient. */
             window.setTimeout(() => setEntering(false), 1200)
@@ -310,9 +315,9 @@ export default function App() {
   return (
     <>
       <main
-        className={`dash${entering ? ' is-entering' : ''}${retour ? ' is-returning' : ''}${
-          openTile ? ' has-blade' : ''
-        }`}
+        className={`dash${entering ? ' is-entering' : ''}${booting ? ' is-booting' : ''}${
+          retour ? ' is-returning' : ''
+        }${openTile ? ' has-blade' : ''}`}
       >
       <Background />
       <Header

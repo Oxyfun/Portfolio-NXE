@@ -454,6 +454,27 @@ disparaît en une image, et les cartes mettaient 220 ms à réapparaître : le f
 clair restait nu entre les deux. La rangée revient donc d'un coup et ne
 s'efface en fondu qu'à l'aller. Pic ramené à **+0.1**.
 
+### Le flash venait d'ailleurs
+
+Après avoir retiré l'opacité du dépilement, le changement de section
+surexposait toujours l'écran. Cause : une règle de `boot.css` que j'avais
+oubliée —
+
+```css
+.dash.is-entering { animation: dash-in 520ms ease-out }
+@keyframes dash-in { from { opacity: 0; filter: brightness(3.2) saturate(0.2) } }
+```
+
+C'est le fondu depuis le blanc de l'allumage. Parfaitement à sa place au
+démarrage, absurde à chaque changement de section — mais les deux partageaient
+la classe `is-entering`. Séparé en `is-booting`, posé une seule fois.
+
+**Pourquoi je ne l'avais pas vu** : je mesurais la luminance moyenne de
+captures espacées de 105 ms, et l'animation commence à `opacity: 0`. Mon premier
+échantillon attrapait l'instant NOIR, pas l'instant surexposé, et je concluais
+à +0.0. La bonne mesure était de suivre `filter` et `opacity` image par image
+depuis la page elle-même.
+
 Le changement de section a exactement le même problème, pour la même raison :
 les cartes du dépilement apparaissent en fondu, donc pendant le décalage le
 fond reste nu. Il utilise donc lui aussi le coulissement. **Le dépilement est

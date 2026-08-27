@@ -100,8 +100,12 @@
   }
 }
 
-/* Entrée du dashboard depuis le blanc. */
-.dash.is-entering {
+/* Entrée du dashboard depuis le blanc de l'allumage. Classe DISTINCTE de
+   `is-entering`, qui ne pilote que le dépilement des cartes : ce fondu part
+   d'une surexposition (brightness 3.2) parfaitement à sa place au démarrage,
+   et absurde à chaque changement de section. Il s'y déclenchait pourtant,
+   parce que les deux partageaient la même classe. */
+.dash.is-booting {
   animation: dash-in 520ms ease-out;
 }
 
@@ -119,7 +123,7 @@
 @media (prefers-reduced-motion: reduce) {
   .boot-stage,
   .boot-cta,
-  .dash.is-entering {
+  .dash.is-booting {
     animation: none;
   }
 

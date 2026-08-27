@@ -229,6 +229,29 @@ step(
   (await p.evaluate(() => window.__entrees)) > 0,
 )
 
+/* Le fondu depuis le blanc de l'allumage (`brightness(3.2)`) ne doit JAMAIS
+   se déclencher ailleurs qu'au démarrage. Il partageait la classe du
+   dépilement, donc chaque changement de section surexposait l'écran. */
+await p.evaluate(() => {
+  window.__filtres = 0
+  const d = document.querySelector('.dash')
+  const b = () => {
+    if (getComputedStyle(d).filter !== 'none') window.__filtres++
+    if (window.__surveille) requestAnimationFrame(b)
+  }
+  window.__surveille = true
+  requestAnimationFrame(b)
+})
+await p.keyboard.press('ArrowDown')
+await p.waitForTimeout(900)
+await p.evaluate(() => (window.__surveille = false))
+step(
+  "changer de section ne surexpose pas l'écran",
+  (await p.evaluate(() => window.__filtres)) === 0,
+)
+await p.keyboard.press('ArrowUp')
+await p.waitForTimeout(1200)
+
 /* Le « flash » au retour : le voile de la lame disparaît d'un coup, et si les
    cartes mettaient du temps à réapparaître le fond restait nu. Mesuré avant
    correction : +6.4 unités de luminance moyenne. On vérifie que la rangée

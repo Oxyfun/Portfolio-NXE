@@ -125,6 +125,12 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une **ombre au sol se centre sur la ligne de contact**, mesurée au rendu. Trop haut elle
   disparaît derrière les jambes, trop bas le personnage flotte au-dessus. Ce qui la rend
   visible c'est sa taille, pas son décalage.
+- **Une classe d'état réutilisée traîne ses anciennes règles.** `is-entering` pilotait le
+  dépilement des cartes ET, depuis `boot.css`, le fondu surexposé de l'allumage : chaque
+  changement de section flashait. `grep` la classe dans TOUS les fichiers avant de la réutiliser.
+- Pour traquer un flash, **suis `filter` et `opacity` image par image depuis la page**, pas la
+  luminance moyenne de captures : à 105 ms d'intervalle j'attrapais l'instant à `opacity: 0`
+  et je concluais qu'il n'y avait rien.
 - Une animation d'entrée ne doit **pas toucher à l'opacité** si le décalage est long : les
   cartes pas encore apparues laissent le fond à nu et ça se voit comme un flash. Le seul
   mouvement suffit.
