@@ -44,22 +44,6 @@ export default function App() {
     void installSceneAssets()
   }, [])
 
-  /* Rejoue la mise en scène d'entrée des cartes. Elle ne servait qu'à l'arrivée
-     depuis l'écran d'accueil ; on la rejoue aussi à chaque changement de
-     section et à la fermeture d'une lame, où la rangée réapparaît. */
-  const entreeTimer = useRef(0)
-  const rejouerEntree = useCallback(() => {
-    setEntering(false)
-    window.clearTimeout(entreeTimer.current)
-    /* Un cadre d'arrêt avant de remettre la classe : sans ça React regroupe les
-       deux mises à jour, la classe n'est jamais retirée du DOM et l'animation
-       ne redémarre pas. */
-    requestAnimationFrame(() => {
-      setEntering(true)
-      entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
-    })
-  }, [])
-
   /* Retour depuis une lame : simple coulissement, pas de dépilement. Les cartes
      n'ont jamais bougé, les faire repartir du paquet n'aurait aucun sens. */
   const retourTimer = useRef(0)
@@ -91,12 +75,16 @@ export default function App() {
         if (next !== cur) {
           play('section')
           setTileIdx(0)
-          rejouerEntree()
+          /* Coulissement, pas dépilement : le dépilement fait apparaître les
+             cartes en fondu, et pendant le décalage le fond reste nu — même
+             flash qu'au retour d'une lame. Le dépilement est réservé à la
+             toute première arrivée depuis l'écran d'accueil. */
+          rejouerRetour()
         }
         return next
       })
     },
-    [play, rejouerEntree],
+    [play, rejouerRetour],
   )
 
   const open = useCallback(
@@ -282,7 +270,9 @@ export default function App() {
             unlock()
             setBooted(true)
             setEntering(true)
-            window.setTimeout(() => setEntering(false), 560)
+            /* 1200 ms : le dépilement dure 640 ms plus 165 par carte. À 560 la
+               classe tombait avant la fin et les dernières cartes sautaient. */
+            window.setTimeout(() => setEntering(false), 1200)
           }}
         />
         <CrtSoftness />

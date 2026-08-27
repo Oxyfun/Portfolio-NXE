@@ -67,6 +67,12 @@
   display: flex;
   /* Derrière la lame de devant (2) mais DEVANT le voile (0). */
   z-index: 1;
+  /* Le panneau commence 19 px DERRIÈRE la lame de gauche (relevé : bord gauche
+     à 776, bord droit de la lame à 795). Sa marge interne de 3 vh était donc
+     mangée aux deux tiers et il ne restait que 10 px visibles entre le bord de
+     la lame et le texte — d'où l'impression de texte collé. 7 vh rétablit une
+     quarantaine de pixels visibles, comme sur image8. */
+  padding-left: 7vh;
   /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
      sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
      contre #2d353d pour la lame de devant. */
@@ -270,7 +276,10 @@
 
 .blade-body {
   margin-top: 2vh;
-  padding: 0 0.4vh;
+  /* Aucun retrait horizontal : le corps doit s'aligner exactement sur le titre
+     et le sous-titre, qui n'en ont pas. 0.4 vh suffisait à créer un décalage
+     de 3 px, visible sur une colonne de texte. */
+  padding: 0;
   /* Dernier recours quand le texte dépasse : il défile, il ne disparaît pas.
      `min-height: 0` est indispensable — sans lui un enfant flex refuse de
      rétrécir sous sa hauteur de contenu et l'`overflow` ne sert à rien. */
@@ -425,33 +434,11 @@
   margin-top: 0.2vh;
 }
 
-/* ── Panneau de détail actif ─────────────────────────────────────────────
-   Flèche droite ou clic : le panneau prend la main, s'éclaircit et se laisse
-   défiler aux flèches. Cet état n'est pas dans les références — elles ne
-   montrent qu'une pose figée — mais sans lui le détail restait sombre et peu
-   lisible, et rien n'indiquait qu'on pouvait le parcourir. */
-.blade.is-secondary {
-  transition:
-    background-color 160ms ease-out,
-    box-shadow 160ms ease-out;
-}
-
-.blade.is-secondary.is-active {
-  background-color: #414c58;
-  box-shadow:
-    0 1.4vh 4vh rgba(0, 0, 0, 0.5),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.16);
-}
-
-.blade.is-secondary.is-active .blade-heading,
-.blade.is-secondary.is-active .blade-body p {
-  color: #ffffff;
-}
-
-.blade.is-secondary.is-active .blade-sub,
-.blade.is-secondary.is-active .blade-foot {
-  color: #cbd4da;
-}
+/* ── Panneau de détail : quelle colonne a la main ─────────────────────────
+   Flèche droite ou clic : le panneau reçoit les flèches et se laisse défiler.
+   `is-active` ne porte AUCUN changement d'apparence — il s'éclaircissait, ce
+   n'était pas voulu. La classe reste : elle dit quelle colonne a la main, et
+   le liseré de focus du corps suffit à le signaler. */
 
 /* Barre de défilement : visible dès que le texte dépasse, et pas seulement au
    survol — c'est le seul indice qu'il reste quelque chose à lire. */
@@ -468,6 +455,3 @@
   background: rgba(255, 255, 255, 0.38);
 }
 
-.blade.is-secondary.is-active .blade-body::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.6);
-}

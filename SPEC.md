@@ -426,21 +426,39 @@ disparaît en une image, et les cartes mettaient 220 ms à réapparaître : le f
 clair restait nu entre les deux. La rangée revient donc d'un coup et ne
 s'efface en fondu qu'à l'aller. Pic ramené à **+0.1**.
 
+Le changement de section a exactement le même problème, pour la même raison :
+les cartes du dépilement apparaissent en fondu, donc pendant le décalage le
+fond reste nu. Il utilise donc lui aussi le coulissement. **Le dépilement est
+réservé à la toute première arrivée depuis l'écran d'accueil.**
+
 Le retour utilise aussi une animation distincte : les cartes **coulissent**
 (`is-returning`) au lieu de se dépiler. Le dépilement fait partir toutes les
 cartes de la position de la première, donc on voyait la grande carte de gauche
 pendant toute l'animation — ce qui n'a aucun sens au retour, puisqu'elles n'ont
 jamais quitté leur place.
 
+### 5 septies. Marge du panneau de détail
+
+Le panneau commence **19 px derrière la lame de gauche** (bord gauche à 776,
+bord droit de la lame à 795) : c'est voulu, elles se chevauchent comme sur
+image5. Mais sa marge interne de 3 vh était donc mangée aux deux tiers, et il ne
+restait que **10 px visibles** entre le bord de la lame et le texte.
+
+Corrigé par la marge interne (7 vh) plutôt qu'en déplaçant le panneau, qui
+viendrait buter sur l'avatar : 40 px visibles, comme sur image8. Le corps de
+texte a perdu son retrait de 0.4 vh pour s'aligner exactement sur le titre —
+3 px, mais visibles sur une colonne de texte.
+
 ### 5 quater. La colonne de détail prend la main
 
-Flèche droite ou clic : le panneau de détail s'éclaircit (#2d353d → #414c58),
-son texte passe au blanc et il reçoit le focus, ce qui suffit à le faire défiler
-aux flèches nativement. Flèche gauche pour rendre la main à la liste.
+Flèche droite ou clic : le panneau de détail reçoit le focus, ce qui suffit à
+le faire défiler aux flèches nativement. Flèche gauche pour rendre la main à la
+liste.
 
-**Cet état n'est pas dans les références** — elles ne montrent que des poses
-figées. Il répond à un vrai problème d'usage : le détail restait sombre, peu
-lisible, et rien n'indiquait qu'on pouvait le parcourir.
+Il s'éclaircissait aussi (#2d353d → #414c58, texte au blanc) : retiré, ce
+n'était pas voulu. La classe `is-active` reste — c'est elle qui dit quelle
+colonne reçoit les flèches — mais elle ne porte plus aucune apparence, et le
+liseré de focus du corps suffit à le signaler.
 
 L'anneau de focus global (vert + halo) formait ici une grosse boîte au milieu
 du texte. Comme c'est le panneau entier qui signale qu'il a la main,

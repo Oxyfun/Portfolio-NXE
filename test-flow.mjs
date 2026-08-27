@@ -219,9 +219,17 @@ await p.evaluate(() => {
 })
 await p.keyboard.press('ArrowDown')
 await p.waitForTimeout(1400)
+/* Changement de section : coulissement lui aussi, pas dépilement. Le
+   dépilement fait apparaître les cartes en fondu et laisse le fond nu pendant
+   le décalage — le même flash qu'au retour d'une lame. Il est réservé à la
+   toute première arrivée depuis l'écran d'accueil. */
 step(
-  'changer de section rejoue bien le dépilement',
-  (await p.evaluate(() => window.__entrees)) > 0,
+  'changer de section fait coulisser les cartes',
+  (await p.evaluate(() => window.__retours)) > 0,
+)
+step(
+  'changer de section ne rejoue pas le dépilement',
+  (await p.evaluate(() => window.__entrees)) === 0,
 )
 
 /* Le « flash » au retour : le voile de la lame disparaît d'un coup, et si les
