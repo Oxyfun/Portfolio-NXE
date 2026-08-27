@@ -105,22 +105,37 @@ export default function App() {
      rien demandé. On accumule le delta plutôt que de réagir à chaque
      événement : un pavé tactile en émet des dizaines par geste, et sans seuil
      on traverserait toute la rangée d'un coup. */
-  const wheelAcc = useRef(0)
+  const wheelLock = useRef(0)
   useEffect(() => {
     if (!booted) return
-    const SEUIL = 90
+    /* Un cran de molette = une carte, quelle que soit sa force.
+       L'accumulateur précédent était faux dans les deux sens : une souris qui
+       envoie 100 « points » d'un coup en franchissait le seuil deux fois et
+       sautait une carte, tandis qu'un pavé tactile qui en envoie 8 à la fois
+       demandait deux gestes pour en franchir un seul. On ne compte donc plus la
+       distance : on prend le SENS du premier événement et on se verrouille le
+       temps que la salve retombe. */
+    const VERROU = 320
+    /* 1 et non 4 : un pavé tactile envoie des deltas de 3 ou moins et se
+       retrouvait entièrement ignoré. Le verrou temporel suffit seul à éviter
+       les crans multiples, le seuil ne sert qu'à écarter le bruit. */
+    const MINI = 1
     const onWheel = (e: WheelEvent) => {
-      // Une zone qui peut défiler d'elle-même (le corps de la lame) garde la molette.
-      const cible = e.target as Element | null
-      if (cible?.closest('.blade-body')) return
+      /* Une zone qui peut défiler d'elle-même (le corps de la lame) garde la
+         molette. `instanceof Element` et non un simple `?.` : la cible d'un
+         événement peut être `window` ou `document`, qui n'ont pas de
+         `closest` — l'appeler y lève une exception et le gestionnaire ne fait
+         plus rien du tout. */
+      const cible = e.target
+      if (cible instanceof Element && cible.closest('.blade-body')) return
       e.preventDefault()
       if (openIdx !== null) return
-      wheelAcc.current += e.deltaY + e.deltaX
-      while (Math.abs(wheelAcc.current) >= SEUIL) {
-        const sens = Math.sign(wheelAcc.current)
-        wheelAcc.current -= sens * SEUIL
-        moveTile(sens)
-      }
+      const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      if (Math.abs(d) < MINI) return
+      const now = performance.now()
+      if (now < wheelLock.current) return
+      wheelLock.current = now + VERROU
+      moveTile(Math.sign(d))
     }
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
@@ -135,8 +150,13 @@ export default function App() {
          intercepte pas, sinon la navigation au clavier déclencherait deux
          actions à la fois. Idem pour le corps de la lame, qui doit pouvoir
          défiler aux flèches quand il a le focus. */
-      const cible = e.target as Element | null
-      if (cible?.closest('.blade-body') && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) return
+      const cible = e.target
+      if (
+        cible instanceof Element &&
+        cible.closest('.blade-body') &&
+        (e.key === 'ArrowDown' || e.key === 'ArrowUp')
+      )
+        return
       if (cible instanceof HTMLElement && cible.matches('button, a, [tabindex]') &&
           (e.key === 'Enter' || e.key === ' ')) return
       switch (e.key) {
@@ -220,7 +240,6 @@ export default function App() {
           }}
         />
         <CrtSoftness />
-        <Cursor />
       </>
     )
   }

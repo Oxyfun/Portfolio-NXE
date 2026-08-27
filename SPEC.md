@@ -841,6 +841,19 @@ droite — centre à 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écr
 taille × 1.04. Il passe aussi **devant** le panneau, sinon son bras se fait
 manger par le bord.
 
+### 8 septies. Les semelles ne touchent pas le bas du cadre
+
+Mesuré au rendu sur 12 instants d'animation : **14 à 15 px sur 405, soit 3.5 %
+de la hauteur du bloc**. Dans sa pose animée le personnage ne pose pas ses
+pieds à `y = 0` — je le supposais, donc il flottait de cette hauteur au-dessus
+du sol et son ombre tombait sous ses semelles.
+
+Le bloc est descendu de cet écart, et l'ombre remontée d'autant. Vérification :
+dans la référence les pieds dépassent le bas de la tuile de 6.4 % de sa
+hauteur, chez nous de 6.0 %.
+
+L'ombre reste discrète — image6 n'en montre pas de marquée non plus.
+
 ### 8 quinquies. Le cadrage qui coupait les mains
 
 Le personnage peut pivoter sur 360° : la largeur nécessaire n'est donc pas sa
@@ -863,6 +876,43 @@ se voit pas sur une respiration lente, mais très bien sur un objet qui suit la
 souris : c'est le décalage curseur/personnage qui devient saccadé. Le plafond ne
 protège l'ordonnancement des sons que pendant la navigation au clavier — or on
 ne navigue pas au clavier en faisant tourner l'avatar à la souris.
+
+---
+
+### 1 ter. Le fond animé est un système de particules
+
+Relevé dans `components/Background.qml` du thème Pegasus NPE, qui l'implémente
+au paramètre près. Ce n'est ni un dégradé qui respire ni un calque qui glisse :
+
+| grandeur | valeur |
+|---|---|
+| émission | 2 par seconde, zone ancrée en haut à droite sur 80 % × 80 % |
+| durée de vie | 10 000 ms ± 4 000 |
+| déplacement | `AngleDirection` angle 320° ± 20, magnitude 25 ± 5 px/s |
+| opacité | 0.15 |
+| image | `bg_ring{1..4}.png`, 256 px, tirée au hasard |
+| échelle | de `random × 0.125` vers `random × 0.875 + 0.125` sur 14 000 ms |
+
+L'échelle est programmée sur 14 s alors que l'anneau ne vit que 10 : il meurt
+avant d'atteindre sa taille finale, et c'est ce décalage qui donne des tailles
+si variées.
+
+J'avais d'abord fabriqué six anneaux fixes qui dérivaient ensemble. Ça ne
+ressemblait à rien, et pour une raison de fond : ce qui fait vivre ce fond
+n'est pas un mouvement d'ensemble mais le fait que chaque anneau naisse,
+grandisse et meure avec ses propres valeurs.
+
+Chaque anneau porte sa trajectoire dans des variables CSS et une animation qui
+dure toute sa vie — aucune boucle JS par image, seul l'ajout et le retrait
+passent par un timer. Une vingtaine d'anneaux vivent à un instant donné.
+
+### 2 bis. Chaque carte a son motif, pas sa couleur
+
+Le thème NPE embarque **huit fonds de carte** en 420 × 320 — le format exact de
+nos tuiles. Leurs couleurs moyennes tiennent en 5 unités les unes des autres
+(#a0cb28 à #add02a) : c'est bien le **motif de ronds** qui change d'une carte à
+l'autre, pas la teinte. J'avais fait varier la teinte, ce qui n'était pas
+demandé et contredisait les captures.
 
 ---
 

@@ -64,10 +64,10 @@
   /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
      sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
      contre #2d353d pour la lame de devant. */
-  /* Éclairci : à #282f36 le panneau se fondait dans le fond sombre et se
-     lisait mal. Un liseré clair en haut et une ombre franche lui redonnent un
-     bord, ce qui manquait autant que la luminosité. */
-  background-color: #313943;
+  /* Même ton que la lame de devant. L'écart mesuré sur image10 (#282f36 contre
+     #2d353d) tient en 6 unités, soit le bruit d'une capture : les distinguer
+     n'apportait rien et accentuait l'impression de zone sombre. */
+  background-color: var(--panel);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 1.4vh 4vh rgba(0, 0, 0, 0.5);
   animation: blade-unfold 260ms var(--ease-nxe) 120ms backwards,
@@ -352,6 +352,14 @@
   position: relative;
   z-index: 1;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Sous-titre sous le titre, posé à même le panneau — pas dans une boîte. */
+.blade-sub {
+  flex: none;
+  margin: 0.3vh 0 0;
+  font-size: 2.5vh;
+  color: #a8b3ba;
 }
 
 /* Sans image : le titre porte seul le haut du panneau (image10). */

@@ -120,15 +120,24 @@ export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose 
             <h2 className="blade-heading">{tile.title}</h2>
           )}
 
-          <div className="blade-about">
-            <span className="blade-about-mark">
-              <GlyphMark glyph={tile.glyph} />
-            </span>
-            <span>
-              <strong>À propos — {tile.title}</strong>
-              <em>{tile.subtitle}</em>
-            </span>
-          </div>
+          {/* Le bloc « À propos » encastré n'existe que lorsqu'il y a une image
+              (image8). Sans image, la référence pose le titre et son sous-titre
+              directement sur la surface du panneau (image10) — c'est cette
+              boîte plus sombre que la nôtre qui donnait l'impression d'un trou
+              noir au milieu du détail. */}
+          {tile.image ? (
+            <div className="blade-about">
+              <span className="blade-about-mark">
+                <GlyphMark glyph={tile.glyph} />
+              </span>
+              <span>
+                <strong>À propos — {tile.title}</strong>
+                <em>{tile.subtitle}</em>
+              </span>
+            </div>
+          ) : (
+            <p className="blade-sub">{tile.subtitle}</p>
+          )}
 
           {/* `tabIndex` pour que le corps soit atteignable au clavier : une
               fois focalisé, les flèches le font défiler nativement, et la

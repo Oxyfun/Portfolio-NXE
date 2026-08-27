@@ -57,6 +57,27 @@ remplace Convection par une police libre.
 
 ---
 
+## 1 ter. Assets repris du thème Pegasus NPE et du site de référence
+
+Trois jeux ajoutés le 27/08, tous des assets NXE redistribués par des projets
+tiers — même statut que le § 1, ils **ne sont pas libres de droit**.
+
+| fichier | origine | usage |
+|---|---|---|
+| `public/nxe/bgrings/bg_ring{1..4}.png` | `riquenunes/pegasus-theme-npe` | les anneaux du fond animé (256 × 256, alpha max 64) |
+| `public/nxe/cards/bg{1..8}.png` | idem, `contenttabs/green/backgrounds/` | les huit motifs de carte (420 × 320) |
+| `public/cursor/{default,pointer}.png` | `gabrielcabrera.co/cursor/` | le curseur vert (17 × 22, #a6ff00) |
+
+Le dépôt `riquenunes/pegasus-theme-npe` **ne porte aucun fichier de licence** —
+seulement un README. Ce sont de toute façon des assets Microsoft redistribués :
+la remarque du § 1 s'applique telle quelle.
+
+Le composant `components/Background.qml` de ce même thème a servi de source pour
+les paramètres du fond animé (émission, durée de vie, vitesse, opacité) ; c'est
+de la lecture de code, pas de la copie d'asset.
+
+---
+
 ## 1 bis. Habillage « vieille télé »
 
 | fichier | rôle |

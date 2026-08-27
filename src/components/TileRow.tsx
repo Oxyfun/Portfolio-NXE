@@ -96,6 +96,11 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
         const scale = r <= 0 ? 1 : Math.pow(K, r)
         const x = `calc(var(--margin-x) + var(--tile-w) * ${advanceCoef(r).toFixed(4)})`
         const y = `calc(var(--row-cy) - var(--tile-h) * ${(scale / 2).toFixed(4)})`
+        /* Point de départ de l'animation d'arrivée : la place de la PREMIÈRE
+           carte. Toutes commencent empilées là, puis se dépilent vers la droite
+           l'une après l'autre — c'est le geste d'un paquet qu'on étale. */
+        const x0 = `calc(var(--margin-x) + var(--tile-w) * ${advanceCoef(0).toFixed(4)})`
+        const y0 = `calc(var(--row-cy) - var(--tile-h) * 0.5)`
 
         return (
           <button
@@ -104,15 +109,18 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
             className={`tile${r === 0 ? ' is-selected' : ''}`}
             style={{
               transform: `translate(${x}, ${y}) scale(${scale.toFixed(4)})`,
-              /* Une seule texture existe (BlankGreen.jpg), donc toutes les
-                 tuiles étaient rigoureusement identiques. Dans les références
-                 chaque carte porte son propre visuel ; à défaut, on décale la
-                 tache lumineuse et la teinte d'une carte à l'autre pour qu'on
-                 les distingue. Renseigner `image` sur une tuile reste la vraie
-                 réponse et l'emporte sur ce repli. */
+              /* Le thème NPE embarque HUIT fonds de carte (420 × 320, le format
+                 exact de nos tuiles) : même vert à 5 unités près, seuls les
+                 motifs de ronds changent. C'est ce que montrent les références —
+                 la couleur ne varie pas d'une carte à l'autre, le motif si.
+                 J'avais fait varier la teinte, ce qui n'était pas demandé. */
               ['--tile-i' as string]: String(i),
-              ['--tile-spot' as string]: `${26 + (i % 4) * 16}%`,
-              ['--tile-hue' as string]: `${(i % 4) * 4 - 6}deg`,
+              ['--tile-motif' as string]: `url("/nxe/cards/bg${(i % 8) + 1}.png")`,
+              ['--x' as string]: x,
+              ['--y' as string]: y,
+              ['--s' as string]: scale.toFixed(4),
+              ['--x0' as string]: x0,
+              ['--y0' as string]: y0,
               zIndex: 1000 - i,
               opacity: r < 0 ? 0 : 1,
               pointerEvents: r < 0 ? 'none' : 'auto',

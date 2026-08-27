@@ -59,6 +59,14 @@ const CADRE = {
    * et se faisaient couper net.
    */
   largeurSurHauteur: 0.56,
+  /**
+   * Écart entre les semelles et le bas du canevas, en fraction de sa hauteur.
+   * Mesuré au rendu sur 12 instants d'animation : 14 à 15 px sur 405, soit
+   * 3.5 %. Dans sa pose animée le personnage ne pose pas ses pieds à y = 0 —
+   * je le supposais, et il flottait donc de cette hauteur au-dessus du sol,
+   * avec son ombre décrochée en dessous.
+   */
+  piedsDansCadre: 0.035,
 }
 
 /**
@@ -113,7 +121,9 @@ function geometrie(r: number) {
        bord gauche = bord gauche de la tuile 1 + 0.98 × sa largeur − W0·s/2
        bord haut   = pieds − H0·s,  pieds = centre de rangée + 0.56 × h_tuile·s */
   const x = `calc(var(--margin-x) + var(--tile-w) * ${(av + CADRE.centreDansTuile * s).toFixed(4)} - ${(W0 * s) / 2}vh)`
-  const y = `calc(var(--row-cy) + var(--tile-h) * ${(CADRE.piedsSousRangee * s).toFixed(4)} - ${H0 * s}vh)`
+  // On descend le bloc de l'écart mesuré pour que les SEMELLES tombent sur la
+  // ligne de sol, et non le bas du cadre.
+  const y = `calc(var(--row-cy) + var(--tile-h) * ${(CADRE.piedsSousRangee * s).toFixed(4)} - ${(H0 * s * (1 - CADRE.piedsDansCadre)).toFixed(3)}vh)`
 
   return {
     largeurCanevas: W0,
@@ -135,7 +145,12 @@ function geometrie(r: number) {
  * trancherait à deux contre un, et surtout elle est nette. On le montre.
  */
 const CADRE_LAME = {
-  droiteVh: 33.1,
+  /* 21.5 et non les 33.1 relevés : à la cote d'image10 la silhouette recouvrait
+     la ligne de pied du panneau (« Section / Alternant »). La géométrie des
+     deux panneaux concorde pourtant à 2 % près — c'est notre ligne de pied qui
+     va jusqu'au bord droit là où celle de la référence s'arrête avant. Écart
+     assumé : masquer du texte est pire que 12 vh de décalage. */
+  droiteVh: 21.5,
   piedsPourcent: 87.9,
   echelle: 1.04,
 }
@@ -171,7 +186,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
            `100%` l'avatar se retrouvait collé au bord gauche. */
         transform:
           `translate(calc(100vw - ${CADRE_LAME.droiteVh}vh - ${geo.largeurCanevas / 2}vh),` +
-          ` calc(${CADRE_LAME.piedsPourcent}vh - ${geo.hauteurCanevas}vh))` +
+          ` calc(${CADRE_LAME.piedsPourcent}vh - ${(geo.hauteurCanevas * (1 - CADRE.piedsDansCadre)).toFixed(3)}vh))` +
           ` scale(${CADRE_LAME.echelle})`,
       }
     : { transform: geo.transform }

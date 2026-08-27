@@ -105,6 +105,19 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   écrase le `cursor` calculé de tous les éléments : impossible ensuite d'en déduire la forme
   du curseur personnalisé. Et un raycast (console, avatar) n'est de toute façon pas dans le
   DOM — expose-le en classe.
+- **Avant d'inventer une animation, cherche-la dans les dépôts de `reference/Site`.**
+  Le fond du NXE est un **système de particules** (`Background.qml` du thème Pegasus NPE),
+  pas un calque qui dérive : anneaux émis 2/s, vie 10 s ± 4, angle 320°, opacité 0.15. Six
+  anneaux fixes qui glissent ensemble ne rendent rien — ce qui fait vivre ce fond, c'est que
+  chaque anneau naisse et meure avec ses propres valeurs. Ces dépôts contiennent aussi les
+  huit motifs de carte (420 × 320, même vert à 5 unités près : le motif change, pas la teinte).
+- Un accumulateur de molette est **faux dans les deux sens** : une souris qui envoie 100 d'un
+  coup franchit deux fois le seuil et saute une carte, un pavé tactile qui envoie 3 n'en
+  franchit jamais aucun. Prends le SIGNE du premier événement et verrouille ~320 ms.
+- `e.target` **n'est pas toujours un `Element`** : sur `window` ou `document`, `?.closest()`
+  lève une exception et le gestionnaire cesse de fonctionner. `instanceof Element`.
+- Une **boîte encastrée plus sombre** au milieu d'un panneau se lit comme un trou. La
+  référence pose son contenu à même la surface quand il n'y a pas d'image.
 - Dans un `transform`, un **pourcentage se rapporte à l'élément**, pas à la fenêtre :
   `translate(calc(100% - …))` collait l'avatar au bord gauche. Utilise `100vw`.
 - Deux objets qui doivent bouger ensemble ont besoin de la **même `transform-origin`**.
@@ -126,6 +139,8 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   sonde avec `new Image()` : hors images, utilise `firstFileAvailable`.
 - Pour cadrer un modèle 3D, mesure-le **dans sa pose animée**, pas sur sa boîte de repos. Et
   s'il peut pivoter, ce qu'il faut c'est son **rayon** horizontal max, pas sa largeur de face.
+  Ses **semelles ne touchent pas le bas du cadre** non plus (3.5 % mesurés) : sans ça il
+  flotte et son ombre tombe sous lui.
 - Les modèles 3D sortis d'IA arrivent avec une **texture 2048² de plusieurs mégaoctets qui
   fait 80 % du poids**. Réencoder en JPEG 1024 suffit et ne se voit pas. Le nombre de
   polygones n'est presque jamais le problème.

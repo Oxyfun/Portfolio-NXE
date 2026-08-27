@@ -91,6 +91,7 @@ step("flou CRT présent aussi sur l'accueil", (await p.locator('.crt-soft').coun
 step("pas de rayures sur l'accueil", (await p.locator('.crt-scanlines').count()) === 0)
 step("pas de cadre sur l'accueil", (await p.locator('.crt-frame').count()) === 0)
 
+step("pas de curseur vert sur l'accueil", (await p.locator('.curseur').count()) === 0)
 step("l'indication s'efface au clic", (await p.locator('.boot-cta.is-leaving').count()) === 1)
 await p.waitForSelector('.dash', { timeout: 8000 }).catch(() => {})
 await p.waitForTimeout(400)
@@ -213,8 +214,54 @@ await p.mouse.wheel(0, 150)
 await p.waitForTimeout(600)
 const apresMolette = await selTuile()
 step(`la molette change de tuile (${avantSurvol} → ${apresMolette})`, apresMolette !== avantSurvol)
-await p.mouse.wheel(0, -150)
+
+/* Une salve = UN seul cran. L'accumulateur d'origine était faux dans les deux
+   sens : une souris qui envoie beaucoup d'un coup sautait une carte, un pavé
+   tactile qui envoie peu n'en franchissait aucune. */
+/* On revient sur la première carte : sinon la sélection est déjà au bout de la
+   rangée, la salve ne peut plus avancer et l'écart mesuré vaut 0 — le test
+   échouerait sans que rien ne soit cassé. */
+await p.keyboard.press('ArrowLeft')
+await p.keyboard.press('ArrowLeft')
+await p.waitForTimeout(700)
+const avantSalve = await selTuile()
+/* Vraie salve : six événements dans la MÊME milliseconde, ce que produit une
+   molette crantée. Les envoyer via `p.mouse.wheel` en boucle ne marche pas —
+   chaque aller-retour CDP coûte quelques dizaines de ms et la salve s'étale
+   au-delà du verrou, ce qui faisait constater deux crans à juste titre. */
+await p.evaluate(() => {
+  for (let i = 0; i < 6; i++) {
+    document.body.dispatchEvent(
+      new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true }),
+    )
+  }
+})
 await p.waitForTimeout(600)
+step('une salve de molette ne saute pas de carte', (await selTuile()) - avantSalve === 1)
+
+// Un petit delta (pavé tactile) doit compter comme un cran.
+const avantPave = await selTuile()
+await p.mouse.wheel(0, -3)
+await p.waitForTimeout(600)
+step('un petit delta de pavé tactile est pris en compte', (await selTuile()) !== avantPave)
+
+// Motifs de carte : même couleur partout, motif propre à chacune.
+const motifs = await p.evaluate(() =>
+  [...document.querySelectorAll('.tile')].map((e) =>
+    getComputedStyle(e).getPropertyValue('--tile-motif').trim(),
+  ),
+)
+step(`chaque carte a son motif (${new Set(motifs).size}/${motifs.length})`, new Set(motifs).size === motifs.length)
+step(
+  'aucune rotation de teinte sur les cartes',
+  await p.evaluate(() => getComputedStyle(document.querySelector('.tile-face')).filter === 'none'),
+)
+
+// Fond animé : le système de particules doit tourner.
+step(
+  'les anneaux du fond sont vivants',
+  (await p.evaluate(() => document.querySelectorAll('.anneau').length)) > 10,
+)
 
 /* Les trois boutons de légende faisaient tous la même chose : ils n'étaient pas
    cliquables et le clic atteignait le voile de la lame, qui fermait. */
@@ -227,6 +274,15 @@ step('« Ouvrir » ne referme PAS la lame', await lameOuverte())
 await p.locator('.legend-item').nth(1).click()
 await p.waitForTimeout(700)
 step('« Retour » referme la lame', !(await lameOuverte()))
+
+/* Le panneau de détail ne doit plus contenir de bloc encastré plus sombre :
+   sans image, la référence pose le titre à même la surface. */
+await p.locator('.legend-item').first().click()
+await p.waitForTimeout(800)
+step("le détail n'a plus de bloc encastré sombre", (await p.locator('.blade-about').count()) === 0)
+step('le sous-titre est posé à même le panneau', (await p.locator('.blade-sub').count()) === 1)
+await p.keyboard.press('Escape')
+await p.waitForTimeout(600)
 
 // L'avatar n'appartient qu'à l'accueil.
 await p.keyboard.press('ArrowDown')

@@ -46,32 +46,48 @@
   will-change: transform;
 }
 
-/* Les grands anneaux translucides du NXE. Ceux de `bg.png` sont cuits dans
-   l'image et ne peuvent donc pas bouger ; ce calque en ajoute quelques-uns qui
-   dérivent, ce qui suffit à ce que le fond respire. Peu nombreux et très
-   pâles : le but est qu'on le remarque sans le regarder, pas qu'on compte les
-   cercles. Animé en `transform`, donc composité sans re-peindre le dégradé. */
-.bg-sky::after {
-  content: '';
+/* Anneaux du fond : système de particules relevé sur le thème Pegasus NPE
+   (cf. src/components/Anneaux.tsx pour les constantes). Chaque anneau porte sa
+   propre trajectoire dans des variables CSS ; les images de début et de fin
+   utilisent des variables DIFFÉRENTES, c'est ce qui permet d'animer d'un point
+   à un autre sans aucune boucle JS. */
+.anneaux {
   position: absolute;
-  inset: -18%;
-  background-image:
-    radial-gradient(circle at 18% 26%, transparent 7.4vh, rgba(255, 255, 255, 0.055) 7.9vh, transparent 8.5vh),
-    radial-gradient(circle at 18% 26%, transparent 12.2vh, rgba(255, 255, 255, 0.04) 12.7vh, transparent 13.4vh),
-    radial-gradient(circle at 63% 14%, transparent 5.2vh, rgba(255, 255, 255, 0.05) 5.6vh, transparent 6.1vh),
-    radial-gradient(circle at 82% 34%, transparent 9.1vh, rgba(255, 255, 255, 0.045) 9.6vh, transparent 10.3vh),
-    radial-gradient(circle at 41% 41%, transparent 3.6vh, rgba(255, 255, 255, 0.05) 3.9vh, transparent 4.3vh),
-    radial-gradient(circle at 92% 9%, transparent 6.3vh, rgba(255, 255, 255, 0.04) 6.7vh, transparent 7.2vh);
-  animation: sky-drift 74s ease-in-out infinite alternate;
-  will-change: transform;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
 }
 
-@keyframes sky-drift {
+.anneau {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 256px;
+  height: 256px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transform-origin: 50% 50%;
+  animation-name: anneau-derive;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+@keyframes anneau-derive {
   from {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(var(--x0), var(--y0), 0) scale(var(--s0));
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--op);
+  }
+  80% {
+    opacity: var(--op);
   }
   to {
-    transform: translate3d(2.6vh, -1.8vh, 0) scale(1.045);
+    transform: translate3d(var(--x1), var(--y1), 0) scale(var(--s1));
+    opacity: 0;
   }
 }
 
@@ -128,7 +144,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bg-sky,
-  .bg-sky::after,
+  .anneau,
   .bg-vignette,
   .guide-ripple span {
     animation: none;
@@ -648,6 +664,12 @@
 /* `pointer-events` n'est activé que lorsque le curseur est réellement sur la
    silhouette (décidé par raycast) : sinon l'avatar créerait une zone morte
    devant les tuiles qu'il recouvre. */
+/* Lame ouverte : l'avatar repasse DEVANT le panneau, comme sur image10 où sa
+   silhouette est entière. */
+.avatar3d.is-blade {
+  z-index: 70;
+}
+
 .avatar3d.is-hot {
   pointer-events: auto;
   cursor: grab;
@@ -682,16 +704,18 @@
 .avatar3d-shadow {
   position: absolute;
   left: 50%;
-  /* Les pieds flottent à 4 vh au-dessus du bas du canevas : l'ombre les suit. */
-  bottom: 2.4vh;
-  width: 13vh;
-  height: 3.2vh;
+  /* Sous les SEMELLES, pas sous le cadre : dans sa pose animée le personnage
+     ne pose pas ses pieds au bas du canevas mais 3.5 % plus haut (mesuré au
+     rendu sur 12 instants). L'ombre était donc décrochée sous lui. */
+  bottom: 3.5%;
+  width: 46%;
+  height: 7%;
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse 50% 50% at 50% 50%,
-    rgba(18, 26, 34, 0.42) 0%,
-    rgba(18, 26, 34, 0.18) 45%,
-    rgba(18, 26, 34, 0) 72%
+    rgba(12, 20, 26, 0.55) 0%,
+    rgba(12, 20, 26, 0.3) 42%,
+    rgba(12, 20, 26, 0) 74%
   );
 }
 
@@ -742,61 +766,47 @@
    son propre visuel. À défaut d'images, on décale la tache lumineuse et on
    fait varier la teinte selon l'indice. Assez pour qu'on distingue les cartes,
    assez peu pour rester dans la gamme du NXE. */
+/* Motif de ronds propre à chaque carte. Les huit fonds du thème NPE font
+   420 × 320 — le format exact de nos tuiles — et partagent le même vert à
+   5 unités près : seuls les motifs changent. C'est bien la couleur qui doit
+   rester identique partout, pas le motif. Il l'emporte sur la texture unique
+   quand il est disponible, et disparaît proprement s'il ne l'est pas. */
 .tile-face::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* La tache glisse de 26 % à 74 % de la largeur au fil des cartes. */
-  background: radial-gradient(
-    58% 46% at var(--tile-spot, 50%) 4%,
-    rgba(255, 255, 235, 0.5) 0%,
-    rgba(255, 255, 235, 0) 68%
-  );
-  mix-blend-mode: soft-light;
-}
-
-/* Rotation de teinte discrète : quelques degrés suffisent à séparer deux cartes
-   voisines sans sortir de la gamme du NXE. Calculée en JS et non avec `mod()`
-   en CSS, qui n'est pas encore assez répandu pour qu'on en dépende. */
-.tile-face {
-  filter: hue-rotate(var(--tile-hue, 0deg));
+  background-image: var(--tile-motif);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 /* ── Arrivée dans le dashboard ───────────────────────────────────────────
-   Relevé sur le site de référence : le sol remonte depuis le bas
-   (`translateY(100vh)` → `0`) en `transform 1.0s cubic-bezier(0.65,0,0.35,1)`,
-   et les cartes se posent l'une après l'autre. C'est ça, le « fond animé » —
-   une mise en scène d'entrée, pas une animation d'ambiance. */
-.dash.is-entering .bg-floor {
-  animation: sol-monte 1s cubic-bezier(0.65, 0, 0.35, 1) backwards;
-}
-
-@keyframes sol-monte {
-  from {
-    transform: translateY(100vh);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-/* Chaque carte glisse depuis la droite, décalée de 90 ms sur la précédente.
-   Le délai est porté par `--tile-i`, déjà posé pour la variation de fond. */
+   Les cartes arrivent EMPILÉES à la place de la première, puis se dépilent
+   vers la droite l'une après l'autre — le geste d'un paquet qu'on étale.
+   Chaque carte anime depuis les coordonnées de la première (`--x0`, `--y0`,
+   échelle 1) vers les siennes (`--x`, `--y`, `--s`) : des variables
+   différentes de part et d'autre, seul moyen d'animer d'un point à un autre
+   sans dupliquer le calcul en CSS.
+   Le sol ne bouge pas : l'animation ne concerne que les cartes. */
 .dash.is-entering .tile {
-  animation: carte-entre 520ms var(--ease-nxe) backwards;
-  animation-delay: calc(var(--tile-i, 0) * 90ms);
+  /* 640 ms et 165 ms de décalage : à 560/110 le dépilement était juste, mais
+     trop rapide pour se lire — on voyait le résultat, pas le geste. */
+  animation: carte-depile 640ms var(--ease-nxe) backwards;
+  animation-delay: calc(var(--tile-i, 0) * 165ms);
 }
 
-@keyframes carte-entre {
+@keyframes carte-depile {
   from {
+    transform: translate(var(--x0), var(--y0)) scale(1);
     opacity: 0;
-    /* Décalage en pourcentage de la tuile : indépendant de sa profondeur. */
-    translate: 42% 0;
+  }
+  22% {
+    opacity: 1;
   }
   to {
+    transform: translate(var(--x), var(--y)) scale(var(--s));
     opacity: 1;
-    translate: 0 0;
   }
 }
 
@@ -822,7 +832,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dash.is-entering .bg-floor,
   .dash.is-entering .tile {
     animation: none;
   }

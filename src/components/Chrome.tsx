@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import { Anneaux } from './Anneaux'
 import { firstAvailable } from '../lib/assets'
 import { profile, siteName } from '../data/content'
 
@@ -11,6 +12,9 @@ export function Background() {
   return (
     <>
       <div className="bg-sky" aria-hidden />
+      {/* Entre le ciel et le sol : les anneaux dérivent devant le fond mais
+          derrière l'horizon, comme dans le thème d'origine. */}
+      <Anneaux />
       <div className="bg-floor" aria-hidden />
       <div className="bg-vignette" aria-hidden />
     </>
