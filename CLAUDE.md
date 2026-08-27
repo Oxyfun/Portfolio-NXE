@@ -118,6 +118,16 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   lève une exception et le gestionnaire cesse de fonctionner. `instanceof Element`.
 - Une **boîte encastrée plus sombre** au milieu d'un panneau se lit comme un trou. La
   référence pose son contenu à même la surface quand il n'y a pas d'image.
+- Quand deux propriétés composent un même changement d'état (fond + couleur du texte),
+  **transitionne les deux** : n'en animer qu'une donne un effet en deux temps qui se voit.
+- Une mesure impossible d'un côté l'est peut-être **de l'autre** : le coin haut-gauche d'une
+  tuile n'a aucun contraste (vert sur vert), le coin bas en a beaucoup (vert sur gris). Et un
+  agrandissement au plus proche voisin se lit directement, sans détecteur.
+- Pour rejouer une animation CSS, il faut que la classe soit **réellement retirée du DOM**
+  entre-temps : sans un cadre d'arrêt, React regroupe les deux états et rien ne redémarre.
+- **Ne valide jamais un défilement sans l'avoir fait déborder.** Un panneau qui tient dans sa
+  boîte ne prouve rien : injecte du texte, puis regarde `scrollTop` bouger aux flèches ET à
+  la molette.
 - Dans un `transform`, un **pourcentage se rapporte à l'élément**, pas à la fenêtre :
   `translate(calc(100% - …))` collait l'avatar au bord gauche. Utilise `100vw`.
 - Deux objets qui doivent bouger ensemble ont besoin de la **même `transform-origin`**.

@@ -708,14 +708,17 @@
      ne pose pas ses pieds au bas du canevas mais 3.5 % plus haut (mesuré au
      rendu sur 12 instants). L'ombre était donc décrochée sous lui. */
   bottom: 3.5%;
-  width: 46%;
-  height: 7%;
+  /* Plus large et plus dense qu'au relevé : la référence n'en montre presque
+     pas, mais notre sol est plus clair et une ombre discrète y disparaissait
+     complètement. Écart assumé, au bénéfice de la lisibilité. */
+  width: 62%;
+  height: 10%;
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse 50% 50% at 50% 50%,
-    rgba(12, 20, 26, 0.55) 0%,
-    rgba(12, 20, 26, 0.3) 42%,
-    rgba(12, 20, 26, 0) 74%
+    rgba(10, 17, 22, 0.62) 0%,
+    rgba(10, 17, 22, 0.34) 46%,
+    rgba(10, 17, 22, 0) 76%
   );
 }
 
@@ -779,6 +782,14 @@
   background-image: var(--tile-motif);
   background-size: 100% 100%;
   background-repeat: no-repeat;
+}
+
+/* Lame ouverte : la rangée s'efface. Ni image8 ni image10 ne laissent voir de
+   carte derrière les panneaux — seulement le fond. */
+.dash.has-blade .row {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease-out;
 }
 
 /* ── Arrivée dans le dashboard ───────────────────────────────────────────

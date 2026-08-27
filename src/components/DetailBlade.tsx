@@ -3,7 +3,7 @@
  * Elle ne glisse pas depuis le côté : elle se déplie depuis son bandeau titre.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { firstAvailable } from '../lib/assets'
 import { GlyphMark } from '../lib/glyphs'
 import type { Tile } from '../data/content'
@@ -32,9 +32,28 @@ interface Props {
   onRowChange(i: number): void
   onActivate(i: number): void
   onClose(): void
+  /** Colonne qui a la main : la liste d'actions ou le panneau de détail. */
+  zone: 'liste' | 'detail'
+  onZone(z: 'liste' | 'detail'): void
 }
 
-export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose }: Props) {
+export function DetailBlade({
+  tile,
+  activeRow,
+  onRowChange,
+  onActivate,
+  onClose,
+  zone,
+  onZone,
+}: Props) {
+  const corps = useRef<HTMLDivElement>(null)
+
+  /* Quand le panneau prend la main, on lui donne le focus : les flèches le font
+     alors défiler nativement, sans qu'on ait à réimplémenter le défilement. */
+  useEffect(() => {
+    if (zone === 'detail') corps.current?.focus({ preventScroll: true })
+    else corps.current?.blur()
+  }, [zone])
   const { detail } = tile
   // Casse d'origine : la référence n'affiche pas les titres en capitales.
   const heading = detail.heading ?? tile.title
@@ -70,7 +89,7 @@ export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose 
           </div>
 
           {detail.rows.length > 0 && (
-            <ul className="blade-rows">
+            <ul className="blade-rows" onClick={() => onZone('liste')}>
               {detail.rows.map((row, i) => (
                 <li key={row.label}>
                   {row.href ? (
@@ -102,7 +121,10 @@ export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose 
 
       {/* Panneau arrière, comme sur image5 : bandeau visuel, ligne « À propos »,
           corps de texte, puis une ligne de bas de panneau. */}
-      <section className="blade is-secondary">
+      <section
+        className={`blade is-secondary${zone === 'detail' ? ' is-active' : ''}`}
+        onClick={() => onZone('detail')}
+      >
         <div className="blade-inner">
           {/* Avec image : bandeau visuel, titre posé dessus (image8).
               Sans image : titre seul (image10 — son panneau arrière commence
@@ -142,7 +164,7 @@ export function DetailBlade({ tile, activeRow, onRowChange, onActivate, onClose 
           {/* `tabIndex` pour que le corps soit atteignable au clavier : une
               fois focalisé, les flèches le font défiler nativement, et la
               molette marche déjà grâce à `overflow-y: auto`. */}
-          <div className="blade-body" tabIndex={0}>
+          <div className="blade-body" tabIndex={0} ref={corps}>
             {detail.body.map((p, i) => (
               <p key={i}>{p}</p>
             ))}

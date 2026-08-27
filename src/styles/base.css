@@ -19,7 +19,10 @@
   --tile-w: calc(var(--tile-h) * var(--tile-ratio));
   --row-cy: 57.8vh;          /* les tuiles sont centrées sur la ligne d'horizon */
   --margin-x: 12.97vh;       /* 173 px sur 1334 */
-  --tile-radius: 0.45vh;     /* 7 px pour 736 px de large */
+  /* Mesuré au zoom 4× sur le coin de la tuile 0 d'image6 : 15 à 16 px sur une
+     tuile haute de 561, soit 1.15 vh. J'avais 0.45 — deux fois et demie trop
+     peu, et ça se voyait. */
+  --tile-radius: 1.15vh;     /* 7 px pour 736 px de large */
 
   /* — Typographie.
        Méthode : le corps vient de la HAUTEUR DE CAPITALE relevée sur image4

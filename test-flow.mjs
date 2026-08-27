@@ -121,9 +121,98 @@ step('le fil d\'Ariane disparaît quand la lame est ouverte', (await p.locator('
 step('le compteur disparaît aussi', (await p.locator('.counter').count()) === 0)
 step('la légende passe à Ouvrir / Retour', (await p.locator('.legend-item').count()) === 2)
 
+/* Rayon des coins : mesuré au zoom 4× sur image6 (15–16 px sur 561), soit
+   1.15 vh. Il valait 0.45 et les cartes paraissaient carrées. */
+const rayon = parseFloat(
+  await p.locator('.tile-face').first().evaluate((e) => getComputedStyle(e).borderRadius),
+)
+step(`coins arrondis à ${rayon.toFixed(1)} px (1.15 vh)`, rayon > 8)
+
+// Ni image8 ni image10 ne montrent de carte derrière les panneaux.
+step(
+  'la rangée disparaît derrière la lame',
+  (await p.locator('.row').evaluate((e) => +getComputedStyle(e).opacity)) < 0.05,
+)
+
+/* Le panneau de détail prend la main à la flèche droite : il s'éclaircit et se
+   laisse défiler. Sans ça il restait sombre et rien n'indiquait qu'on pouvait
+   le parcourir. */
+const estActif = () =>
+  p.locator('.blade.is-secondary').evaluate((e) => e.classList.contains('is-active'))
+step('le détail est inactif au départ', !(await estActif()))
+await p.keyboard.press('ArrowRight')
+await p.waitForTimeout(400)
+step('→ donne la main au panneau de détail', await estActif())
+step(
+  'le corps du détail a le focus',
+  await p.evaluate(() => document.activeElement?.classList.contains('blade-body')),
+)
+
+/* Défilement réellement vérifié, pas seulement déclaré possible : on force un
+   texte plus long que le panneau et on regarde `scrollTop` bouger. */
+await p.evaluate(() => {
+  const c = document.querySelector('.blade-body')
+  for (let i = 0; i < 8; i++) {
+    const q = document.createElement('p')
+    q.textContent = `Paragraphe de test ${i} pour faire déborder le panneau.`
+    c.appendChild(q)
+  }
+})
+await p.waitForTimeout(250)
+const deborde = await p.evaluate(() => {
+  const c = document.querySelector('.blade-body')
+  return c.scrollHeight > c.clientHeight + 5
+})
+step('le texte déborde bien du panneau', deborde)
+for (let i = 0; i < 6; i++) {
+  await p.keyboard.press('ArrowDown')
+  await p.waitForTimeout(80)
+}
+const parFleches = await p.evaluate(() => document.querySelector('.blade-body').scrollTop)
+step(`les flèches font défiler le détail (scrollTop ${parFleches})`, parFleches > 20)
+await p.mouse.move(1050, 450)
+await p.mouse.wheel(0, 200)
+await p.waitForTimeout(350)
+step(
+  'la molette aussi',
+  (await p.evaluate(() => document.querySelector('.blade-body').scrollTop)) > parFleches,
+)
+step(
+  'la barre de défilement occupe de la place',
+  (await p.evaluate(() => {
+    const c = document.querySelector('.blade-body')
+    return c.offsetWidth - c.clientWidth
+  })) >= 6,
+)
+await p.keyboard.press('ArrowLeft')
+await p.waitForTimeout(300)
+step('← rend la main à la liste', !(await estActif()))
+
+/* La mise en scène d'entrée se rejoue à la fermeture d'une lame et à chaque
+   changement de section — pas seulement à l'arrivée depuis l'écran d'accueil. */
+await p.evaluate(() => {
+  window.__entrees = 0
+  new MutationObserver(() => {
+    if (document.querySelector('.dash.is-entering')) window.__entrees++
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] })
+})
+
 await p.keyboard.press('Escape')
-await p.waitForTimeout(500)
+await p.waitForTimeout(1400)
 step('Échap referme la lame', (await p.locator('.blade').count()) === 0)
+step(
+  "sortir d'une carte rejoue l'animation des cartes",
+  (await p.evaluate(() => window.__entrees)) > 0,
+)
+await p.evaluate(() => (window.__entrees = 0))
+await p.keyboard.press('ArrowDown')
+await p.waitForTimeout(1400)
+step(
+  'changer de section la rejoue aussi',
+  (await p.evaluate(() => window.__entrees)) > 0,
+)
+await p.keyboard.press('ArrowUp')
+await p.waitForTimeout(1400)
 
 // Effet CRT : flou partout, rayures + cadre uniquement dans le dashboard.
 step('rayures CRT présentes dans le dashboard', (await p.locator('.crt-scanlines').count()) === 1)

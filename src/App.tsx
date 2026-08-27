@@ -27,6 +27,10 @@ export default function App() {
   const [tileIdx, setTileIdx] = useState(0)
   const [openIdx, setOpenIdx] = useState<number | null>(null)
   const [rowIdx, setRowIdx] = useState(0)
+  /* Quelle colonne de la lame a la main : la liste d'actions à gauche, ou le
+     panneau de détail à droite. Flèche droite pour y aller, gauche pour en
+     revenir. Le panneau actif s'éclaircit et se laisse défiler aux flèches. */
+  const [zone, setZone] = useState<'liste' | 'detail'>('liste')
 
   const section = sections[sectionIdx]
   const tiles = section.tiles
@@ -37,6 +41,22 @@ export default function App() {
 
   useEffect(() => {
     void installSceneAssets()
+  }, [])
+
+  /* Rejoue la mise en scène d'entrée des cartes. Elle ne servait qu'à l'arrivée
+     depuis l'écran d'accueil ; on la rejoue aussi à chaque changement de
+     section et à la fermeture d'une lame, où la rangée réapparaît. */
+  const entreeTimer = useRef(0)
+  const rejouerEntree = useCallback(() => {
+    setEntering(false)
+    window.clearTimeout(entreeTimer.current)
+    /* Un cadre d'arrêt avant de remettre la classe : sans ça React regroupe les
+       deux mises à jour, la classe n'est jamais retirée du DOM et l'animation
+       ne redémarre pas. */
+    requestAnimationFrame(() => {
+      setEntering(true)
+      entreeTimer.current = window.setTimeout(() => setEntering(false), 1200)
+    })
   }, [])
 
   // ── Navigation ─────────────────────────────────────────────────────────
@@ -58,17 +78,19 @@ export default function App() {
         if (next !== cur) {
           play('section')
           setTileIdx(0)
+          rejouerEntree()
         }
         return next
       })
     },
-    [play],
+    [play, rejouerEntree],
   )
 
   const open = useCallback(
     (i: number) => {
       setOpenIdx(i)
       setRowIdx(0)
+      setZone('liste')
       play('unfold')
     },
     [play],
@@ -76,8 +98,10 @@ export default function App() {
 
   const close = useCallback(() => {
     setOpenIdx(null)
+    setZone('liste')
     play('back')
-  }, [play])
+    rejouerEntree()
+  }, [play, rejouerEntree])
 
   const activateRow = useCallback(
     (i: number) => {
@@ -162,15 +186,23 @@ export default function App() {
       switch (e.key) {
         case 'ArrowRight':
           e.preventDefault()
-          if (!isOpen) moveTile(1)
+          if (isOpen) {
+            setZone('detail')
+            play('focus')
+          } else moveTile(1)
           break
         case 'ArrowLeft':
           e.preventDefault()
-          if (!isOpen) moveTile(-1)
+          if (isOpen) {
+            setZone('liste')
+            play('focus')
+          } else moveTile(-1)
           break
         case 'ArrowDown':
           e.preventDefault()
           if (isOpen) {
+            // Zone « detail » : on laisse le panneau défiler tout seul.
+            if (zone === 'detail') return
             const n = tiles[openIdx].detail.rows.length
             if (n) {
               setRowIdx((r) => Math.min(n - 1, r + 1))
@@ -181,6 +213,7 @@ export default function App() {
         case 'ArrowUp':
           e.preventDefault()
           if (isOpen) {
+            if (zone === 'detail') return
             if (tiles[openIdx].detail.rows.length) {
               setRowIdx((r) => Math.max(0, r - 1))
               play('focus')
@@ -202,7 +235,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [booted, openIdx, tileIdx, rowIdx, tiles, moveTile, moveSection, open, close, activateRow, play])
+  }, [booted, openIdx, tileIdx, rowIdx, zone, tiles, moveTile, moveSection, open, close, activateRow, play])
 
   // ── Manette ────────────────────────────────────────────────────────────
   useGamepad(
@@ -248,7 +281,7 @@ export default function App() {
 
   return (
     <>
-      <main className={`dash${entering ? ' is-entering' : ''}`}>
+      <main className={`dash${entering ? ' is-entering' : ''}${openTile ? ' has-blade' : ''}`}>
       <Background />
       <Header previous={previousLabel} current={section.label} hidden={!!openTile} />
       <Profile />
@@ -278,6 +311,8 @@ export default function App() {
           onRowChange={setRowIdx}
           onActivate={activateRow}
           onClose={close}
+          zone={zone}
+          onZone={setZone}
         />
       )}
       </main>

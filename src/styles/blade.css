@@ -226,7 +226,14 @@
   text-decoration: none;
   border-radius: 0.6vh;
   border-bottom: 1px solid var(--panel-rule);
-  transition: color 120ms linear;
+  /* Le fond ET la couleur du texte changent ensemble. Seule la couleur était
+     transitionnée : le vert apparaissait d'un coup et le texte blanchissait
+     120 ms plus tard, ce qui se voyait comme deux étapes distinctes. */
+  background: linear-gradient(to bottom, transparent, transparent);
+  transition:
+    color 120ms linear,
+    background 120ms linear,
+    box-shadow 120ms linear;
 }
 
 .blade-row:last-child {
@@ -246,13 +253,15 @@
   text-shadow: 0 1px 2px rgba(30, 60, 0, 0.5);
 }
 
-/* Focalisable : une fois le corps focalisé, les flèches le font défiler
-   nativement. Le contour ne s'affiche qu'au clavier pour ne pas encadrer le
-   texte à chaque clic. */
+/* Focalisable pour que les flèches le fassent défiler. Le contour global
+   (anneau vert + halo) forme ici une grosse boîte au milieu du texte : c'est
+   le PANNEAU qui s'éclaircit pour signaler qu'il a la main, l'indication est
+   déjà là. On garde un liseré discret, pas une cible de tir. */
 .blade-body:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 3px;
+  outline: 1px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 4px;
   border-radius: 0.4vh;
+  box-shadow: none;
 }
 
 .blade-body {
@@ -410,4 +419,51 @@
   font-size: 2.3vh;
   color: #a8b1b6;
   margin-top: 0.2vh;
+}
+
+/* ── Panneau de détail actif ─────────────────────────────────────────────
+   Flèche droite ou clic : le panneau prend la main, s'éclaircit et se laisse
+   défiler aux flèches. Cet état n'est pas dans les références — elles ne
+   montrent qu'une pose figée — mais sans lui le détail restait sombre et peu
+   lisible, et rien n'indiquait qu'on pouvait le parcourir. */
+.blade.is-secondary {
+  transition:
+    background-color 160ms ease-out,
+    box-shadow 160ms ease-out;
+}
+
+.blade.is-secondary.is-active {
+  background-color: #414c58;
+  box-shadow:
+    0 1.4vh 4vh rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.blade.is-secondary.is-active .blade-heading,
+.blade.is-secondary.is-active .blade-body p {
+  color: #ffffff;
+}
+
+.blade.is-secondary.is-active .blade-sub,
+.blade.is-secondary.is-active .blade-foot {
+  color: #cbd4da;
+}
+
+/* Barre de défilement : visible dès que le texte dépasse, et pas seulement au
+   survol — c'est le seul indice qu'il reste quelque chose à lire. */
+.blade-body {
+  scrollbar-gutter: stable;
+}
+
+.blade-body::-webkit-scrollbar {
+  width: 1vh;
+}
+
+.blade-body::-webkit-scrollbar-thumb {
+  border-radius: 0.5vh;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.blade.is-secondary.is-active .blade-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.6);
 }

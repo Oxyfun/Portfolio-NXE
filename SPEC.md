@@ -401,6 +401,28 @@ après le premier, en glissant de la droite.
 
 ---
 
+### 5 quater. La colonne de détail prend la main
+
+Flèche droite ou clic : le panneau de détail s'éclaircit (#2d353d → #414c58),
+son texte passe au blanc et il reçoit le focus, ce qui suffit à le faire défiler
+aux flèches nativement. Flèche gauche pour rendre la main à la liste.
+
+**Cet état n'est pas dans les références** — elles ne montrent que des poses
+figées. Il répond à un vrai problème d'usage : le détail restait sombre, peu
+lisible, et rien n'indiquait qu'on pouvait le parcourir.
+
+L'anneau de focus global (vert + halo) formait ici une grosse boîte au milieu
+du texte. Comme c'est le panneau entier qui signale qu'il a la main,
+un liseré à 22 % suffit.
+
+**La rangée disparaît derrière la lame.** Vérifié sur image8 comme sur image10 :
+au bord gauche de l'écran, derrière les panneaux, il n'y a que le fond — aucune
+carte.
+
+**Surbrillance et texte changeaient en deux temps.** Seule la couleur du texte
+était transitionnée : le vert de sélection apparaissait d'un coup et le texte
+blanchissait 120 ms plus tard. Le fond a maintenant la même transition.
+
 ### 5 ter. Le voile de la lame volait les clics
 
 Les trois boutons de légende faisaient tous la même chose : ils ne faisaient
@@ -905,6 +927,18 @@ grandisse et meure avec ses propres valeurs.
 Chaque anneau porte sa trajectoire dans des variables CSS et une animation qui
 dure toute sa vie — aucune boucle JS par image, seul l'ajout et le retrait
 passent par un timer. Une vingtaine d'anneaux vivent à un instant donné.
+
+### 2 ter. Rayon des coins
+
+Mesuré au zoom 4× sur le coin de la tuile 0 d'image6 : **15 à 16 px sur une
+tuile haute de 561**, soit 1.15 vh, ou 2.76 % de la hauteur de tuile. La valeur
+en place était 0.45 vh — deux fois et demie trop peu, et les cartes paraissaient
+presque carrées.
+
+La détection automatique échoue ici : au coin haut-gauche la tuile et le fond
+sont tous deux verts et clairs, le saut de luminance ne dépasse pas 2 unités.
+Le coin bas-gauche, contre le sol gris, est en revanche parfaitement net — et
+un agrandissement au plus proche voisin donne la lecture directement.
 
 ### 2 bis. Chaque carte a son motif, pas sa couleur
 
