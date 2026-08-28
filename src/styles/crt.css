@@ -4,7 +4,7 @@
    Trois couches indépendantes, empruntées au montage du site de référence
    (voir CREDITS.md) :
 
-     1. `.crt-soft` — un flou très léger sur TOUT ce qui est dessous. Un tube
+     1. `.crt-soft` - un flou très léger sur TOUT ce qui est dessous. Un tube
         cathodique n'a pas de pixel net : c'est ce qui fait « vieux » avant
         même les rayures.
 
@@ -15,11 +15,11 @@
         38 ms programmés, parce que le `setTimeout` attendait le thread
         principal. Le `backdrop-filter` travaille sur le résultat déjà
         rastérisé et ne touche pas à la source.
-     2. `.crt-scanlines` — le masque de lignes cyan / rouge / noir, en
+     2. `.crt-scanlines` - le masque de lignes cyan / rouge / noir, en
         `mix-blend-mode: screen` à 20 %. Le motif source a 3 px de période et
         est étiré en `cover` : à 1920 de large ça donne 9 px, exactement le
         rapport relevé sur les captures de référence (12 px pour 2530 de large).
-     3. `.crt-frame` — le cadre : coins arrondis, bord noir, vignette.
+     3. `.crt-frame` - le cadre : coins arrondis, bord noir, vignette.
 
    Les rayures et le cadre restent NETS (ils ne sont pas dans l'élément flouté) :
    sur un vrai tube, c'est l'image qui est molle, pas la grille d'ouverture.

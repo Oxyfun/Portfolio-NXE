@@ -33,7 +33,7 @@ export async function firstAvailable(...candidates: string[]): Promise<string | 
 const fileCache = new Map<string, Promise<string | null>>()
 
 /**
- * Sonde un fichier quelconque — modèle 3D, son… — par requête HTTP.
+ * Sonde un fichier quelconque - modèle 3D, son… - par requête HTTP.
  *
  * `firstAvailable` ne convient pas ici : elle teste avec `new Image()`, qui
  * échoue systématiquement sur un `.glb` puisque le navigateur ne sait pas le
@@ -64,23 +64,20 @@ export async function firstFileAvailable(...candidates: string[]): Promise<strin
   return null
 }
 
-export const SKY_CANDIDATES = ['/assets/background.jpg', '/assets/background.png', '/nxe/bg.png']
-export const FLOOR_CANDIDATES = ['/assets/floor.png', '/nxe/bgFloor.png']
-export const TILE_CANDIDATES = ['/assets/tile.png', '/assets/tile.jpg', '/nxe/cards/BlankGreen.jpg']
-export const PANEL_CANDIDATES = ['/assets/panel.png', '/nxe/BackgroundPanel.png']
+const SKY_CANDIDATES = ['/assets/background.jpg', '/assets/background.png', '/nxe/bg.png']
+const FLOOR_CANDIDATES = ['/assets/floor.png', '/nxe/bgFloor.png']
+const TILE_CANDIDATES = ['/assets/tile.png', '/assets/tile.jpg', '/nxe/cards/BlankGreen.jpg']
+const PANEL_CANDIDATES = ['/assets/panel.png', '/nxe/BackgroundPanel.png']
 
 /**
  * Icônes NXE d'origine, quand le glyphe demandé en a une.
- * `music` et `film` sont des alias : autant utiliser les vraies icônes
- * « Music Library » et « Video Library » plutôt qu'un SVG approchant.
+ * `film` est un alias : autant utiliser la vraie icône « Video Library » que
+ * redessiner un SVG approchant.
  */
-export const NXE_ICONS: Partial<Record<string, string>> = {
-  musiclib: '/nxe/icons/icon_musiclib.png',
+const NXE_ICONS: Partial<Record<string, string>> = {
   picturelib: '/nxe/icons/icon_picturelib.png',
-  videolib: '/nxe/icons/icon_videolib.png',
   gamelib: '/nxe/icons/icon_gamelib.png',
   settings: '/nxe/icons/icon_settings.png',
-  music: '/nxe/icons/icon_musiclib.png',
   film: '/nxe/icons/icon_videolib.png',
 }
 

@@ -60,7 +60,7 @@ remplace Convection par une police libre.
 ## 1 ter. Assets repris du thème Pegasus NPE et du site de référence
 
 Trois jeux ajoutés le 27/08, tous des assets NXE redistribués par des projets
-tiers — même statut que le § 1, ils **ne sont pas libres de droit**.
+tiers - même statut que le § 1, ils **ne sont pas libres de droit**.
 
 | fichier | origine | usage |
 |---|---|---|
@@ -68,7 +68,7 @@ tiers — même statut que le § 1, ils **ne sont pas libres de droit**.
 | `public/nxe/cards/bg{1..8}.png` | idem, `contenttabs/green/backgrounds/` | les huit motifs de carte (420 × 320) |
 | `public/cursor/{default,pointer}.png` | `gabrielcabrera.co/cursor/` | le curseur vert (17 × 22, #a6ff00) |
 
-Le dépôt `riquenunes/pegasus-theme-npe` **ne porte aucun fichier de licence** —
+Le dépôt `riquenunes/pegasus-theme-npe` **ne porte aucun fichier de licence** -
 seulement un README. Ce sont de toute façon des assets Microsoft redistribués :
 la remarque du § 1 s'applique telle quelle.
 
@@ -87,7 +87,7 @@ de la lecture de code, pas de la copie d'asset.
 
 Récupérés au même endroit, mais **ce ne sont pas des assets Microsoft** : ce sont des
 textures d'habillage ajoutées par le site de référence, de provenance inconnue. Elles se
-régénèrent facilement si tu veux t'en passer — le motif fait trois lignes de haut (cyan
+régénèrent facilement si tu veux t'en passer - le motif fait trois lignes de haut (cyan
 `#00ffc0`, rouge `#f30032`, noir) et le cadre est un rectangle à coins arrondis avec vignette.
 Les deux chemins sont dans `src/styles/crt.css`, et l'effet se désactive en mettant
 `--crt-blur: 0` et `--crt-scanline-opacity: 0`.
@@ -99,7 +99,7 @@ Les deux chemins sont dans `src/styles/crt.css`, et l'effet se désactive en met
 `reference/image1.png` … `image5.png` sont des captures de
 <https://gabrielcabrera.co/> fournies par le commanditaire du projet. Elles ne
 servent qu'à la mesure et à la comparaison (`compare.mjs`) et ne sont pas
-publiées avec le site — pense à exclure `reference/` de ton déploiement.
+publiées avec le site - pense à exclure `reference/` de ton déploiement.
 
 Le portfolio de Gabriel Cabrera a servi de référence visuelle et de source pour
 les assets Microsoft listés ci-dessus. **Aucun de son code n'a été repris** : le
@@ -115,14 +115,14 @@ style avatar Xbox 360, puis riggé et animé par leur outil.
 
 ⚠️ **Il a été généré sous licence CC BY 4.0**, l'option « Privé » étant réservée aux
 formules payantes. Le modèle est donc publié et réutilisable par des tiers avec
-attribution. C'est un avatar cartoon stylisé, pas un scan photoréaliste — le niveau de
-sensibilité n'a rien à voir — mais c'est à savoir.
+attribution. C'est un avatar cartoon stylisé, pas un scan photoréaliste - le niveau de
+sensibilité n'a rien à voir - mais c'est à savoir.
 
 Les fichiers d'origine sont dans `assets-source/`, hors du build.
 
 ---
 
-## 3. Recréations open source — licences vérifiées
+## 3. Recréations open source - licences vérifiées
 
 Le brief demandait de vérifier quatre dépôts. Contrôle fait via l'API GitHub :
 
@@ -135,8 +135,8 @@ Le brief demandait de vérifier quatre dépôts. Contrôle fait via l'API GitHub
 
 Sans licence explicite, le droit d'auteur par défaut s'applique : « public sur
 GitHub » ne veut pas dire « réutilisable ». **Rien n'a été repris de ces quatre
-dépôts**, ni code ni assets. Le seul intérêt qu'ils auraient présenté — les
-textures NXE — est de toute façon couvert par la section 1, et à une source plus
+dépôts**, ni code ni assets. Le seul intérêt qu'ils auraient présenté - les
+textures NXE - est de toute façon couvert par la section 1, et à une source plus
 directe.
 
 *(Note : les trois dernières lignes ont été relevées alors que l'API GitHub était
@@ -158,7 +158,7 @@ Comme rien n'en est repris, la question reste théorique.)*
 | [pngjs](https://github.com/pngjs/pngjs) | MIT |
 
 Aucune bibliothèque d'animation : tout est en CSS. `motion` avait été installé au
-départ puis retiré — le navigateur gère nativement ces transitions, un runtime de plus
+départ puis retiré - le navigateur gère nativement ces transitions, un runtime de plus
 n'apportait rien.
 
 ---
@@ -170,3 +170,11 @@ les composants React, les glyphes SVG `home` / `cloud` / `terminal` / `school` /
 `mail` / `server` / `search` / `keyboard`, l'écran d'accueil three.js, l'outillage
 `compare.mjs` / `measure.mjs` / `audit.mjs` / `pose.mjs` / `test-flow.mjs`, le montage de
 l'effet vieille télé, et les textes du site.
+
+## Favicon
+
+Le favicon du site est la sphere Xbox de `Legend_Menu.png`, recadree sur son
+glyphe et redimensionnee. C'est une marque de Microsoft, au meme titre que le
+reste des assets listes ici : reprise en connaissance de cause pour un portfolio
+personnel non commercial, et retirable en supprimant `public/favicon*` et
+`public/apple-touch-icon.png` avec les balises correspondantes d'`index.html`.

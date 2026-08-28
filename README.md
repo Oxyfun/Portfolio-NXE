@@ -1,12 +1,12 @@
 # Portfolio NXE
 
 Portfolio personnel de Nolan, dont l'interface reproduit le dashboard
-**New Xbox Experience** de la Xbox 360 (2008–2010).
+**New Xbox Experience** de la Xbox 360 (2008-2010).
 
 Vite + React + TypeScript · three.js pour l'écran d'accueil · build statique, aucun backend.
 
-- `SPEC.md` — l'analyse des captures de `reference/` et les décisions qui en découlent.
-- `CREDITS.md` — tout ce qui vient d'ailleurs, et sous quelle licence.
+- `SPEC.md` - l'analyse des captures de `reference/` et les décisions qui en découlent.
+- `CREDITS.md` - tout ce qui vient d'ailleurs, et sous quelle licence.
 
 ---
 
@@ -57,11 +57,11 @@ Autres scripts :
 | **Clic sur la console** | démarre (le curseur passe à `pointer` quand on la survole) |
 | **Entrée** ou **Espace** | démarre au clavier |
 
-Au clic, la console pivote toujours vers sa face avant — celle du bouton power — quelle que
+Au clic, la console pivote toujours vers sa face avant - celle du bouton power - quelle que
 soit l'orientation où tu l'as laissée, en zoomant dessus, puis tout s'efface dans le blanc.
 
 Le texte « Cliquer sur la console pour continuer » est une indication : il n'est
-pas cliquable. Seule la console l'est — le clic est validé par un raycast sur le
+pas cliquable. Seule la console l'est - le clic est validé par un raycast sur le
 modèle, pas par une zone rectangulaire.
 
 Le son est coupé tant que tu n'as pas interagi avec la page : c'est la politique
@@ -69,9 +69,9 @@ autoplay des navigateurs, pas un réglage.
 
 Trois paramètres d'URL, utiles pour le développement :
 
-- `?boot=0` — saute l'écran d'accueil ;
-- `?spin=0` — fige la rotation de la console 3D ;
-- `?pose=x,y,roll,scale` — impose une pose à la console 3D.
+- `?boot=0` - saute l'écran d'accueil ;
+- `?spin=0` - fige la rotation de la console 3D ;
+- `?pose=x,y,roll,scale` - impose une pose à la console 3D.
 
 ---
 
@@ -122,7 +122,7 @@ Glyphes dessinés en SVG dans le même langage : `home`, `cloud`, `terminal`,
 
 Pour en ajouter un, deux options :
 
-1. déposer `public/assets/icons/<id>.png` — il l'emporte automatiquement ;
+1. déposer `public/assets/icons/<id>.png` - il l'emporte automatiquement ;
 2. ajouter une entrée dans `SHAPES` de [`src/lib/glyphs.tsx`](src/lib/glyphs.tsx).
    Les chemins se dessinent dans une boîte de 120 × 120 ; le dégradé
    blanc → vert-jaune, le reflet et l'ombre sont appliqués automatiquement.
@@ -135,7 +135,7 @@ Pour en ajouter un, deux options :
 
 `public/nxe/`, `public/fonts/` et `public/audio/` contiennent les assets NXE
 d'origine (fond, texture de tuile, icônes, pastilles A/B, police Convection,
-sons du dashboard). Voir `CREDITS.md` — **lis-le avant de déployer ce site sous
+sons du dashboard). Voir `CREDITS.md` - **lis-le avant de déployer ce site sous
 un nom commercial.**
 
 `public/xbox360.glb` est le modèle 3D de la console pour l'écran d'accueil.
@@ -160,14 +160,14 @@ dossier est vide.
 | `public/avatar.glb` | l'avatar 3D devant les tuiles (ou `public/assets/avatar.glb`) |
 
 Si `public/xbox360.glb` est absent, l'écran d'accueil construit une
-approximation de la console en géométrie procédurale — moins jolie, mais le site
+approximation de la console en géométrie procédurale - moins jolie, mais le site
 démarre.
 
 ### L'avatar 3D
 
 `public/avatar.glb` est affiché devant la rangée de tuiles, animé en boucle. Le composant
 choisit tout seul l'animation d'attente parmi celles du fichier (il cherche `breathe`,
-`idle` ou `stand` dans les noms, sinon prend la plus longue — marcher et courir sont courts).
+`idle` ou `stand` dans les noms, sinon prend la plus longue - marcher et courir sont courts).
 
 **Il appartient à la rangée.** Il se tient au bord droit de la **deuxième** tuile et suit
 sa profondeur : quand tu sélectionnes cette tuile il avance et grandit avec elle, et quand
@@ -178,13 +178,13 @@ déplace à droite, devant le panneau. Tout est calé sur les captures de réfé
 **On peut le faire tourner** : maintiens le clic sur lui et glisse de gauche à droite, il
 pivote sur 360° et repart en roue libre quand tu lâches. Un tour complet fait 320 px de
 glissement. Il tourne uniquement sur lui-même, les pieds restent au sol. Le curseur passe
-à « main » quand tu es dessus — et seulement quand tu es vraiment sur la silhouette : il
+à « main » quand tu es dessus - et seulement quand tu es vraiment sur la silhouette : il
 ne mange jamais un clic destiné à la tuile qu'il recouvre. Relâcher ne resélectionne rien ;
 il faut bouger la souris pour ça.
 
 **Chargement différé** : le fichier n'est sondé qu'après le premier rendu, et three.js
 n'est importé que si le modèle existe. Le dashboard s'affiche sans lui, puis l'avatar
-apparaît en fondu. Supprime le fichier et il n'y a simplement pas d'avatar — rien ne casse,
+apparaît en fondu. Supprime le fichier et il n'y a simplement pas d'avatar - rien ne casse,
 et three.js n'est pas chargé du tout.
 
 Pour en mettre un autre, passe-le d'abord par l'optimiseur :
@@ -262,9 +262,9 @@ server {
 
 `compare.mjs` ouvre le site, capture cinq vues, et pour chacune écrit dans `shots/` :
 
-- `iter-NN-<vue>.png` — la capture brute,
-- `iter-NN-<vue>-side.png` — la référence et la capture côte à côte,
-- `iter-NN-<vue>-diff.png` — la différence absolue amplifiée ×3,
+- `iter-NN-<vue>.png` - la capture brute,
+- `iter-NN-<vue>-side.png` - la référence et la capture côte à côte,
+- `iter-NN-<vue>-diff.png` - la différence absolue amplifiée ×3,
 - et un score dans `shots/report.json`, avec l'écart par rapport à l'itération précédente.
 
 Le script échoue si une erreur console apparaît.
@@ -288,7 +288,7 @@ src/
   data/content.ts        ← tout le contenu du site
   lib/assets.ts          résolution des assets avec repli en cascade
   lib/glyphs.tsx         glyphes SVG + traitement NXE (dégradé, reflet, ombre)
-  hooks/useSounds.ts     sons, avec le décalage de 38–45 ms après l'animation
+  hooks/useSounds.ts     sons, avec le décalage de 38-45 ms après l'animation
   hooks/useGamepad.ts    API Gamepad
   components/
     Chrome.tsx           fond, en-tête, bloc profil, pied de page, orbe Guide

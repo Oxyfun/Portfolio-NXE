@@ -1,5 +1,5 @@
 /**
- * compare.mjs — boucle de fidélité visuelle.
+ * compare.mjs - boucle de fidélité visuelle.
  *
  * Ouvre le site, capture, et pose la capture À CÔTÉ de la référence
  * correspondante dans une planche de comparaison, plus une carte de différence
@@ -121,7 +121,7 @@ function cropPng(src, crop) {
   return out
 }
 
-/** Redimensionnement bilinéaire — suffisant, et évite une dépendance native. */
+/** Redimensionnement bilinéaire - suffisant, et évite une dépendance native. */
 function resize(src, w, h) {
   const out = new PNG({ width: w, height: h })
   const sx = src.width / w
@@ -178,7 +178,7 @@ function diffMap(a, b, gain = 3) {
   return { png: out, score: total / (a.data.length / 4) }
 }
 
-/** Moyenne d'une grille de blocs — utile pour situer l'écart, pas juste le chiffrer. */
+/** Moyenne d'une grille de blocs - utile pour situer l'écart, pas juste le chiffrer. */
 function blockReport(a, b, cols = 6, rows = 4) {
   const bw = Math.floor(a.width / cols)
   const bh = Math.floor(a.height / rows)
@@ -323,7 +323,7 @@ async function main() {
   console.log(`\n── itération ${ITER} ────────────────────────────────`)
   for (const r of results) {
     console.log(
-      `  ${r.view.padEnd(14)} ${String(r.score ?? '—').padStart(7)}   (${r.viewport ?? ''} vs ${r.ref ?? ''})`,
+      `  ${r.view.padEnd(14)} ${String(r.score ?? '-').padStart(7)}   (${r.viewport ?? ''} vs ${r.ref ?? ''})`,
     )
     if (r.grid) for (const line of r.grid) console.log('      ' + line.map((v) => String(v).padStart(4)).join(''))
   }

@@ -9,3 +9,6 @@ tsconfig.tsbuildinfo
 
 # Scripts de mise au point temporaires (cf. CLAUDE.md).
 *.tmp.mjs
+
+# Captures de la passe d audit, regenerables a la demande.
+shots/check/

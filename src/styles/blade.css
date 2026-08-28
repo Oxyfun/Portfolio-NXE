@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Panneau de détail — la « lame » NXE (cf. image3, image5)
+   Panneau de détail - la « lame » NXE (cf. image3, image5)
    ========================================================================== */
 
 .blade-layer {
@@ -29,7 +29,7 @@
 }
 
 /* `max-height` : la lame grandit avec son contenu, mais s'arrête avant la
-   légende du pied de page. Avec cinq lignes d'actions — la section Contact —
+   légende du pied de page. Avec cinq lignes d'actions - la section Contact -
    elle passait dessous et la dernière ligne devenait illisible. Au-delà, c'est
    la LISTE qui défile, pas la lame qui déborde. */
 .blade {
@@ -44,7 +44,7 @@
   border-radius: 1.2vh;
   background-color: var(--panel);
   /* BackgroundPanel.png est un dégradé 75x75 (#465056 → #262f38) : il est fait
-     pour être ÉTIRÉ sur toute la lame, pas répété — le répéter donne un
+     pour être ÉTIRÉ sur toute la lame, pas répété - le répéter donne un
      matelassage qui n'existe nulle part dans les références. */
   background-image: var(--panel-texture);
   background-repeat: no-repeat;
@@ -76,9 +76,17 @@
   /* Le panneau commence 19 px DERRIÈRE la lame de gauche (relevé : bord gauche
      à 776, bord droit de la lame à 795). Sa marge interne de 3 vh était donc
      mangée aux deux tiers et il ne restait que 10 px visibles entre le bord de
-     la lame et le texte — d'où l'impression de texte collé. 7 vh rétablit une
+     la lame et le texte - d'où l'impression de texte collé. 7 vh rétablit une
      quarantaine de pixels visibles, comme sur image8. */
   padding-left: 7vh;
+  /* L'avatar est revenu à sa cote relevée et sa silhouette entre de 74 px dans
+     ce panneau. Dans la référence il chevauche aussi le panneau - mais là-bas le
+     contenu (titre + deux barres) n'occupe pas toute la largeur, donc rien n'est
+     caché. Notre corps de texte, lui, allait jusqu'au bord : les fins de ligne
+     passaient derrière l'épaule. On réserve la bande que la silhouette occupe
+     plutôt que de déplacer le personnage - il n'y a que 151 px entre la fin du
+     texte et l'orbe, et il en fait 180. */
+  padding-right: 8.6vh;
   /* `filter` sur un panneau ré-rastérise tout son sous-arbre : la nuance plus
      sombre du panneau arrière est un fond, pas un filtre. Mesuré #282f36
      contre #2d353d pour la lame de devant. */
@@ -127,7 +135,7 @@
 .blade-inner {
   animation: fade-in 220ms ease-out 90ms backwards;
   /* Colonne : le bandeau et l'encart gardent leur taille, seule la liste cède.
-     `min-height: 0` est indispensable — sans lui un enfant flex refuse de
+     `min-height: 0` est indispensable - sans lui un enfant flex refuse de
      rétrécir sous sa hauteur de contenu et rien ne défile. */
   display: flex;
   flex-direction: column;
@@ -230,17 +238,6 @@
   white-space: nowrap;
 }
 
-.blade-stars {
-  display: flex;
-  gap: 0.5vh;
-  justify-content: flex-end;
-}
-
-.blade-stars img {
-  width: 3vh;
-  height: 3vh;
-}
-
 .blade-rows {
   margin-top: 2vh;
   list-style: none;
@@ -270,7 +267,7 @@
   border-radius: 0.6vh;
   border-bottom: 1px solid var(--panel-rule);
   /* AUCUNE transition : le fond et la couleur changent dans la même image.
-     Transitionner les deux ne suffisait pas — un `linear-gradient` ne
+     Transitionner les deux ne suffisait pas - un `linear-gradient` ne
      s'interpole pas depuis `transparent`, donc le vert continuait d'apparaître
      d'un coup pendant que le texte mettait 120 ms. La sélection du NXE est de
      toute façon instantanée. */
@@ -312,7 +309,7 @@
      de 3 px, visible sur une colonne de texte. */
   padding: 0;
   /* Dernier recours quand le texte dépasse : il défile, il ne disparaît pas.
-     `min-height: 0` est indispensable — sans lui un enfant flex refuse de
+     `min-height: 0` est indispensable - sans lui un enfant flex refuse de
      rétrécir sous sa hauteur de contenu et l'`overflow` ne sert à rien. */
   min-height: 0;
   overflow-y: auto;
@@ -327,7 +324,7 @@
   margin: 0 0 1.3vh;
   /* Interligne relevé sur image8 : trois lignes consécutives à 51 px d'écart
      exactement, soit 3.78 vh. Le nôtre en faisait 4.50 (2.9 × 1.55), 19 % de
-     trop — et c'est une bonne part de la raison pour laquelle le texte
+     trop - et c'est une bonne part de la raison pour laquelle le texte
      débordait. Recoupement : la référence loge ~56 caractères par ligne dans un
      panneau large de 30 % d'écran, nous 37 dans 33 %.
      Je mesure l'interligne, pas le corps : la répartition entre taille et
@@ -394,7 +391,7 @@
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* Sous-titre sous le titre, posé à même le panneau — pas dans une boîte. */
+/* Sous-titre sous le titre, posé à même le panneau - pas dans une boîte. */
 .blade-sub {
   flex: none;
   margin: 0.3vh 0 0;
@@ -454,12 +451,12 @@
 
 /* ── Panneau de détail : quelle colonne a la main ─────────────────────────
    Flèche droite ou clic : le panneau reçoit les flèches et se laisse défiler.
-   `is-active` ne porte AUCUN changement d'apparence — il s'éclaircissait, ce
+   `is-active` ne porte AUCUN changement d'apparence - il s'éclaircissait, ce
    n'était pas voulu. La classe reste : elle dit quelle colonne a la main, et
    le liseré de focus du corps suffit à le signaler. */
 
 /* Barre de défilement : visible dès que le texte dépasse, et pas seulement au
-   survol — c'est le seul indice qu'il reste quelque chose à lire. */
+   survol - c'est le seul indice qu'il reste quelque chose à lire. */
 .blade-body {
   scrollbar-gutter: stable;
 }
@@ -477,7 +474,7 @@
 /* ── Barre de défilement dessinée ────────────────────────────────────────
    Remplace la barre native, dont le chrome ignore `cursor` : le curseur vert
    y disparaissait au profit de la flèche système. Elle reste tirable.
-   Elle se place dans le conteneur positionné le plus proche — la lame. */
+   Elle se place dans le conteneur positionné le plus proche - la lame. */
 .defil {
   position: absolute;
   top: 0;
@@ -524,4 +521,80 @@
 .defil-zone > .blade-body {
   flex: 1;
   min-height: 0;
+}
+
+/* ── Barres de progression ───────────────────────────────────────────────
+   Relevé sur image10 : libellé à gauche, pilule très sombre, remplissage vert
+   proportionnel, et le chiffre centré DANS la pilule (pas à côté). La piste
+   fait 28.5 vh de large pour 2.55 de haut sur la référence. */
+.blade-bars {
+  flex: none;
+  margin-top: 1.6vh;
+  display: grid;
+  gap: 0.9vh;
+}
+
+.blade-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.4vh;
+  font-size: 2.5vh;
+}
+
+.blade-bar-label {
+  color: #c3ccd2;
+  white-space: nowrap;
+}
+
+.blade-bar-piste {
+  position: relative;
+  display: block;
+  height: 2.9vh;
+  /* Bornée comme sur la référence (28.5 vh) : étirée sur toute la colonne elle
+     écrase la mise en page du panneau. */
+  max-width: 30vh;
+  border-radius: 1.45vh;
+  background: rgba(0, 0, 0, 0.62);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.blade-bar-plein {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 1.45vh;
+  /* Même vert que le bouton sélectionné : reflet en haut, creux, remontée. */
+  background: linear-gradient(
+    to bottom,
+    var(--green-hi-1) 0%,
+    var(--green-hi-2) 60%,
+    var(--green-hi-3) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.blade-bar-valeur {
+  position: relative;
+  display: block;
+  text-align: center;
+  line-height: 2.9vh;
+  color: #ffffff;
+  font-size: 2.2vh;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Le même texte, à la même place, mais sombre - et découpé exactement à la
+   largeur du remplissage. Une ombre portée ne suffisait pas : blanc sur le vert
+   mesuré, on tombe à 2.53:1, sous le minimum de 3:1. En sombre sur ce vert on
+   remonte au-delà de 7:1, et rien ne bouge d'un pixel puisque les deux copies
+   partagent le même centrage. */
+.blade-bar-valeur.is-sur-plein {
+  position: absolute;
+  inset: 0;
+  color: #1b2a06;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+  clip-path: inset(0 calc(100% - var(--plein, 0%)) 0 0);
 }

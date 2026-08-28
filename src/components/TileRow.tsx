@@ -2,9 +2,9 @@
  * Rangée de tuiles en fuite.
  *
  * Modèle relevé sur image4 (SPEC § 2) :
- *   – facteur d'échelle constant K = 0.83 par tuile ;
- *   – toutes les tuiles sont centrées sur la même ligne (l'horizon) ;
- *   – le pas horizontal vaut 0.79 × la largeur de la tuile précédente.
+ *   - facteur d'échelle constant K = 0.83 par tuile ;
+ *   - toutes les tuiles sont centrées sur la même ligne (l'horizon) ;
+ *   - le pas horizontal vaut 0.79 × la largeur de la tuile précédente.
  *
  * Positions en `calc()` sur les variables de scène : aucune écoute de resize,
  * et la mise en page reste correcte à n'importe quel ratio d'écran.
@@ -25,7 +25,7 @@ const ADVANCE = 0.79;
  *
  * Les quatre premières valeurs sont relevées directement sur image4 : la suite
  * n'est pas exactement géométrique (0.748 puis 0.713 puis 0.552 de pas), et
- * caler un facteur unique laissait 15 px d'erreur sur la deuxième tuile — visible.
+ * caler un facteur unique laissait 15 px d'erreur sur la deuxième tuile - visible.
  * Au-delà de la quatrième, on prolonge géométriquement.
  */
 const CUM = [0, 0.7483, 1.461, 2.0133];
@@ -66,7 +66,7 @@ function TileFace({ tile }: { tile: Tile }) {
  * Reflet au sol.
  *
  * Relevé au pixel sur image4 : juste sous la tuile, le sol vaut `#8f969d`
- * contre `#8c929e` en zone nue — soit +3 seulement. Et à l'endroit du titre
+ * contre `#8c929e` en zone nue - soit +3 seulement. Et à l'endroit du titre
  * inversé, +6 à +12. Autrement dit le NXE ne renvoie PAS un miroir de la
  * tuile (qui produirait une bande sombre, la tuile étant presque noire en
  * bas) : il ne renvoie que la lumière. On ne duplique donc que le texte, sans
@@ -100,7 +100,7 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
         const y = `calc(var(--row-cy) - var(--tile-h) * ${(scale / 2).toFixed(4)})`;
         /* Point de départ de l'animation d'arrivée : la place de la PREMIÈRE
            carte. Toutes commencent empilées là, puis se dépilent vers la droite
-           l'une après l'autre — c'est le geste d'un paquet qu'on étale. */
+           l'une après l'autre - c'est le geste d'un paquet qu'on étale. */
         const x0 = `calc(var(--margin-x) + var(--tile-w) * ${advanceCoef(0).toFixed(4)})`;
         const y0 = `calc(var(--row-cy) - var(--tile-h) * 0.5)`;
 
@@ -113,7 +113,7 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
               transform: `translate(${x}, ${y}) scale(${scale.toFixed(4)})`,
               /* Le thème NPE embarque HUIT fonds de carte (420 × 320, le format
                  exact de nos tuiles) : même vert à 5 unités près, seuls les
-                 motifs de ronds changent. C'est ce que montrent les références —
+                 motifs de ronds changent. C'est ce que montrent les références -
                  la couleur ne varie pas d'une carte à l'autre, le motif si.
                  J'avais fait varier la teinte, ce qui n'était pas demandé. */
               ["--tile-i" as string]: String(i),
@@ -135,7 +135,7 @@ function TileRowImpl({ tiles, selected, onSelect, onOpen }: Props) {
             onFocus={() => r !== 0 && onSelect(i)}
           >
             <span className="sr-only">
-              {tile.title} — {tile.subtitle}
+              {tile.title} - {tile.subtitle}
             </span>
             <div className="tile-glow" aria-hidden />
             <TileReflection tile={tile} />

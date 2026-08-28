@@ -61,7 +61,7 @@ export function Cursor() {
       el.style.opacity = '1'
       /* La forme se déduit de la nature de l'élément survolé.
          J'ai d'abord lu son `cursor` calculé, pour ne pas tenir une liste de
-         sélecteurs en double du CSS — mais c'est impossible : masquer le
+         sélecteurs en double du CSS - mais c'est impossible : masquer le
          curseur natif écrase justement cette valeur pour tout le monde, et la
          variante « pointer » ne s'affichait donc jamais. Les deux cas 3D
          (console de l'accueil, silhouette de l'avatar) exposent leur état sous

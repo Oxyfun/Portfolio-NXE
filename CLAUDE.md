@@ -1,6 +1,6 @@
-# Portfolio NXE — instructions de travail
+# Portfolio NXE - instructions de travail
 
-Reconstitution du dashboard New Xbox Experience (Xbox 360, 2008–2010) en portfolio.
+Reconstitution du dashboard New Xbox Experience (Xbox 360, 2008-2010) en portfolio.
 Vite + React + TS, three.js pour l'accueil, build statique derrière nginx, aucun backend.
 
 `SPEC.md` = les mesures et les décisions. `README.md` = comment lancer et éditer.
@@ -22,7 +22,7 @@ Avant d'écrire une taille, une couleur, une position ou une opacité :
 
 Si tu changes une valeur commentée, remesure. Ne « corrige à l'œil » jamais.
 
-Quand un relevé contredit une consigne de l'utilisateur, **le relevé gagne** — et tu le dis
+Quand un relevé contredit une consigne de l'utilisateur, **le relevé gagne** - et tu le dis
 explicitement dans la réponse. C'est comme ça qu'on a trouvé que les tuiles ne sont pas
 carrées (1.3125:1), que le ciel ne s'éclaircit pas vers la droite, et que les tuiles ne
 descendent pas mais rétrécissent autour de la ligne d'horizon.
@@ -42,7 +42,7 @@ node audit.mjs          # console, chargement, focus, reduced-motion, responsive
 `measure.mjs` est le juge de la géométrie, pas `compare.mjs`. Vise **±2 px** sur chaque cote.
 Les scores de `compare.mjs` **ne sont pas une note** : les références montrent le contenu d'un
 autre portfolio, un score qui monte n'est pas forcément une régression. Après un changement
-visuel, **regarde la capture** — ne conclus jamais depuis le seul chiffre.
+visuel, **regarde la capture** - ne conclus jamais depuis le seul chiffre.
 
 ---
 
@@ -51,7 +51,7 @@ visuel, **regarde la capture** — ne conclus jamais depuis le seul chiffre.
 Chacun a coûté au moins une itération. Ne les repaie pas.
 
 - `reference/image4.png` a **34 px de barre navigateur en haut** : retranche-les. Les captures
-  sont en ratio ~1.90, pas 16:9 — les mesures en « % de largeur » ne sont pas transposables,
+  sont en ratio ~1.90, pas 16:9 - les mesures en « % de largeur » ne sont pas transposables,
   d'où la scène décrite en `vh`.
 - Le **corps d'un texte se déduit de la hauteur de capitale**, pas de sa largeur. À défaut,
   l'**interligne** est un relevé fiable et indépendant.
@@ -70,7 +70,7 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Pour faire tourner un objet à la souris **sur deux axes**, orbite la caméra en sphériques :
   incliné, un glissé horizontal ne tourne plus autour de la verticale de l'écran (test : un
   cercle fermé doit ramener à la pose de départ, 0.54/255). Pour un **seul** axe, tourner
-  l'objet est plus juste — l'avatar pivote en lacet, ses pieds restent au sol.
+  l'objet est plus juste - l'avatar pivote en lacet, ses pieds restent au sol.
 - Un gain de rotation **s'indexe sur la dimension que le geste parcourt**. `OrbitControls`
   prend la hauteur du canevas ; sur l'avatar (160 × 384) ça demandait 766 px pour un tour.
   Recoupe par le mapping physique arc = r·θ : ici 320 contre 346 px, ils convergent.
@@ -78,7 +78,7 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   `pointer-events: none` et ne le rends cliquable qu'après confirmation du raycast.
   `Raycaster` ignore `visible` : la boîte de sélection peut être invisible.
 - **Un glissé qui sort de sa boîte survole ce qu'il traverse.** Un bouclier plein écran
-  pendant le geste, qui survit au relâchement — sinon le survol reprend sous un curseur qui
+  pendant le geste, qui survit au relâchement - sinon le survol reprend sous un curseur qui
   a bougé de 320 px.
 - **`prefers-reduced-motion` ne coupe pas la réponse à une manipulation directe.** Si la
   boucle est arrêtée, applique le geste et redessine à la demande. On retire l'inertie, pas
@@ -95,15 +95,15 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   sur ~8 lignes avant toute lecture de couleur, sinon tu relèves les rayures.
 - **Un seuil de luminance ne sait pas isoler un glyphe en dégradé** (les icônes NXE vont du
   blanc au vert-jaune, la tache de la tuile monte à un bleu de 160). Règle générale : si une
-  mesure sature sur les bords de ta zone de recherche, elle est fausse — ne conclus pas.
+  mesure sature sur les bords de ta zone de recherche, elle est fausse - ne conclus pas.
 - **Un voile plein écran vole les clics de tout ce qui passe dessous.** Deux causes empilées
   sur la légende (`<span>` non cliquables ET `z-index` trop bas) : corriger une seule ne
   changeait rien. Playwright désigne ce coupable seul (« X intercepts pointer events »).
 - **`cursor` ne s'applique pas au chrome d'une barre de défilement native.** Même en
   `!important` : la flèche système reprend la main dessus. Si tu masques le curseur natif,
-  il faut aussi dessiner la barre toi-même — et la garder tirable.
+  il faut aussi dessiner la barre toi-même - et la garder tirable.
 - **Masquer le curseur natif efface la valeur qu'on voulait lire** : `cursor: none !important`
-  écrase le `cursor` calculé partout. Et un raycast n'est pas dans le DOM — expose-le en classe.
+  écrase le `cursor` calculé partout. Et un raycast n'est pas dans le DOM - expose-le en classe.
 - **Avant d'inventer une animation, cherche-la dans les dépôts de `reference/Site`.** Le fond
   du NXE est un **système de particules** (`Background.qml`, thème Pegasus NPE), pas un calque
   qui dérive. Ces dépôts contiennent aussi les huit motifs de carte : le motif change d'une
@@ -115,7 +115,7 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Une **boîte encastrée plus sombre** au milieu d'un panneau se lit comme un trou. La
   référence pose son contenu à même la surface quand il n'y a pas d'image.
 - Quand deux propriétés composent un même changement d'état (fond + couleur du texte),
-  **transitionne les deux** — et vérifie qu'elles sont interpolables : un `linear-gradient`
+  **transitionne les deux** - et vérifie qu'elles sont interpolables : un `linear-gradient`
   ne s'anime pas depuis `transparent`, il saute. Le plus sûr est de tout rendre instantané.
 - Transformer un `<span>` en `<button>` **déplace la géométrie** : `padding` et
   `line-height: normal` faussent la hauteur de capitale que `measure.mjs` calcule depuis le
@@ -149,7 +149,7 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   se lit directement, sans détecteur.
 - Pour rejouer une animation CSS sur un élément QUI RESTE EN PLACE, la classe doit être
   **réellement retirée du DOM** entre-temps (un cadre d'arrêt, sinon React regroupe les deux
-  états). Mais si l'élément est **remonté** — clé React différente — l'animation repart seule,
+  états). Mais si l'élément est **remonté** - clé React différente - l'animation repart seule,
   et ce cycle devient nuisible : l'image sans la classe fait sauter l'élément à sa position
   finale. Visible dès qu'on enchaîne les changements.
 - **Ne valide jamais un défilement sans l'avoir fait déborder** : injecte du texte, puis
@@ -181,6 +181,29 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - Un matériau `metalness: 1, roughness: 1` **n'a aucune composante diffuse**. Sans environment
   map il ne peut rendre que du gris terne. Le `.glb` de la console arrive comme ça : repasse
   en diélectrique (`metalness: 0`) pour retrouver du blanc.
+- **Ne compare jamais une boîte CSS à de l'encre visible.** Un PNG d'icône a du vide autour
+  du glyphe : notre orbe fait 15.07 vh de boîte pour 5.36 vh de sphère. J'ai annoncé « 2.7
+  fois trop gros » sur cette confusion. Mesure les deux côtés avec LE MÊME script.
+- Un gestionnaire posé sur `window` en **phase de capture** s'exécute avant celui de la
+  cible : son `stopPropagation` lui vole l'événement. L'avatar a ainsi neutralisé la barre
+  de défilement qu'il recouvrait. Un élément qui flotte doit céder à ce qu'il couvre -
+  `elementFromPoint` dit quoi, à condition d'être en `pointer-events: none`.
+- Quand tu fais céder un élément à un autre, **vise ce qui porte l'encre, pas le calque** :
+  `.blade-layer` contient un voile de fermeture plein écran, donc « la lame est dessous »
+  y est vrai partout. L'avatar en est devenu insaisissable sous une lame. Et écris le test
+  du CAS QUI CÈDE autant que du cas qui gagne - le mien ne couvrait que la rangée.
+- **Un conteneur dont tous les enfants sont en `position: absolute` mesure 0 x 0.**
+  `closest('.header')` ne trouvait donc jamais rien et la molette n'y faisait rien. S'il
+  faut une surface de saisie, pose un rectangle explicite - derriere, sinon il vole les clics.
+- Une liste circulaire **n'a de sens que si elle boucle vraiment** : un modulo sur un fil
+  d'Ariane affichait la DERNIERE section juste au-dessus de la PREMIERE. Si le rang porte
+  une taille differente, compte-le depuis la fin pour que la page courante reste en bas.
+- **Deux reperes au pas voisin suggerent une correspondance.** Une colonne de pastilles au
+  pas de 2.6 vh a cote de lignes de titre : l'oeil apparie, et l'allumee designait le mauvais
+  titre. Ancre l'element actif sur ce qu'il designe plutot que de centrer le bloc.
+- **Un contournement se périme.** L'avatar était décalé de 12 vh pour ne pas masquer une
+  ligne de pied qui ne se rend plus depuis qu'aucune tuile n'a d'image. Quand tu poses un
+  compromis, écris SA CONDITION - et vérifie-la avant de le garder.
 - Avant d'inventer un réglage d'interaction, **lis le bundle du site de référence** : ses
   constantes sont les bonnes (`OrbitControls rotateSpeed=0.5 dampingFactor=0.05`). Plusieurs
   réglages devinés ont été corrigés comme ça.
@@ -193,7 +216,7 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
   jargon marketing.
 - Un commentaire explique **pourquoi**, jamais quoi. Sur une valeur relevée, il dit la source.
 - L'interface est en **`font-weight: 600` synthétique**, posé sur `body`. Convection n'a
-  qu'une graisse, donc le navigateur le fabrique — c'est voulu, et c'est ce que fait
+  qu'une graisse, donc le navigateur le fabrique - c'est voulu, et c'est ce que fait
   l'original (densité d'encre mesurée sur quatre chaînes d'image4, cf. SPEC § 6.1).
 - Les couleurs de texte sont **opaques**. Un `rgba(255,255,255,…)` sur le fond vert laisse
   passer le vert et verdit le texte : mesuré #829b5a au lieu de #adbd92.
@@ -207,14 +230,14 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 
 ---
 
-## Plancher de qualité — non négociable
+## Plancher de qualité - non négociable
 
 À vérifier avec `node audit.mjs` avant de livrer :
 
 - zéro erreur console (`compare.mjs` échoue si `console.error` ou `pageerror`) ; `load` < 2 s ;
 - focus clavier visible sur tout élément focusable, jamais supprimé ;
 - `prefers-reduced-motion: reduce` neutralise toutes les transitions ;
-- les sons partent **38–45 ms après** le début de l'animation, jamais en même temps.
+- les sons partent **38-45 ms après** le début de l'animation, jamais en même temps.
 
 Le mobile **adapte, il ne dégrade pas** : sous 820 px on bascule de l'idiome « rangée en
 perspective » vers l'idiome « lame », lui aussi authentiquement NXE. Fond, texture, glyphes,
@@ -227,7 +250,7 @@ typographie et pastilles inchangés.
 - **Itère seul.** Boucle construire → capturer → regarder → lister les écarts → corriger,
   jusqu'à ce que ce soit difficile à distinguer de la référence.
 - **Vérifie empiriquement plutôt qu'au jugé.** Fabrique le cas où le signe est évident, et
-  quand une mesure surprend, instrumente — ne théorise pas deux fois de suite.
+  quand une mesure surprend, instrumente - ne théorise pas deux fois de suite.
 - **Écris l'outil quand il fera gagner du temps** (`pose.mjs`, `window.__avatar` en dev).
 - Les scripts jetables vont dans le scratchpad ou en `*.tmp.mjs` supprimé après usage.
 - **Un test qui échoue une fois sur six est un bug, pas du bruit.** Cherche la course (état
@@ -241,7 +264,7 @@ typographie et pastilles inchangés.
 - **Dis les écarts qui subsistent.** « Écarts assumés » dans `SPEC.md` doit rester honnête.
 - **N'induis pas une règle générale d'un seul cas de référence.** image3 déplaçait l'avatar
   quand une lame s'ouvre, image5 non. J'ai retenu le comportement le plus simple, documenté
-  comme écart — et image10, arrivée plus tard, a tranché. Attendre valait mieux qu'inventer.
+  comme écart - et image10, arrivée plus tard, a tranché. Attendre valait mieux qu'inventer.
 - Quand une consigne repose sur une prémisse fausse, dis-le en une phrase, propose
   l'atténuation, **et fais quand même le travail demandé**.
 
@@ -251,7 +274,7 @@ typographie et pastilles inchangés.
 
 Les décisions et les corrections trouvées en itérant s'écrivent dans **`SPEC.md`** :
 § 11 bis pour ce que la boucle a corrigé, § 12 pour les écarts assumés.
-Pas ici — ce fichier doit rester sous 200 lignes et ne contenir que des règles.
+Pas ici - ce fichier doit rester sous 200 lignes et ne contenir que des règles.
 
 Quand tu ajoutes une fonctionnalité, mets à jour dans le même passage : `SPEC.md`,
 `README.md` (commandes et raccourcis), `CREDITS.md` si un asset externe entre, et

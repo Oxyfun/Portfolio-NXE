@@ -6,7 +6,7 @@
 
 /* Le panneau est blanc et opaque dès la première frame : c'est du blanc qu'on
    émerge. Faire un fondu sur `.boot` lui-même laisserait voir le fond vert du
-   `body` au travers — on fait donc apparaître son CONTENU, pas le panneau. */
+   `body` au travers - on fait donc apparaître son CONTENU, pas le panneau. */
 .boot {
   position: fixed;
   inset: 0;
@@ -42,7 +42,7 @@
 }
 
 /* Simple indication : non cliquable, et hors de la couche d'interaction.
-   Le clignotement est un fondu long — les consoles de l'époque respiraient,
+   Le clignotement est un fondu long - les consoles de l'époque respiraient,
    elles ne clignotaient pas comme un avertissement. */
 .boot-cta {
   position: absolute;
@@ -52,7 +52,10 @@
   transform: translateX(-50%);
   font-size: 2.6vh;
   letter-spacing: 0.6px;
-  color: #8a8a8a;
+  /* #8a8a8a ne donnait que 2.75:1 sur le blanc - sous le minimum de 3:1, et
+     c'est la seule consigne de tout l'écran d'allumage. #767676 est le gris le
+     plus clair qui atteint 4.5:1, donc lisible même en plein jour. */
+  color: #767676;
   white-space: nowrap;
   pointer-events: none;
   /* Entrée après la console, puis respiration lente. */

@@ -1,7 +1,7 @@
 /**
  * Fond animé du NXE : les anneaux qui dérivent lentement.
  *
- * Ce n'est ni un dégradé qui respire ni un calque qui glisse — c'est un
+ * Ce n'est ni un dégradé qui respire ni un calque qui glisse - c'est un
  * SYSTÈME DE PARTICULES. Relevé sur `components/Background.qml` du thème
  * Pegasus NPE (riquenunes/pegasus-theme-npe), qui l'implémente au paramètre
  * près :

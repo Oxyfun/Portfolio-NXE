@@ -23,7 +23,7 @@ export function Background() {
 
 /**
  * En-tête. Le NXE affiche un fil d'Ariane qui défile : section précédente,
- * nom du site, section courante — la ligne du bas est toujours celle où l'on
+ * nom du site, section courante - la ligne du bas est toujours celle où l'on
  * se trouve (SPEC § 3). `animKey` change à chaque section : les trois lignes
  * rejouent leur remontée.
  */
@@ -42,17 +42,49 @@ export function Header({
   if (hidden) return null;
 
   /* Une roue de sections : la ligne du BAS est la page courante, les deux
-     au-dessus sont celles qui la précèdent, dans l'ordre. Cliquer une ligne
-     mène à la section qu'elle nomme — on va où c'est écrit, rien à deviner.
-     Avant, la ligne du milieu portait le nom du site : mélangée à deux sections,
-     elle rendait le fil illisible dès qu'on essayait de cliquer dedans. */
+     au-dessus sont celles qui la précèdent, dans l'ordre. Cliquer une ligne mène
+     à la section qu'elle nomme - on va où c'est écrit, rien à deviner.
+
+     Elle ENROULE, et c'est ce qui la rend juste : la navigation boucle (molette
+     et flèches passent d'Accueil à Contact d'un cran), donc les sections
+     affichées sont réellement celles où le geste suivant mènera.
+
+     La page COURANTE est en HAUT, et les deux suivantes en dessous, en corps
+     décroissant. C'est une divergence assumée avec image4, qui place le titre
+     courant en bas et en gros (voir SPEC § 12) : demandé explicitement.
+     `.crumb-3` reste la classe de la page courante - c'est elle que visent
+     `measure.mjs` et le test du parcours - seule sa position a changé. */
   const n = libelles.length;
-  const roue = [(index - 2 + n * 2) % n, (index - 1 + n) % n, index];
+  const roue = [(index + 2) % n, (index + 1) % n, index];
 
   return (
     <header className="header" key={index}>
+      {/* Zone de saisie de la molette. `.header` mesure 0 × 0 - ses trois lignes
+          et sa colonne de pastilles sont toutes en `position: absolute` - donc
+          `closest('.header')` ne trouvait jamais rien et la molette au-dessus
+          des titres continuait de faire défiler les cartes. Ce rectangle
+          invisible lui donne une surface. Il est posé DERRIÈRE les lignes
+          (`z-index: -1`), sinon il leur volerait leurs clics. */}
+      <div className="header-zone" aria-hidden />
+      {/* Position dans le site : une pastille par section, la courante allumée.
+          Décoratives pour le clavier et les lecteurs d'écran - les lignes de
+          titre au-dessus disent déjà la même chose et sont, elles, dans l'ordre
+          de tabulation. Cliquables tout de même : c'est ce qu'on essaie de faire
+          en les voyant. */}
+      <div className="pages" aria-hidden>
+        {libelles.map((nom, i) => (
+          <button
+            type="button"
+            key={nom}
+            tabIndex={-1}
+            className={`page-point${i === index ? " is-courante" : ""}`}
+            onClick={() => onAller(i)}
+          />
+        ))}
+      </div>
       {roue.map((sec, rang) => {
-        const courant = rang === 2;
+        // La page courante est la dernière, donc toujours la ligne du bas.
+        const courant = rang === roue.length - 1;
         const bouton = (
           <button
             type="button"
@@ -138,7 +170,7 @@ function LegendDot({ button }: { button: "a" | "b" }) {
  * Légende A/B du pied de page.
  *
  * C'étaient des `<span>` : décoratifs, donc « Sélectionner » ne faisait rien et
- * le clic traversait jusqu'au voile de la lame — ce qui la fermait. D'où
+ * le clic traversait jusqu'au voile de la lame - ce qui la fermait. D'où
  * l'impression que « Ouvrir » et « Retour » faisaient la même chose : les deux
  * ne faisaient que fermer. Ce sont maintenant de vrais boutons câblés à leur
  * action, focusables au clavier et actionnables à Entrée comme à Espace.
@@ -151,8 +183,10 @@ export function Footer({
 }: {
   index: number;
   total: number;
+  /* Les deux touches sont optionnelles : une tuile sans ligne d'action
+     n'affiche que « Retour ». */
   actions: {
-    a: { label: string; onPress(): void };
+    a?: { label: string; onPress(): void };
     b?: { label: string; onPress(): void };
   };
   showCounter?: boolean;
@@ -166,14 +200,16 @@ export function Footer({
         </div>
       )}
       <div className="legend">
-        <button
-          type="button"
-          className="legend-item"
-          onClick={actions.a.onPress}
-        >
-          <LegendDot button="a" />
-          {actions.a.label}
-        </button>
+        {actions.a && (
+          <button
+            type="button"
+            className="legend-item"
+            onClick={actions.a.onPress}
+          >
+            <LegendDot button="a" />
+            {actions.a.label}
+          </button>
+        )}
         {actions.b && (
           <button
             type="button"

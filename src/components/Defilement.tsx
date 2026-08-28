@@ -4,7 +4,7 @@
  * Deux raisons de ne pas garder celle du navigateur :
  *
  *  1. Le curseur vert disparaît dessus. Dans Blink, `cursor` ne s'applique pas
- *     au chrome d'une barre native — même `cursor: none !important` est ignoré,
+ *     au chrome d'une barre native - même `cursor: none !important` est ignoré,
  *     et la flèche système reprend la main. Notre curseur continue bien de la
  *     suivre (vérifié : opacité 1, position à jour), mais l'autre se dessine
  *     par-dessus.
@@ -60,7 +60,7 @@ export function Defilement({ cible }: { cible: React.RefObject<HTMLElement | nul
     if (!el) return;
     relire();
     el.addEventListener("scroll", relire, { passive: true });
-    /* Le contenu peut changer sans que rien ne défile — changement de tuile,
+    /* Le contenu peut changer sans que rien ne défile - changement de tuile,
        arrivée d'une police. `ResizeObserver` couvre les deux. */
     const ro = new ResizeObserver(relire);
     ro.observe(el);

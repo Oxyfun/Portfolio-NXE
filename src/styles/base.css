@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Base — police, réinitialisation, variables de scène.
+   Base - police, réinitialisation, variables de scène.
    Les valeurs numériques viennent de SPEC.md (relevés sur reference/).
    ========================================================================== */
 
@@ -12,25 +12,25 @@
 }
 
 :root {
-  /* — Scène. Tout est en unités de hauteur : une projection perspective se
-       dimensionne sur le champ de vision vertical, pas sur la largeur. — */
+  /* - Scène. Tout est en unités de hauteur : une projection perspective se
+       dimensionne sur le champ de vision vertical, pas sur la largeur. - */
   --tile-h: 41.9vh;          /* 559 px sur 1334 (image4) */
-  --tile-ratio: 1.3125;      /* 420 / 320 — ratio de BlankGreen.jpg */
+  --tile-ratio: 1.3125;      /* 420 / 320 - ratio de BlankGreen.jpg */
   --tile-w: calc(var(--tile-h) * var(--tile-ratio));
   --row-cy: 57.8vh;          /* les tuiles sont centrées sur la ligne d'horizon */
   --margin-x: 12.97vh;       /* 173 px sur 1334 */
   /* Mesuré au zoom 4× sur le coin de la tuile 0 d'image6 : 15 à 16 px sur une
-     tuile haute de 561, soit 1.15 vh. J'avais 0.45 — deux fois et demie trop
+     tuile haute de 561, soit 1.15 vh. J'avais 0.45 - deux fois et demie trop
      peu, et ça se voyait. */
   --tile-radius: 1.15vh;     /* 7 px pour 736 px de large */
 
-  /* — Typographie.
+  /* - Typographie.
        Méthode : le corps vient de la HAUTEUR DE CAPITALE relevée sur image4
        (mesurée sur le « 1 » de « mopo1o » : 37 px, et sur les hampes du « m » :
        27 px de hauteur d'x), et l'interlettrage vient de l'écart entre la
        largeur réelle du mot et sa largeur naturelle en Convection.
-       Ce recoupement donne 0.09 em de tracking sur l'en-tête et le pseudo —
-       cohérent sur trois chaînes indépendantes — et zéro sur les tuiles. — */
+       Ce recoupement donne 0.09 em de tracking sur l'en-tête et le pseudo -
+       cohérent sur trois chaînes indépendantes - et zéro sur les tuiles. - */
   --fs-crumb-1: 2.36vh;
   --fs-crumb-2: 3.36vh;
   --fs-crumb-3: 4.38vh;
@@ -43,13 +43,13 @@
   --track-ui: 0.098em;
   --ink-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 
-  /* — Couleurs relevées — */
+  /* - Couleurs relevées - */
   --ink: #ffffff;
   --ink-dim: #c9d0d4;
   /* Les deux lignes hautes du fil d'Ariane sont OPAQUES dans l'original, pas des
      blancs translucides. Résolu en inversant la composition sur les canaux R et
      B des pixels les plus clairs d'image4 : le vert du fond passait au travers
-     de mes `rgba(255,255,255,…)` et verdissait le texte — mesuré #829b5a chez
+     de mes `rgba(255,255,255,…)` et verdissait le texte - mesuré #829b5a chez
      moi contre #adbd92 côté référence, sur la même ligne. */
   --ink-dimmer: #f5f5f5;
   --ink-faint: #cccccc;
@@ -98,7 +98,7 @@ body {
   font-family: 'Convection', 'Exo 2', 'Titillium Web', 'Segoe UI', system-ui, sans-serif;
 
   /* Convection n'a qu'une graisse (400) : le navigateur SYNTHÉTISE ce 600.
-     C'est délibéré, et c'est ce que fait l'original — j'avais interdit le gras
+     C'est délibéré, et c'est ce que fait l'original - j'avais interdit le gras
      synthétique par principe, la mesure dit l'inverse. Densité d'encre relevée
      sur image4, à hauteur et largeur calées, pour quatre chaînes indépendantes :
 
@@ -111,13 +111,13 @@ body {
   font-weight: 600;
 
   /* Le site de référence pose `-webkit-font-smoothing: none`. Vérifié : c'est
-     une propriété macOS, sans effet sous Windows/Linux — elle n'explique donc
+     une propriété macOS, sans effet sous Windows/Linux - elle n'explique donc
      pas l'écart de rendu, et je ne la garde pas pour ne pas laisser croire
      qu'elle fait quelque chose. `geometricPrecision` reste utile : elle désactive
      le hinting, donc les chasses ne sont plus arrondies au pixel. */
   text-rendering: geometricPrecision;
 
-  /* Ombre portée nette, décalée en bas à droite — pas un flou. Reprise telle
+  /* Ombre portée nette, décalée en bas à droite - pas un flou. Reprise telle
      quelle du site de référence, qui la pose globalement. */
   text-shadow: var(--ink-shadow);
 }
@@ -137,7 +137,7 @@ button {
   cursor: pointer;
 }
 
-/* Focus clavier — jamais supprimé. */
+/* Focus clavier - jamais supprimé. */
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;

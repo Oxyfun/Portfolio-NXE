@@ -8,9 +8,7 @@
 
 /** Glyphes disponibles. Les cinq premiers sont les icônes NXE d'origine. */
 export type GlyphId =
-  | "musiclib"
   | "picturelib"
-  | "videolib"
   | "gamelib"
   | "settings"
   // glyphes dessinés en SVG dans le même langage visuel
@@ -20,16 +18,45 @@ export type GlyphId =
   | "school"
   | "mail"
   | "server"
-  | "music"
-  | "search"
   | "keyboard"
-  | "film";
+  | "film"
+  // ajoutés pour que deux cartes voisines n'aient jamais la même icône
+  | "network"
+  | "heart"
+  | "book"
+  | "target"
+  | "calendar"
+  | "building"
+  | "phone"
+  | "badge"
+  | "document";
 
 /** Une ligne du panneau de détail. */
 export interface DetailRow {
   label: string;
   /** Si présent, la ligne devient un lien (s'ouvre dans un nouvel onglet). */
   href?: string;
+  /**
+   * Si présent, la ligne ferme la lame et va à cette section (son `id`).
+   * Sans `href` ni `section`, une ligne ne fait rien du tout - c'était le cas
+   * des trois lignes de la carte d'accueil.
+   */
+  section?: string;
+}
+
+/**
+ * Une barre de progression du panneau de détail.
+ *
+ * Relevé sur image10 (« Gamerscore 25/105 », « Achievements 1/4 ») : libellé à
+ * gauche, pilule très sombre, remplissage vert PROPORTIONNEL à la valeur -
+ * 22 % de la piste pour 25/105, 25 % pour 1/4 - et le chiffre centré dedans.
+ */
+export interface DetailBar {
+  label: string;
+  /** Ce qui s'affiche dans la pilule, ex. « 21 / 34 mois ». */
+  value: string;
+  /** Remplissage, de 0 à 1. */
+  ratio: number;
 }
 
 /** Une paire libellé / valeur dans l'encart d'infos du panneau. */
@@ -55,6 +82,8 @@ export interface Tile {
      */
     heading?: string;
     stats: DetailStat[];
+    /** Optionnel : barres de progression, au-dessus du corps de texte. */
+    bars?: DetailBar[];
     body: string[];
     rows: DetailRow[];
   };
@@ -73,13 +102,6 @@ export const profile = {
   /** Optionnel : public/assets/avatar.png. Sinon vignette générée. */
   avatar: "/assets/avatar.png",
 };
-
-/**
- * Nom du site. Il n'apparaît plus dans l'en-tête depuis que le fil d'Ariane est
- * devenu une roue de sections (SPEC § 3 bis) ; gardé pour le jour où il servira
- * ailleurs.
- */
-export const siteName = "Portfolio de Nolan";
 
 export const sections: Section[] = [
   // ── ACCUEIL ───────────────────────────────────────────────────────────────
@@ -103,15 +125,15 @@ export const sections: Section[] = [
             "En parallèle je prépare mon Bachelor à l'ESGI, spécialisation IA & Big Data, avec un Master Data/IA visé derrière. Et le reste du temps, je casse des trucs sur mon VPS.",
           ],
           rows: [
-            { label: "Voir mes projets" },
-            { label: "Voir mon parcours" },
-            { label: "Me contacter" },
+            { label: "Voir mes projets", section: "projets" },
+            { label: "Voir mon parcours", section: "parcours" },
+            { label: "Me contacter", section: "contact" },
           ],
         },
       },
       {
         id: "carrefour",
-        title: "Carrefour — OneCloud",
+        title: "Carrefour, OneCloud",
         subtitle: "Alternance en cours",
         glyph: "cloud",
         detail: {
@@ -125,7 +147,10 @@ export const sections: Section[] = [
             "Concrètement : une quarantaine de self-services migrés de Jenkins vers Backstage, la refonte de l'architecture des sandbox cloud avec un provisioning en self-service via Terraform et GitLab CI, et une douzaine de workflows d'automatisation en production, la plupart avec un LLM dans la boucle.",
             "Je suis aussi responsable des mises en production des workflows de toute l'équipe automation.",
           ],
-          rows: [],
+          rows: [
+            { label: "Ce que j'y fais", section: "competences" },
+            { label: "Mon parcours", section: "parcours" },
+          ],
         },
       },
       {
@@ -140,10 +165,13 @@ export const sections: Section[] = [
             { label: "Suite", value: "Master IA / Data" },
           ],
           body: [
-            "Bachelor Informatique à l'ESGI de 2024 à 2027, en alternance avec Carrefour. Troisième année en spécialisation IABD — Intelligence Artificielle & Big Data.",
-            "Objectif ensuite : un Master IA/Data. C'est là que mes projets perso et mon boulot se rejoignent — j'ai envie de faire de la donnée et du modèle, pas seulement de la plomberie autour.",
+            "Bachelor Informatique à l'ESGI de 2024 à 2027, en alternance avec Carrefour. Troisième année en spécialisation IABD (Intelligence Artificielle & Big Data).",
+            "Objectif ensuite : un Master IA/Data. C'est là que mes projets perso et mon boulot se rejoignent : j'ai envie de faire de la donnée et du modèle, pas seulement de la plomberie autour.",
           ],
-          rows: [],
+          rows: [
+            { label: "Mes projets", section: "projets" },
+            { label: "Mon parcours", section: "parcours" },
+          ],
         },
       },
     ],
@@ -170,7 +198,11 @@ export const sections: Section[] = [
             "Le critère de réussite n'était pas « ça fait vaguement Xbox » mais « quelqu'un qui a connu la console reconnaît le dashboard en deux secondes ». Les cotes des CSS viennent de mesures relevées sur des captures de référence, et une boucle de comparaison automatique capture le site puis le confronte aux références à chaque itération.",
           ],
           rows: [
-            { label: "Code source", href: "https://github.com/Oxyfun/Portfolio-NXE" },
+            {
+              label: "Code source",
+              href: "https://github.com/Oxyfun/Portfolio-NXE",
+            },
+            { label: "Ce que ça m'a appris", section: "competences" },
           ],
         },
       },
@@ -190,14 +222,17 @@ export const sections: Section[] = [
             "Monter un serveur à la main, c'est plusieurs heures de fichiers de config, de ports et de dépendances. Ici on choisit son jeu, la plateforme provisionne et configure tout : moins de cinq minutes.",
           ],
           // Dépôt privé : pas de lien.
-          rows: [],
+          rows: [
+            { label: "Mes compétences", section: "competences" },
+            { label: "Ce que ça m'a appris", section: "competences" },
+          ],
         },
       },
       {
         id: "upcycleconnect",
         title: "UpcycleConnect",
         subtitle: "Projet annuel ESGI",
-        glyph: "terminal",
+        glyph: "network",
         detail: {
           stats: [
             { label: "Type", value: "Projet annuel ESGI" },
@@ -209,7 +244,11 @@ export const sections: Section[] = [
             "La partie la plus intéressante était en dessous : segmentation multi-VLAN, VPN inter-sites et cluster de firewalls pfSense pour relier les six sites, le tout conteneurisé, avec Stripe pour le paiement et OneSignal pour les notifications.",
           ],
           rows: [
-            { label: "Code source", href: "https://github.com/Oxyfun/Projet-Annuel" },
+            {
+              label: "Code source",
+              href: "https://github.com/Oxyfun/Projet-Annuel",
+            },
+            { label: "Ce que ça m'a appris", section: "competences" },
           ],
         },
       },
@@ -217,7 +256,7 @@ export const sections: Section[] = [
         id: "bilo",
         title: "The Binding of Bilo",
         subtitle: "Rogue-like 2D en C",
-        glyph: "gamelib",
+        glyph: "heart",
         detail: {
           stats: [
             { label: "Type", value: "Projet école" },
@@ -229,7 +268,11 @@ export const sections: Section[] = [
             "Il embarque aussi un éditeur de niveau intégré : on pose les tuiles, les portes, les monstres et les items à la souris, et la salle est sauvegardée en CSV pour être réinjectée dans la génération.",
           ],
           rows: [
-            { label: "Code source", href: "https://github.com/Oxyfun/The-Binding-of-Bilo" },
+            {
+              label: "Code source",
+              href: "https://github.com/Oxyfun/The-Binding-of-Bilo",
+            },
+            { label: "Ce que ça m'a appris", section: "competences" },
           ],
         },
       },
@@ -248,7 +291,10 @@ export const sections: Section[] = [
             "Un homelab sur VPS où je fais tourner ce dont j'ai besoin : n8n pour mes automatisations perso, un serveur Minecraft, mes projets web et les services qui vont avec.",
             "Tout est en conteneurs derrière un reverse proxy. C'est là que je casse des choses avant de les proposer au boulot.",
           ],
-          rows: [],
+          rows: [
+            { label: "Mes compétences", section: "competences" },
+            { label: "Ce que ça m'a appris", section: "competences" },
+          ],
         },
       },
       {
@@ -266,9 +312,10 @@ export const sections: Section[] = [
             "Un sélecteur aléatoire de films depuis une watchlist Letterboxd, hébergé sur mon VPS.",
             "Le problème n'a jamais été de trouver quoi regarder, mais de choisir. L'outil lit la watchlist et tranche à ma place.",
           ],
-          /* L'URL publique n'a pas été fournie. Pour ajouter le bouton :
-             rows: [{ label: 'Ouvrir', href: 'https://…' }] */
-          rows: [],
+          rows: [
+            { label: "Ouvrir", href: "https://letterboxd.myddns.me/" },
+            { label: "Ce que ça m'a appris", section: "competences" },
+          ],
         },
       },
     ],
@@ -294,7 +341,10 @@ export const sections: Section[] = [
             "Je provisionne et j'opère sur GCP et Azure en parallèle, dans un contexte multi-cloud assumé.",
             "Réseau, IAM, gestion des identités de service, quotas, coûts. La partie la moins visible et la plus structurante.",
           ],
-          rows: [],
+          rows: [
+            { label: "Où je pratique ça", section: "parcours" },
+            { label: "Les projets qui s'en servent", section: "projets" },
+          ],
         },
       },
       {
@@ -312,7 +362,10 @@ export const sections: Section[] = [
             "Terraform pour tout ce qui se provisionne, en modules réutilisables plutôt qu'en copier-coller entre projets.",
             "GitLab CI pour l'appliquer, et Backstage comme porte d'entrée : les équipes créent un service depuis un template et repartent avec un dépôt, une pipeline et une infra déjà câblés.",
           ],
-          rows: [],
+          rows: [
+            { label: "Les projets qui s'en servent", section: "projets" },
+            { label: "Mon GitHub", href: "https://github.com/Oxyfun" },
+          ],
         },
       },
       {
@@ -330,7 +383,10 @@ export const sections: Section[] = [
             "Une douzaine de workflows n8n en production : synthèse automatique de tickets, notification de demandes, détection de modifications manuelles en console cloud, suivi des incidents et des fins de support. La majorité ont un LLM dans la boucle, pour résumer ou classer ce qu'un humain lisait à la main.",
             "En ce moment je travaille sur les serveurs MCP, pour exposer l'infrastructure cloud aux agents de façon sécurisée et réutilisable. Et je fais tourner des modèles en local sur ma machine, histoire de savoir ce que ça coûte vraiment.",
           ],
-          rows: [],
+          rows: [
+            { label: "Les projets qui s'en servent", section: "projets" },
+            { label: "Mon GitHub", href: "https://github.com/Oxyfun" },
+          ],
         },
       },
       {
@@ -348,7 +404,10 @@ export const sections: Section[] = [
             "Python et Go pour l'outillage, Java et C pour l'école, PHP/Laravel et TypeScript pour le web, Kotlin pour l'Android.",
             "SQL et NoSQL des deux côtés, PostgreSQL surtout. Rien d'exotique : ce qui compte c'est de savoir choisir le bon outil et de livrer quelque chose de maintenable.",
           ],
-          rows: [],
+          rows: [
+            { label: "Les projets qui s'en servent", section: "projets" },
+            { label: "Mon GitHub", href: "https://github.com/Oxyfun" },
+          ],
         },
       },
     ],
@@ -363,19 +422,25 @@ export const sections: Section[] = [
         id: "carrefour-parcours",
         title: "Carrefour",
         subtitle: "Nov. 2024 → sept. 2027",
-        glyph: "cloud",
+        glyph: "building",
         detail: {
-          heading: "CARREFOUR — SIÈGE SOCIAL, MASSY",
+          heading: "Carrefour, siège social de Massy",
           stats: [
             { label: "Poste", value: "Ingénieur cloud (alternance)" },
             { label: "Période", value: "Nov. 2024 → sept. 2027" },
             { label: "Équipe", value: "OneCloud" },
           ],
+          /* Avancement factuel, calculé sur les dates ci-dessus - rien
+             d'auto-évalué ici. À réajuster quand les dates bougent. */
+          bars: [{ label: "Avancement", value: "21 / 34 mois", ratio: 0.62 }],
           body: [
             "Alternance en cours au siège de Massy, dans l'équipe OneCloud. Infrastructure as code, CI/CD, plateforme interne et automatisation.",
             "Je travaille en grande autonomie sur mes sujets : cadrage, tickets, développement, documentation, puis démo à l'équipe à chaque fin de projet.",
           ],
-          rows: [],
+          rows: [
+            { label: "Ce que j'y fais", section: "competences" },
+            { label: "Me contacter", section: "contact" },
+          ],
         },
       },
       {
@@ -384,110 +449,222 @@ export const sections: Section[] = [
         subtitle: "2024 → 2027",
         glyph: "school",
         detail: {
-          heading: "ESGI PARIS — BACHELOR INFORMATIQUE",
+          heading: "ESGI Paris, Bachelor Informatique",
           stats: [
             { label: "Diplôme", value: "Bachelor Informatique" },
             { label: "Période", value: "2024 → 2027" },
             { label: "Spécialité", value: "IA & Big Data" },
           ],
+          bars: [{ label: "Avancement", value: "23 / 36 mois", ratio: 0.64 }],
           body: [
             "Développement : Java, Laravel, C avancé, Kotlin, Git, UML2. Systèmes et réseaux : Linux, Windows, virtualisation, sécurité. Web : PHP, JavaScript, API, Go, cloud, SQL et NoSQL.",
             "Et la partie qui m'intéresse le plus : data mining, algorithmique avancée et initiation à l'IA, avant la spécialisation IABD en troisième année.",
           ],
-          rows: [],
+          rows: [
+            { label: "Mes projets d'école", section: "projets" },
+            { label: "Mes compétences", section: "competences" },
+          ],
         },
       },
       {
         id: "massy",
         title: "Mairie de Massy",
         subtitle: "Étés 2023 et 2024",
-        glyph: "home",
+        glyph: "calendar",
         detail: {
+          /* Trois cartes du Parcours ont un heading en capitales et deux non :
+             le bandeau orange alternait entre crier et parler normalement dans
+             la même section. Uniformisé - seule la casse change. */
+          heading: "Mairie de Massy",
           stats: [
             { label: "Été 2024", value: "Logistique" },
             { label: "Été 2023", value: "Factotum" },
             { label: "Type", value: "Emplois saisonniers" },
           ],
+          bars: [{ label: "Avancement", value: "Terminé", ratio: 1 }],
           body: [
             "Deux étés en emploi saisonnier à la mairie de ma ville, en logistique puis en factotum.",
             "Rien à voir avec l'informatique, mais c'est là que j'ai appris à me lever tôt et à finir ce que je commence.",
           ],
-          rows: [],
+          rows: [
+            { label: "La suite du parcours", section: "competences" },
+            { label: "Me contacter", section: "contact" },
+          ],
         },
       },
       {
         id: "bac",
         title: "Bac Général",
         subtitle: "Maths, NSI, SES",
-        glyph: "school",
+        glyph: "book",
         detail: {
-          heading: "LYCÉE FUSTEL DE COULANGES",
+          heading: "Lycée Fustel de Coulanges",
           stats: [
             { label: "Diplôme", value: "Baccalauréat Général" },
             { label: "Période", value: "2021 → 2024" },
             { label: "Spécialités", value: "Maths, NSI, SES" },
           ],
+          bars: [{ label: "Avancement", value: "Obtenu", ratio: 1 }],
           body: [
             "Bac général au lycée Fustel de Coulanges à Massy, spécialités mathématiques, NSI et SES.",
             "La NSI a réglé la question de l'orientation assez vite.",
           ],
-          rows: [],
+          rows: [
+            { label: "La suite du parcours", section: "competences" },
+            { label: "Mes projets", section: "projets" },
+          ],
         },
       },
       {
         id: "ensuite",
         title: "Ensuite",
         subtitle: "Master IA / Data",
-        glyph: "school",
+        glyph: "target",
         detail: {
+          heading: "Ensuite",
           stats: [
             { label: "Cible", value: "Master" },
             { label: "Domaine", value: "IA / Data" },
             { label: "Statut", value: "Visé" },
           ],
+          bars: [{ label: "Avancement", value: "À venir", ratio: 0 }],
           body: [
             "Un Master IA/Data après le Bachelor.",
-            "J'ai commencé par l'infra et j'y suis à l'aise. Ce que je veux ajouter, c'est le traitement de la donnée et les modèles — la partie que mes projets perso grattent déjà sans que j'aie toute la théorie derrière.",
+            "J'ai commencé par l'infra et j'y suis à l'aise. Ce que je veux ajouter, c'est le traitement de la donnée et les modèles. C'est la partie que mes projets perso grattent déjà sans que j'aie toute la théorie derrière.",
           ],
-          rows: [],
+          rows: [
+            { label: "Me contacter", section: "contact" },
+            { label: "Mon CV", href: "/assets/CV_Nolan_Lemaitre.pdf" },
+          ],
         },
       },
     ],
   },
 
   // ── CONTACT ───────────────────────────────────────────────────────────────
+  /* Une carte par canal plutôt qu'une seule carte fourre-tout : la rangée du
+     NXE est faite pour aligner des destinations, et une section à une seule
+     tuile laissait les trois quarts de l'écran vides.
+     Les textes sont courts et repris de ce que Nolan a écrit - à relire. */
   {
     id: "contact",
     label: "Contact",
     tiles: [
       {
-        id: "contact",
-        title: "Me contacter",
-        subtitle: "Email, téléphone, LinkedIn, GitHub",
+        id: "email",
+        title: "Email",
+        subtitle: "nolanlemaitre91@gmail.com",
         glyph: "mail",
         detail: {
           stats: [
+            { label: "Réponse", value: "Sous 48 h" },
             { label: "Où", value: "Massy (91), Île-de-France" },
             { label: "Langues", value: "FR / EN (B2) / 中文 (HSK3)" },
-            { label: "Réponse", value: "Sous 48 h" },
           ],
           body: [
-            "Le plus simple, c'est l'email. LinkedIn marche aussi, et le téléphone si c'est urgent.",
-            "Mon CV est téléchargeable ci-dessous.",
+            "Le plus simple, c'est l'email. Je réponds sous 48 heures.",
+            "Pour une alternance, un stage ou juste une question sur un projet, n'hésite pas.",
           ],
           rows: [
             {
-              label: "Email — nolanlemaitre91@gmail.com",
+              label: "Écrire un mail",
               href: "mailto:nolanlemaitre91@gmail.com",
             },
-            { label: "Téléphone — 06 62 18 63 01", href: "tel:+33662186301" },
             {
-              label: "LinkedIn",
+              label: "Télécharger mon CV",
+              href: "/assets/CV_Nolan_Lemaitre.pdf",
+            },
+          ],
+        },
+      },
+      {
+        id: "telephone",
+        title: "Téléphone",
+        subtitle: "06 62 18 63 01",
+        glyph: "phone",
+        detail: {
+          stats: [
+            { label: "Numéro", value: "06 62 18 63 01" },
+            { label: "Quand", value: "Si c'est urgent" },
+            { label: "Où", value: "Massy (91)" },
+          ],
+          body: ["Le téléphone si c'est urgent. Sinon l'email passe mieux."],
+          rows: [
+            { label: "Appeler", href: "tel:+33662186301" },
+            {
+              label: "Ou m'écrire un mail",
+              href: "mailto:nolanlemaitre91@gmail.com",
+            },
+          ],
+        },
+      },
+      {
+        id: "linkedin",
+        title: "LinkedIn",
+        subtitle: "Le parcours en détail",
+        glyph: "badge",
+        detail: {
+          stats: [
+            { label: "Réseau", value: "LinkedIn" },
+            { label: "Poste", value: "Alternant ingénieur cloud" },
+            { label: "Entreprise", value: "Carrefour" },
+          ],
+          body: [
+            "Le parcours complet, les expériences et les recommandations.",
+          ],
+          rows: [
+            {
+              label: "Voir le profil",
               href: "https://www.linkedin.com/in/nolan-lemaitre-b79a69332/",
             },
-            { label: "GitHub", href: "https://github.com/Oxyfun" },
-            // Dépose le fichier dans public/assets/ pour que ce lien fonctionne.
-            { label: "Télécharger mon CV", href: "/assets/CV_Nolan_Lemaitre.pdf" },
+            { label: "Mon GitHub", href: "https://github.com/Oxyfun" },
+          ],
+        },
+      },
+      {
+        id: "github",
+        title: "GitHub",
+        subtitle: "Le code des projets",
+        glyph: "terminal",
+        detail: {
+          stats: [
+            { label: "Compte", value: "Oxyfun" },
+            { label: "Publics", value: "Portfolio, UpcycleConnect, Bilo" },
+            { label: "Reste", value: "Dépôts privés" },
+          ],
+          body: [
+            "Le code des projets qui sont publics. Le reste est en privé, mais je peux en parler.",
+          ],
+          rows: [
+            { label: "Voir le compte", href: "https://github.com/Oxyfun" },
+            {
+              label: "Mon LinkedIn",
+              href: "https://www.linkedin.com/in/nolan-lemaitre-b79a69332/",
+            },
+          ],
+        },
+      },
+      {
+        id: "cv",
+        title: "Mon CV",
+        subtitle: "PDF, une page",
+        glyph: "document",
+        detail: {
+          stats: [
+            { label: "Format", value: "PDF" },
+            { label: "Profil", value: "Ingénieur cloud" },
+            { label: "Recherche", value: "Master IA / Data" },
+          ],
+          body: ["Le parcours, les compétences et les projets sur une page."],
+          rows: [
+            {
+              label: "Télécharger mon CV",
+              href: "/assets/CV_Nolan_Lemaitre.pdf",
+            },
+            {
+              label: "M'écrire un mail",
+              href: "mailto:nolanlemaitre91@gmail.com",
+            },
           ],
         },
       },

@@ -7,7 +7,7 @@
  * arrive en fondu une fraction de seconde plus tard.
  *
  * Si `public/avatar.glb` est absent, ce composant ne rend rien et ne charge
- * même pas three.js — même cascade de repli que les autres assets optionnels.
+ * même pas three.js - même cascade de repli que les autres assets optionnels.
  */
 
 import { useEffect, useRef, useState } from 'react'
@@ -16,7 +16,7 @@ import { firstFileAvailable } from '../lib/assets'
 import { K, advanceCoef } from './TileRow'
 
 /**
- * Cadrage — l'avatar est un objet DE LA RANGÉE, arrimé à la tuile d'indice 1.
+ * Cadrage - l'avatar est un objet DE LA RANGÉE, arrimé à la tuile d'indice 1.
  *
  * Relevé sur les deux captures qui le montrent, et elles disent la même chose :
  *
@@ -34,7 +34,7 @@ import { K, advanceCoef } from './TileRow'
  * les captures de référence n'ont pas toutes la même marge de rangée (15.3 vh
  * sur image2, 14.5 sur image6, 12.97 sur image4 d'où vient notre `--margin-x`),
  * donc un vh absolu recopié d'une capture serait faux chez nous. Ancré sur
- * notre propre géométrie de tuiles — validée à ±2 px par `measure.mjs` — le
+ * notre propre géométrie de tuiles - validée à ±2 px par `measure.mjs` - le
  * placement reste juste. Vérification : le modèle prédit le centre de l'avatar
  * d'image6 à 98.9 vh, mesuré 99.3.
  */
@@ -53,8 +53,8 @@ const CADRE = {
   hauteurMonde: 1.8,
   /**
    * Largeur du cadre en fraction de sa hauteur. Le rayon horizontal maximal du
-   * personnage — mesuré sur les mêmes 240 poses, car il peut désormais pivoter
-   * sur 360° — vaut 0.470 unité, soit 0.522 de la demi-hauteur. À 0.56 il reste
+   * personnage - mesuré sur les mêmes 240 poses, car il peut désormais pivoter
+   * sur 360° - vaut 0.470 unité, soit 0.522 de la demi-hauteur. À 0.56 il reste
    * de la marge : c'est ce qui manquait avant, où les mains sortaient du cadre
    * et se faisaient couper net.
    */
@@ -62,7 +62,7 @@ const CADRE = {
   /**
    * Écart entre les semelles et le bas du canevas, en fraction de sa hauteur.
    * Mesuré au rendu sur 12 instants d'animation : 14 à 15 px sur 405, soit
-   * 3.5 %. Dans sa pose animée le personnage ne pose pas ses pieds à y = 0 —
+   * 3.5 %. Dans sa pose animée le personnage ne pose pas ses pieds à y = 0 -
    * je le supposais, et il flottait donc de cette hauteur au-dessus du sol,
    * avec son ombre décrochée en dessous.
    */
@@ -74,7 +74,7 @@ const CADRE = {
  * eux-mêmes repris d'`OrbitControls` : le geste alimente une réserve dont on
  * ne consomme que 5 % par frame, et le gain vaut la moitié du défaut.
  *
- * Ici c'est le PERSONNAGE qui tourne, pas la caméra — et seulement en lacet.
+ * Ici c'est le PERSONNAGE qui tourne, pas la caméra - et seulement en lacet.
  * Le modèle est centré en X et Z avec les pieds à y = 0, donc une rotation
  * autour de son axe vertical les laisse plantés au sol. Pas de tangage : on ne
  * veut ni le voir basculer ni découvrir le dessous de ses semelles.
@@ -94,8 +94,8 @@ function choisirAttente(clips: THREE.AnimationClip[]): THREE.AnimationClip | nul
 /**
  * Géométrie du bloc pour une profondeur `r = 1 - selected`.
  *
- * Le canevas garde une taille en pixels CONSTANTE — celle de la profondeur 0,
- * la plus grande — et c'est un `scale` CSS qui le fait avancer et reculer.
+ * Le canevas garde une taille en pixels CONSTANTE - celle de la profondeur 0,
+ * la plus grande - et c'est un `scale` CSS qui le fait avancer et reculer.
  * Redimensionner le canevas WebGL à chaque image d'une transition coûterait
  * une réallocation de tampon par image ; un `scale` est composité par le GPU.
  * C'est exactement ce que font les tuiles, et ça garde les deux synchrones.
@@ -133,11 +133,11 @@ function geometrie(r: number) {
 }
 
 /**
- * Position quand une lame est ouverte — relevée sur image10.
+ * Position quand une lame est ouverte - relevée sur image10.
  *
  * L'avatar quitte la rangée et fait un pas en avant sur la droite : centre à
- * 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écran (contre 78–80 %
- * dans la rangée), pour une taille de 48.2 vh — soit 1.04 fois sa taille à la
+ * 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écran (contre 78-80 %
+ * dans la rangée), pour une taille de 48.2 vh - soit 1.04 fois sa taille à la
  * profondeur 0. Autant dire la même : il ne grossit pas, il descend.
  *
  * Je l'avais documenté comme écart assumé faute de références concordantes :
@@ -145,12 +145,14 @@ function geometrie(r: number) {
  * trancherait à deux contre un, et surtout elle est nette. On le montre.
  */
 const CADRE_LAME = {
-  /* 21.5 et non les 33.1 relevés : à la cote d'image10 la silhouette recouvrait
-     la ligne de pied du panneau (« Section / Alternant »). La géométrie des
-     deux panneaux concorde pourtant à 2 % près — c'est notre ligne de pied qui
-     va jusqu'au bord droit là où celle de la référence s'arrête avant. Écart
-     assumé : masquer du texte est pire que 12 vh de décalage. */
-  droiteVh: 21.5,
+  /* 33.1 vh, la cote relevée sur image10. J'étais descendu à 21.5 parce que la
+     silhouette recouvrait la ligne de pied du panneau - mais cette ligne ne se
+     rend que sur une tuile AVEC image, et plus aucune n'en a. Le contournement
+     ne protégeait donc plus rien, et il collait l'avatar sur l'orbe Xbox : 61 %
+     de l'orbe recouvert, alors que la référence les pose côte à côte.
+     Si une tuile reprend une image un jour, c'est la ligne de pied qu'il faudra
+     arrêter avant le bord droit, comme le fait la référence. */
+  droiteVh: 33.1,
   piedsPourcent: 87.9,
   echelle: 1.04,
 }
@@ -162,7 +164,7 @@ interface Props {
   lameOuverte?: boolean
   /**
    * L'avatar n'appartient qu'à la section d'accueil. Ailleurs il n'a pas de
-   * tuile 1 à laquelle s'arrimer — sur Contact, qui n'a qu'une carte, il se
+   * tuile 1 à laquelle s'arrimer - sur Contact, qui n'a qu'une carte, il se
    * retrouvait planté seul au milieu de l'écran sans rien derrière lui.
    */
   actif: boolean
@@ -182,7 +184,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
   const pose = lameOuverte
     ? {
         /* `100vw` et non `100%` : dans un `translate`, un pourcentage se
-           rapporte à la taille de l'ÉLÉMENT, pas à celle de la fenêtre — avec
+           rapporte à la taille de l'ÉLÉMENT, pas à celle de la fenêtre - avec
            `100%` l'avatar se retrouvait collé au bord gauche. */
         transform:
           `translate(calc(100vw - ${CADRE_LAME.droiteVh}vh - ${geo.largeurCanevas / 2}vh),` +
@@ -275,7 +277,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
 
         /* Volume de sélection : on ne teste pas les 23 000 triangles à chaque
            mouvement de souris. Une boîte suffit à savoir si le curseur est sur
-           le personnage — et surtout, le conteneur reste transparent aux clics
+           le personnage - et surtout, le conteneur reste transparent aux clics
            tant qu'on n'est pas dessus, pour ne pas créer une zone morte devant
            les tuiles qu'il recouvre. */
         const box = new THREE.Box3().setFromObject(gltf.scene)
@@ -305,7 +307,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
         /* Un `catch` muet ici avait masqué pendant un moment un vrai bug (la
            sonde validait un chemin inexistant). On avertit, sans passer par
            `console.error` que le plancher de qualité interdit. */
-        console.warn('Avatar 3D : chargement impossible —', err)
+        console.warn('Avatar 3D : chargement impossible -', err)
         return
       }
 
@@ -347,7 +349,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
            respiration lente, mais se voient très bien sur un objet qui suit la
            souris : c'est le décalage entre le curseur et le personnage qui
            devient saccadé, pas l'animation. Le plafond ne sert qu'à protéger
-           l'ordonnancement des sons pendant la navigation au clavier — or on ne
+           l'ordonnancement des sons pendant la navigation au clavier - or on ne
            navigue pas au clavier en faisant tourner l'avatar à la souris. */
         const manipule = drag.actif || Math.abs(drag.attente) > 0.0004
         const dt = (t - dernier) / 1000
@@ -404,6 +406,25 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
 
       const conteneur = host.parentElement as HTMLElement | null
 
+      /* Les PANNEAUX de la lame passent avant le personnage. `.avatar3d` est en
+         `pointer-events: none`, donc `elementFromPoint` renvoie bien ce qu'il y
+         a DESSOUS ; mais `onDown` est posé sur la fenêtre en phase de CAPTURE,
+         donc il s'exécute avant le gestionnaire de la cible et son
+         `stopPropagation` lui vole l'événement. Depuis que l'avatar est revenu
+         à sa cote relevée, il couvre la barre de défilement du panneau de
+         détail : le pouce ne se tirait plus du tout.
+
+         `.blade` et NON `.blade-layer` : le calque contient `.blade-scrim`, un
+         bouton de fermeture qui fait tout l'écran (mesuré 1600 × 840). Viser le
+         calque revenait donc à dire « la lame est dessous » PARTOUT, et le
+         personnage n'était plus saisissable du tout dès qu'une lame était
+         ouverte. C'est le voile qui doit céder au personnage, pas l'inverse. */
+      const surLaLame = (x: number, y: number) => {
+        const sous = document.elementFromPoint(x, y)
+        return sous instanceof Element && Boolean(sous.closest('.blade'))
+      }
+      const saisissable = (x: number, y: number) => surAvatar(x, y) && !surLaLame(x, y)
+
       /* Bouclier de glissement, monté sur `document.body` et non dans l'avatar.
          `.avatar3d` porte un `transform` depuis qu'il suit la tuile 1, et un
          ancêtre transformé fait qu'un `position: fixed` se cale sur LUI et non
@@ -419,7 +440,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
            320 px de glissement, se trouve au-dessus d'une autre tuile : le
            navigateur recalculait le survol et la sélection sautait toute seule
            (mesuré : de la tuile 1 à la 3). Relâcher ne sélectionne rien ;
-           bouger la souris, si — et là c'est l'utilisateur qui le demande. */
+           bouger la souris, si - et là c'est l'utilisateur qui le demande. */
         if (!drag.actif && bouclier.isConnected) bouclier.remove()
         if (drag.actif && e.pointerId === drag.id) {
           const dx = e.clientX - drag.x
@@ -428,7 +449,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
              sa hauteur : le geste est horizontal et le personnage est haut et
              étroit (160 px de large pour 383 de haut). Indexé sur la hauteur,
              il fallait 766 px de glissement pour un tour, soit sept fois la
-             largeur visible du personnage — on pousse beaucoup pour peu.
+             largeur visible du personnage - on pousse beaucoup pour peu.
              Sur la largeur : un tour en 320 px. Le mapping physique « j'attrape
              la surface et je pousse » (arc = r·θ, demi-largeur ≈ 55 px) donne
              346 px de son côté : les deux convergent à 8 % près. */
@@ -436,7 +457,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
           /* En mouvement réduit la boucle de rendu est à l'arrêt : on applique
              le geste tout de suite et on redessine à la demande. Faire tourner
              le personnage est une manipulation directe, pas une animation
-             d'ambiance — la couper reviendrait à ignorer l'utilisateur. Ce
+             d'ambiance - la couper reviendrait à ignorer l'utilisateur. Ce
              qu'on lui retire, c'est l'inertie, pas la réponse. */
           if (reduit) {
             pivot.rotation.y += drag.attente
@@ -445,13 +466,13 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
           }
           return
         }
-        conteneur?.classList.toggle('is-hot', surAvatar(e.clientX, e.clientY))
+        conteneur?.classList.toggle('is-hot', saisissable(e.clientX, e.clientY))
       }
 
       const onDown = (e: PointerEvent) => {
         // Un clic ailleurs lève le bouclier résiduel avant tout autre effet.
         if (!drag.actif && bouclier.isConnected) bouclier.remove()
-        if (e.button !== 0 || !surAvatar(e.clientX, e.clientY)) return
+        if (e.button !== 0 || !saisissable(e.clientX, e.clientY)) return
         // Capture : la tuile recouverte ne doit pas recevoir ce clic.
         e.stopPropagation()
         e.preventDefault()
@@ -466,7 +487,7 @@ export function Avatar3D({ selected, lameOuverte = false, actif }: Props) {
         if (!drag.actif || e.pointerId !== drag.id) return
         drag.actif = false
         conteneur?.classList.remove('is-dragging')
-        conteneur?.classList.toggle('is-hot', surAvatar(e.clientX, e.clientY))
+        conteneur?.classList.toggle('is-hot', saisissable(e.clientX, e.clientY))
       }
 
       window.addEventListener('pointermove', onMove, { passive: true })

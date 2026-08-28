@@ -1,7 +1,7 @@
 /**
  * Écran d'accueil (cf. image1) : Xbox 360 en 3D sur fond blanc, rotation lente,
  * réaction à la souris, orbite au glissé. Au clic, la console pivote vers sa
- * face avant — celle du bouton power — en zoomant, puis fondu au blanc.
+ * face avant - celle du bouton power - en zoomant, puis fondu au blanc.
  *
  * three.js est chargé en `import()` dynamique : le dashboard n'en dépend pas.
  */
@@ -13,7 +13,7 @@ import type { PlayFn } from '../hooks/useSounds'
 /**
  * Pose de la console, calée sur image1 : grille d'aération en haut à gauche,
  * face avant (bouton power, « XBOX 360 ») en bas à droite, axe long descendant
- * d'environ 28° vers la droite — l'angle relevé sur la référence.
+ * d'environ 28° vers la droite - l'angle relevé sur la référence.
  * `?pose=x,y,roll,scale` permet de la régler sans recompiler.
  */
 const DEFAULT_POSE = [-1.2, 4.9, 1.35, 2.1] as const
@@ -39,10 +39,10 @@ const JITTER = { pitch: 0.15, yaw: 0.24, roll: 0.38, panX: 0.26, panY: 0.24 }
  *
  * Les valeurs qui font la sensation :
  *
- * — `DAMPING` : le geste alimente une réserve dont on ne consomme que 5 % par
+ * - `DAMPING` : le geste alimente une réserve dont on ne consomme que 5 % par
  *   frame. La console suit la main de loin et continue de glisser au relâché.
  *   C'est la différence entre « elle colle au curseur » et « elle tourne ».
- * — `ROTATE_SPEED` : moitié du défaut d'OrbitControls. Sans lui, un écran de
+ * - `ROTATE_SPEED` : moitié du défaut d'OrbitControls. Sans lui, un écran de
  *   haut de glissé fait un tour complet, ce qui est beaucoup trop nerveux.
  *
  * Surtout : comme OrbitControls, **c'est la caméra qui orbite autour de la
@@ -61,7 +61,7 @@ const AUTO_SPIN = ((Math.PI * 2) / 3600) * 0.5 * 60
  * Durées de la séquence d'allumage, en ms.
  *
  * `fadeStart` doit venir APRÈS la fin de `turn`, sinon le blanc recouvre la
- * console avant qu'elle soit arrivée sur sa face avant — invisible quand on
+ * console avant qu'elle soit arrivée sur sa face avant - invisible quand on
  * part du repos (le trajet est court), flagrant quand on a tourné la console
  * à l'opposé avant de cliquer.
  */
@@ -70,7 +70,7 @@ const IGNITE = { turn: 1500, fadeStart: 1390, fadeDur: 560 }
 /**
  * Interpolation douce. Sinusoïdale et non cubique : une cubique in-out a une
  * pente maximale de 3 au milieu, contre π/2 ≈ 1.57 ici. C'est ce pic de vitesse
- * à mi-course qui donnait l'impression que « d'un coup ça zoome » — il ne se
+ * à mi-course qui donnait l'impression que « d'un coup ça zoome » - il ne se
  * passait presque rien, puis tout arrivait d'un bloc.
  */
 const easeInOut = (t: number) => 0.5 * (1 - Math.cos(Math.PI * t))
@@ -80,7 +80,7 @@ const easeInOut = (t: number) => 0.5 * (1 - Math.cos(Math.PI * t))
  *
  * La taille apparente d'un objet varie en 1/distance : interpoler le rayon
  * linéairement fait donc ACCÉLÉRER le grossissement vers la fin (de 7.2 à 3.15,
- * l'échelle passe par 1×, 1.15×, 1.4×, 1.8×, 2.3× — les écarts se creusent).
+ * l'échelle passe par 1×, 1.15×, 1.4×, 1.8×, 2.3× - les écarts se creusent).
  * En géométrique, le taux de grossissement est constant d'un bout à l'autre,
  * ce qui est la définition d'un zoom régulier.
  */
@@ -112,7 +112,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
   const [started, setStarted] = useState(false)
   const startedRef = useRef(false)
   /* Passé à `true` au clic : la boucle de rendu prend la main sur la rotation
-     et joue l'allumage. Un ref, pas un état — on est dans une boucle rAF. */
+     et joue l'allumage. Un ref, pas un état - on est dans une boucle rAF. */
   const igniteRef = useRef<(() => void) | null>(null)
   /* La scène three.js vit dans un effet monté une seule fois ; elle a besoin
      d'appeler `start` sans que celui-ci soit une dépendance de l'effet. */
@@ -182,7 +182,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
         /* Le .glb arrive en `metalness: 1, roughness: 1`. Un métal parfaitement
            rugueux n'a aucune composante diffuse : sans environment map il ne
            peut rendre que du gris terne, ce qui ressortait mal sur le fond
-           blanc. La 360 est du plastique blanc brillant — on repasse en
+           blanc. La 360 est du plastique blanc brillant - on repasse en
            diélectrique et la texture d'albédo redevient visible. */
         model.traverse((o) => {
           const mesh = o as THREE.Mesh
@@ -209,7 +209,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
 
       /* Volume de sélection : c'est la console qui est cliquable, pas l'écran.
          Raycaster sur la géométrie complète du modèle à chaque mouvement de
-         souris serait cher pour rien — la 360 est une boîte, une boîte suffit.
+         souris serait cher pour rien - la 360 est une boîte, une boîte suffit.
          `colorWrite: false` la rend invisible tout en gardant le raycast.
 
          `setFromObject` renvoie une boîte MONDE : on la calcule donc AVANT de
@@ -238,7 +238,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
          `theta` = azimut, `phi` = angle polaire, exactement la convention de
          `Spherical` de three.js. Le point de départ reproduit à l'identique
          l'ancienne caméra fixe (0, 0.6, 7.2) : θ = 0 et cos φ = 0.6 / rayon.
-         `pan` décale la vue dans le plan de l'écran — c'est ce qui remplace
+         `pan` décale la vue dans le plan de l'écran - c'est ce qui remplace
          l'ancien décalage de position de l'objet, et qui garde le cadrage
          constant quand on tourne autour. */
       const REST_R = Math.hypot(0.6, 7.2)
@@ -251,7 +251,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
       const par = { theta: 0, phi: 0 }
       /* `pt` / `pp` : orbite en attente, que l'amortissement consomme. */
       /* Le survol est le résultat d'un RAYCAST : il n'existe nulle part dans le
-         DOM. On l'expose donc en classe, pas seulement en `cursor` — le curseur
+         DOM. On l'expose donc en classe, pas seulement en `cursor` - le curseur
          personnalisé masque le curseur natif et ne peut pas le relire, et le
          test de parcours a besoin du même signal pour localiser la console. */
       const marquerSurvol = (dessus: boolean) => {
@@ -346,7 +346,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
       /* ── Allumage ────────────────────────────────────────────────────────
          Au clic : la console pivote vers sa face avant par le chemin le plus
          court, la caméra s'approche, et le tout s'efface dans le blanc. Pas
-         d'anneau qui s'allume, pas de saccade — une seule interpolation.     */
+         d'anneau qui s'allume, pas de saccade - une seule interpolation.     */
       const jitter = (a: number) => (Math.random() * 2 - 1) * a
 
       /* Direction de la face avant, en monde.
@@ -523,7 +523,7 @@ export function BootScreen({ onDone, play }: { onDone(): void; play: PlayFn }) {
   return (
     <div className={`boot${flash ? ' is-flash' : ''}`}>
       {/* La scène est un vrai bouton : au clavier elle se prend au Tab et
-          s'active à Entrée. À la souris, seul un clic SUR la console démarre —
+          s'active à Entrée. À la souris, seul un clic SUR la console démarre -
           le reste de la surface sert au glissé (voir le raycast plus haut). */}
       <button
         type="button"

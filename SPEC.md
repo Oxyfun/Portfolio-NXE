@@ -1,4 +1,4 @@
-# SPEC — Portfolio NXE (New Xbox Experience, 2008–2010)
+# SPEC - Portfolio NXE (New Xbox Experience, 2008-2010)
 
 Analyse des captures de `reference/` et décisions d'implémentation.
 Toutes les mesures ci-dessous sont relevées au pixel sur les captures, pas estimées à l'œil.
@@ -12,7 +12,7 @@ Toutes les mesures ci-dessous sont relevées au pixel sur les captures, pas esti
 | `image1.png` | Écran d'accueil : Xbox 360 Slim 3D sur fond blanc, « Click to continue » | 2521×1326 | 1.901 |
 | `image2.png` | Dashboard, section *Testimonials*, tuile 2/5 sélectionnée, avatar 3D visible | 2530×1330 | 1.902 |
 | `image3.png` | Panneau de détail « lame » (profil + succès) | 2506×1300 | 1.928 |
-| `image4.png` | Dashboard, section *Projects*, tuile 1/4 — **la plus propre, référence principale** | 2526×1368 (barre navigateur 34 px en haut → 2526×1334 utiles) | 1.893 |
+| `image4.png` | Dashboard, section *Projects*, tuile 1/4 - **la plus propre, référence principale** | 2526×1368 (barre navigateur 34 px en haut → 2526×1334 utiles) | 1.893 |
 | `image5.png` | Panneau de détail « lame » (projet HARDLAUN.CH) | 2548×1330 | 1.916 |
 
 Les cinq captures viennent de <https://gabrielcabrera.co/>, un portfolio Next.js qui réutilise
@@ -24,14 +24,14 @@ les sons du dashboard. Voir §9 et `CREDITS.md`.
 ⚠️ **Note d'honnêteté sur les droits.** Le brief dit que ces assets sont libres de droit.
 Ils ne le sont pas : `Convection` est une police propriétaire Microsoft/Monotype, et les
 sons + textures viennent du firmware Xbox 360. Pour un portfolio personnel non commercial
-le risque pratique est proche de zéro et je les utilise comme demandé — mais ils sont
+le risque pratique est proche de zéro et je les utilise comme demandé - mais ils sont
 isolés dans `public/nxe/`, `public/fonts/` et `public/audio/`, chaque fichier est listé dans
 `CREDITS.md`, et le site **fonctionne sans eux** (fallbacks générés en code, §9.3).
 Si tu déploies un jour ce site sous un nom commercial, supprime ces trois dossiers.
 
 **Ratio des captures ≈ 1.90, pas 16:9.** Conséquence méthodologique : toute mesure exprimée
 en « % de la largeur » n'est pas transposable. Je décris donc la scène en **unités de hauteur**
-(`vh`), ce qui est correct physiquement — une projection perspective se dimensionne sur le
+(`vh`), ce qui est correct physiquement - une projection perspective se dimensionne sur le
 champ de vision vertical. `compare.mjs` capture à la fois en 1920×1080 (demandé) et à
 2526×1334 (ratio natif des références) pour que la comparaison au pixel ait un sens.
 
@@ -46,7 +46,7 @@ sinon on relève l'alternance des rayures et pas la couleur.
 
 | capture | ce qu'elle apporte |
 |---|---|
-| image6 | dashboard complet, « 1 of 5 » — avatar au bord droit de la tuile 1 |
+| image6 | dashboard complet, « 1 of 5 » - avatar au bord droit de la tuile 1 |
 | image7 | le bandeau de notification (non implémenté, cf. § 12) |
 | image8 | lame ouverte AVEC image de bandeau, panneau arrière dimensionné sur son contenu |
 | image9 | lecteur audio centré (non implémenté) + onde sous l'orbe bien visible |
@@ -61,8 +61,8 @@ sinon on relève l'alternance des rayures et pas la couleur.
 
 Le fond n'est **pas** un simple dégradé CSS. C'est la superposition de :
 
-1. `bg.png` — 1920×1080, le ciel complet, `background-size: cover`.
-2. `bgFloor.png` — 1920×1080 avec alpha, le sol gris. **Sa ligne d'horizon est courbe**,
+1. `bg.png` - 1920×1080, le ciel complet, `background-size: cover`.
+2. `bgFloor.png` - 1920×1080 avec alpha, le sol gris. **Sa ligne d'horizon est courbe**,
    pas droite : convexe, sommet vers x ≈ 0.85.
 3. Une vignette radiale sombre par-dessus (voir §1.4).
 
@@ -82,7 +82,7 @@ captures de dashboard (image2 : 0.5797 → 0.5579 → 0.5669 ; image5 : 0.5917 �
 **Décision :** on utilise les deux PNG originaux. Reproduire cet arc en CSS demanderait un
 `border-radius` elliptique + masque, et serait de toute façon approximatif.
 
-### 1.2 Ciel — dégradé relevé (image2, colonne x = 0.02)
+### 1.2 Ciel - dégradé relevé (image2, colonne x = 0.02)
 
 | y | couleur |
 |---|---|
@@ -112,7 +112,7 @@ et près de l'horizon c'est **la gauche qui vire au blanc cyan** (`#ccdddb`) tan
 C'est bien ce qu'on voit aussi dans `bg.png` : bande lumineuse blanc-cyan horizontale au
 niveau de l'horizon, coin haut-droit sombre et désaturé, tache jaune-orangé en bas à droite.
 
-### 1.3 Sol — dégradé relevé (image2, colonne x = 0.02)
+### 1.3 Sol - dégradé relevé (image2, colonne x = 0.02)
 
 | y | couleur |
 |---|---|
@@ -124,16 +124,16 @@ niveau de l'horizon, coin haut-droit sombre et désaturé, tache jaune-orangé e
 | 0.95 | `#6e7a81` |
 
 Horizontalement à y = 0.75 : `#919ba3` (gauche) → `#525c64` (droite). Le sol est plus clair
-à gauche et s'assombrit vers la droite et vers le bas — c'est un reflet spéculaire large.
+à gauche et s'assombrit vers la droite et vers le bas - c'est un reflet spéculaire large.
 
 ### 1.4 Cercles concentriques et vignette
 
-Les amas de cercles sont **déjà dans `bg.png`** (visibles en filigrane à ~4–8 % d'opacité,
+Les amas de cercles sont **déjà dans `bg.png`** (visibles en filigrane à ~4-8 % d'opacité,
 tailles de 20 à 250 px, mélange de disques flous, d'anneaux fins et de grappes de petits
 cercles). Rien à redessiner.
 
 Une vignette est nécessaire par-dessus : à y = 0.05, le ciel passe de `#456509` (x=0.10) à
-`#6f9136` (x=0.50) puis `#475245` (x=0.90) — les bords sont nettement plus sombres que le
+`#6f9136` (x=0.50) puis `#475245` (x=0.90) - les bords sont nettement plus sombres que le
 centre, ce qui ne vient pas de `bg.png` seul.
 → `radial-gradient(ellipse 120% 100% at 50% 45%, transparent 55%, rgba(0,0,0,.38) 100%)`.
 
@@ -151,7 +151,7 @@ Désactivé sous `prefers-reduced-motion`.
 Les grands anneaux translucides du NXE dérivent lentement. Ceux de `bg.png` sont
 cuits dans l'image et ne peuvent pas bouger : un calque `.bg-sky::after` en
 ajoute six, très pâles (5 % de blanc), qui dérivent de 2.6 vh sur 74 s avec un
-léger grossissement. Peu nombreux et discrets — on doit le remarquer sans le
+léger grossissement. Peu nombreux et discrets - on doit le remarquer sans le
 regarder.
 
 La respiration du ciel elle-même est passée de `background-position` à
@@ -166,19 +166,19 @@ d'un quart de cycle, période 8.8 s.
 
 | grandeur | relevé |
 |---|---|
-| centre | bas de la sphère — 49.5 % / 73.1 % de la boîte de l'orbe |
+| centre | bas de la sphère - 49.5 % / 73.1 % de la boîte de l'orbe |
 | diamètre max | ~4.5 × le diamètre de la sphère, soit 31 vh |
 | rapport | 2:1 (le sol est vu en perspective, les cercles s'y projettent en ellipses) |
 | contraste | **+2.5 unités de luminance sur 255** au-dessus du fond |
 
 Deux pièges payés ici. `Legend_Menu.png` a du vide autour du glyphe : la sphère
 n'occupe que 46.3 % de la boîte et son bas est à 73.1 % de la hauteur, pas en
-bas — placer l'onde à 92 % la décrochait sous la sphère. Et une bordure de
+bas - placer l'onde à 92 % la décrochait sous la sphère. Et une bordure de
 1.5 px est arrondie à 1 px à densité 1, ce qui la faisait disparaître : 2 px.
 
 L'opacité tient un palier (0.16 à 9 %, 0.11 à 55 %) au lieu de décroître dès le
 départ. Avec une simple rampe, chaque anneau passait l'essentiel de son cycle à
-0.03 et on ne voyait plus rien — mesuré, 24 unités d'écart sur 1243 pixels pour
+0.03 et on ne voyait plus rien - mesuré, 24 unités d'écart sur 1243 pixels pour
 un résultat invisible à l'œil.
 
 **Écart assumé** : le contraste réel est de 1 %, ce qui serait presque invisible
@@ -222,17 +222,17 @@ remontante vers la droite (−0.005 H sur toute la rangée). Ce n'est donc pas �
 descendent » : elles rétrécissent autour d'un axe fixe, ce qui fait descendre leur bord
 supérieur et remonter leur bord inférieur. L'effet perçu est le bon, le modèle est plus simple.
 
-Cette ligne est à ~0.578 H — soit **l'horizon lui-même** (0.568–0.589). Les tuiles sont
+Cette ligne est à ~0.578 H - soit **l'horizon lui-même** (0.568-0.589). Les tuiles sont
 posées sur la ligne d'horizon. C'est la clé de la mise en page.
 
 ### 2.4 Pas horizontal
 
 Bords gauches en unités de hauteur : 0.1297, 0.5383, 0.9386, 1.2400.
-Écarts : 0.4086, 0.4003, 0.3014 — rapportés à la largeur de la tuile précédente :
+Écarts : 0.4086, 0.4003, 0.3014 - rapportés à la largeur de la tuile précédente :
 0.741, 0.874, 0.793. Moyenne **0.79**.
 
 Modèle retenu : `left(i+1) = left(i) + width(i) × 0.79`.
-Erreur résiduelle < 3 % de la largeur d'une tuile — la dispersion vient très probablement
+Erreur résiduelle < 3 % de la largeur d'une tuile - la dispersion vient très probablement
 d'une capture prise en cours d'animation de la rangée. À affiner dans la boucle `compare`.
 
 ### 2.5 Dégradé et voile sombre
@@ -286,7 +286,7 @@ glyphe centré horizontalement à ~48 % et verticalement à ~40 % de la tuile,
 hauteur ≈ 62 % de la hauteur de la tuile.
 
 Pour les sections du portfolio qui n'ont pas d'équivalent NXE (Compétences, Parcours, Contact),
-je dessine des glyphes SVG dans le même langage — formes épaisses à coins très arrondis — et
+je dessine des glyphes SVG dans le même langage - formes épaisses à coins très arrondis - et
 je leur applique **le même traitement** (dégradé blanc→vert, reflet, ombre) via un composant
 `<NxeGlyph>` partagé, pour que rien ne détonne à côté des originaux.
 Pas d'emoji. Nulle part.
@@ -296,7 +296,7 @@ Pas d'emoji. Nulle part.
 Relevés sur image4 (tuile de 736×559) :
 
 - Titre : `#ffffff`, corps déduit de la largeur du mot (« TTS.Mom » fait 125 px, donc 33 px
-  de corps) — vérifié : 123 px de large contre 125 une fois posé.
+  de corps) - vérifié : 123 px de large contre 125 une fois posé.
 - Sous-titre : `#c9d0d4` (blanc légèrement froid, pas gris neutre). Corps déduit de la même
   façon : « Text-to-Speech Platform » fait 226 px, soit 22.9 px de corps.
 - **Positions relevées, pas devinées** : le bas d'encre du titre est à 15.2 % de la hauteur de
@@ -308,14 +308,14 @@ de luminance destiné à isoler le texte blanc attrape aussi le dessin. Les prem
 relevées (195 px au lieu de 125) étaient fausses pour cette raison.
 
 Sur les tuiles non sélectionnées, titre et sous-titre existent mais sont partiellement
-masqués par la tuile suivante — pas d'exception à coder, c'est le recouvrement naturel.
+masqués par la tuile suivante - pas d'exception à coder, c'est le recouvrement naturel.
 
 ### 2.9 Reflet au sol
 
 Visible sous chaque tuile : copie miroir, floutée, désaturée, très pâle. Relevé dans
 `c_refl4.png` : le texte inversé reste lisible sur ~0.28 de la hauteur de la tuile avant
 extinction, et la zone du reflet est **plus claire** que le sol alentour (`#c5cdd4` contre
-`#8e96a3`) — c'est un débord lumineux, pas seulement un miroir.
+`#8e96a3`) - c'est un débord lumineux, pas seulement un miroir.
 
 Implémentation : duplication du nœud, `transform: scaleY(-1)`, `filter: blur(2px) saturate(.35)`,
 `opacity: .30`, masque `linear-gradient(to bottom, rgba(0,0,0,.55), transparent 30%)`,
@@ -363,12 +363,12 @@ haut restait la seule façon de changer de section.
 
 Les trois lignes portent désormais **trois sections** : la ligne du bas est la
 page courante, les deux au-dessus celles qui la précèdent, dans l'ordre.
-Cliquer une ligne mène à la section qu'elle nomme — on va où c'est écrit.
+Cliquer une ligne mène à la section qu'elle nomme - on va où c'est écrit.
 
 Premier essai : ligne du haut → précédente, milieu → nom du site → accueil,
 bas → suivante. Illisible à l'usage, parce que la ligne du milieu n'était pas
 une page et que les deux autres ne menaient pas où elles étaient écrites. Le
-nom du site quitte donc l'en-tête — **écart avec les références**, où il occupe
+nom du site quitte donc l'en-tête - **écart avec les références**, où il occupe
 la ligne du bas.
 
 **Écart assumé** : les références ne montrent aucune interaction ici, et pour
@@ -395,7 +395,7 @@ Relevés sur image4 (distances depuis le bas du contenu, H = 1334) :
 - Pastille B (visible sur image3/image5) : même diamètre, à ~205 px à droite du libellé A.
 
 Les pastilles sont les PNG d'origine (`Legend_A.png`, `Legend_B.png`, 32×32) : sphères
-bombées avec spéculaire haut-gauche, anneau sombre, lettre en creux — un `border-radius`
+bombées avec spéculaire haut-gauche, anneau sombre, lettre en creux - un `border-radius`
 CSS ne rend pas ça.
 
 Logo Guide Xbox en bas à droite (`Legend_Menu.png`, 108×108) : présent sur toutes les
@@ -415,7 +415,7 @@ D'après image3 et image5.
   texte `#d8dde0` (pas blanc pur), interlettrage +0.5 px.
 - Encart d'infos : légèrement plus clair que le panneau, rayon 8 px, vignette carrée à gauche
   avec liseré gris, libellés à gauche / valeurs à droite, étoiles `redstar.png` orange.
-- Ligne sélectionnée : dégradé vert brillant relevé au pixel —
+- Ligne sélectionnée : dégradé vert brillant relevé au pixel -
   `#c9e1a2` (haut) → `#7db430` (60 %) → `#9fc952` (bas), liseré supérieur clair, rayon 6 px.
 - Lignes non sélectionnées : texte `#b9c0c4`, séparateur `rgba(255,255,255,.13)` de 1 px.
 - Second panneau à droite, décalé vers le bas et légèrement en retrait (plan arrière).
@@ -432,7 +432,7 @@ après le premier, en glissant de la droite.
 ### 5 quinquies. Le voile passait devant le panneau de détail
 
 Le panneau arrière est en `z-index: -1` pour passer derrière la lame de devant.
-Mais `.blade-scrim` — le voile plein écran qui ferme la lame — n'avait aucun
+Mais `.blade-scrim` - le voile plein écran qui ferme la lame - n'avait aucun
 `z-index`, donc il se retrouvait **au-dessus** : tout clic sur le détail
 l'atteignait et refermait la lame. Ordre explicite désormais : voile 0,
 détail 1, lame de devant 2.
@@ -445,7 +445,7 @@ Deuxième fois que ce voile vole des clics, après la légende. Un calque plein
 **La surbrillance arrivait en deux temps.** Transitionner `color` ET
 `background` ne suffisait pas : un `linear-gradient` **ne s'interpole pas**
 depuis `transparent`, donc le vert continuait d'apparaître d'un coup pendant
-que le texte mettait 120 ms. Les deux sont maintenant instantanés — c'est de
+que le texte mettait 120 ms. Les deux sont maintenant instantanés - c'est de
 toute façon ce que fait la sélection du NXE.
 
 **Le retour d'une lame produisait un flash.** Mesuré : la luminance moyenne de
@@ -458,7 +458,7 @@ s'efface en fondu qu'à l'aller. Pic ramené à **+0.1**.
 
 En enchaînant les changements de section, les cartes sautaient. Relevé image par
 image : à chaque switch il y avait **une image sans la classe `is-entering`**,
-animation à `none` — les cartes atterrissaient d'un coup à leur place finale
+animation à `none` - les cartes atterrissaient d'un coup à leur place finale
 avant que l'animation ne reprenne depuis la pile.
 
 Ça venait du cycle éteindre → cadre d'arrêt → rallumer, qui sert normalement à
@@ -472,7 +472,7 @@ classe.
 
 Après avoir retiré l'opacité du dépilement, le changement de section
 surexposait toujours l'écran. Cause : une règle de `boot.css` que j'avais
-oubliée —
+oubliée -
 
 ```css
 .dash.is-entering { animation: dash-in 520ms ease-out }
@@ -480,7 +480,7 @@ oubliée —
 ```
 
 C'est le fondu depuis le blanc de l'allumage. Parfaitement à sa place au
-démarrage, absurde à chaque changement de section — mais les deux partageaient
+démarrage, absurde à chaque changement de section - mais les deux partageaient
 la classe `is-entering`. Séparé en `is-booting`, posé une seule fois.
 
 **Pourquoi je ne l'avais pas vu** : je mesurais la luminance moyenne de
@@ -497,13 +497,13 @@ réservé à la toute première arrivée depuis l'écran d'accueil.**
 Le retour utilise aussi une animation distincte : les cartes **coulissent**
 (`is-returning`) au lieu de se dépiler. Le dépilement fait partir toutes les
 cartes de la position de la première, donc on voyait la grande carte de gauche
-pendant toute l'animation — ce qui n'a aucun sens au retour, puisqu'elles n'ont
+pendant toute l'animation - ce qui n'a aucun sens au retour, puisqu'elles n'ont
 jamais quitté leur place.
 
 ### 5 nonies. La barre de défilement est dessinée
 
 Le curseur vert disparaissait dès qu'on passait sur une barre de défilement.
-Vérifié : le nôtre continue bien de la suivre (opacité 1, position à jour) —
+Vérifié : le nôtre continue bien de la suivre (opacité 1, position à jour) -
 c'est la flèche système qui se dessine par-dessus. Dans Blink, `cursor` ne
 s'applique pas au chrome d'une barre native ; même `cursor: none !important`
 est ignoré là.
@@ -512,7 +512,7 @@ Les barres natives sont donc masquées et remplacées par les nôtres
 (`Defilement.tsx`). C'est aussi plus juste : une barre Windows au milieu d'un
 dashboard de 2008, ça se voit.
 
-Elle reste **tirable** — masquer la native sans la remplacer aurait retiré une
+Elle reste **tirable** - masquer la native sans la remplacer aurait retiré une
 façon légitime de faire défiler. Elle réserve sa place quand elle apparaît,
 sinon le pouce passait sur le bouton vert de la ligne sélectionnée, et le
 pouce ne descend pas sous 12 % de la piste, en dessous de quoi il devient
@@ -525,7 +525,7 @@ La section Contact en demande cinq. Mesuré à 1600 × 840 : le bandeau titre fa
 248 px pour une liste qui en demande 344. Il faudrait une lame de 82.5 vh
 commençant à 15.6 : elle finirait à 98 vh, hors écran.
 
-Ce n'est donc pas un défaut mais une contrainte de proportions — image10 en
+Ce n'est donc pas un défaut mais une contrainte de proportions - image10 en
 montre quatre, et quatre tiennent. La lame est plafonnée à 73 vh pour rester
 au-dessus de la légende, et c'est la LISTE qui défile, pas la lame qui déborde.
 
@@ -542,7 +542,7 @@ restait que **10 px visibles** entre le bord de la lame et le texte.
 
 Corrigé par la marge interne (7 vh) plutôt qu'en déplaçant le panneau, qui
 viendrait buter sur l'avatar : 40 px visibles, comme sur image8. Le corps de
-texte a perdu son retrait de 0.4 vh pour s'aligner exactement sur le titre —
+texte a perdu son retrait de 0.4 vh pour s'aligner exactement sur le titre -
 3 px, mais visibles sur une colonne de texte.
 
 ### 5 quater. La colonne de détail prend la main
@@ -552,8 +552,8 @@ le faire défiler aux flèches nativement. Flèche gauche pour rendre la main à
 liste.
 
 Il s'éclaircissait aussi (#2d353d → #414c58, texte au blanc) : retiré, ce
-n'était pas voulu. La classe `is-active` reste — c'est elle qui dit quelle
-colonne reçoit les flèches — mais elle ne porte plus aucune apparence, et le
+n'était pas voulu. La classe `is-active` reste - c'est elle qui dit quelle
+colonne reçoit les flèches - mais elle ne porte plus aucune apparence, et le
 liseré de focus du corps suffit à le signaler.
 
 L'anneau de focus global (vert + halo) formait ici une grosse boîte au milieu
@@ -561,7 +561,7 @@ du texte. Comme c'est le panneau entier qui signale qu'il a la main,
 un liseré à 22 % suffit.
 
 **La rangée disparaît derrière la lame.** Vérifié sur image8 comme sur image10 :
-au bord gauche de l'écran, derrière les panneaux, il n'y a que le fond — aucune
+au bord gauche de l'écran, derrière les panneaux, il n'y a que le fond - aucune
 carte.
 
 **Surbrillance et texte changeaient en deux temps.** Seule la couleur du texte
@@ -571,7 +571,7 @@ blanchissait 120 ms plus tard. Le fond a maintenant la même transition.
 ### 5 ter. Le voile de la lame volait les clics
 
 Les trois boutons de légende faisaient tous la même chose : ils ne faisaient
-rien, et le clic atteignait `.blade-scrim` — le voile plein écran qui ferme la
+rien, et le clic atteignait `.blade-scrim` - le voile plein écran qui ferme la
 lame. D'où « Sélectionner » sans effet, et « Ouvrir » comme « Retour » qui
 fermaient tous les deux.
 
@@ -601,7 +601,7 @@ rien.
 lignes consécutives à **51 px d'écart exactement, soit 3.78 vh**. Le nôtre en
 faisait 4.50 (2.9 × 1.55). Recoupement indépendant : la référence loge ~56
 caractères par ligne dans un panneau large de 30 % d'écran, nous 37 dans 33 %.
-Corrigé à 2.52 vh / 1.5 — et le texte tient désormais sans défiler.
+Corrigé à 2.52 vh / 1.5 - et le texte tient désormais sans défiler.
 *Ce qui est mesuré, c'est l'interligne ; la répartition entre corps et interligne
 est un choix conventionnel.*
 
@@ -633,7 +633,7 @@ couleur, pas un effet.
 
 ## 6. Typographie
 
-La police est **Convection** — la police propriétaire Microsoft du dashboard 360
+La police est **Convection** - la police propriétaire Microsoft du dashboard 360
 (dérivée de Neo Sans). Le site de référence la sert en TTF ; je la récupère telle quelle.
 
 Pile CSS, avec repli si le fichier est absent :
@@ -642,14 +642,14 @@ Pile CSS, avec repli si le fichier est absent :
 font-family: 'Convection', 'Exo 2', 'Titillium Web', 'Segoe UI', system-ui, sans-serif;
 ```
 
-### 6.1 Graisse — j'avais tort
+### 6.1 Graisse - j'avais tort
 
 Le fichier Convection récupéré n'a qu'une graisse (400), et j'en avais conclu qu'il ne fallait
 jamais demander de gras, le navigateur le synthétisant. **La mesure dit le contraire : le site
 de référence rend son interface en gras synthétique.**
 
 Méthode : à hauteur de capitale et à largeur de mot calées sur la référence, on compare la
-**densité d'encre** — le nombre de pixels de texte rapporté à la surface du mot. C'est une
+**densité d'encre** - le nombre de pixels de texte rapporté à la surface du mot. C'est une
 mesure de graisse indépendante de la taille, et contrairement à l'épaisseur d'un fût elle ne
 dépend pas de la ligne de balayage choisie.
 
@@ -694,7 +694,7 @@ Fichiers d'origine récupérés (48 kHz / 44.1 kHz, PCM 16 bits) :
 | transition vers le dashboard | `snd_transitioninto.wav` | 2.66 s |
 | démarrage console | `intro.wav` | 7.02 s |
 
-**Décalage demandé (30–50 ms après le début de l'animation).** Implémenté avec un délai de
+**Décalage demandé (30-50 ms après le début de l'animation).** Implémenté avec un délai de
 **38 ms** pour les déplacements et **45 ms** pour validation/retour, via `setTimeout` sur la
 frame qui lance l'animation. Un même son ne peut jamais se déclencher deux fois dans la même
 frame (garde par identifiant). Volume global 0.55, réglable, coupé par défaut tant que
@@ -704,7 +704,7 @@ l'utilisateur n'a pas interagi (politique autoplay des navigateurs).
 
 ### 7 bis. Deux sons qui n'allaient pas
 
-**Le son de démarrage n'était jamais joué.** `intro.wav` (7.02 s — le carillon
+**Le son de démarrage n'était jamais joué.** `intro.wav` (7.02 s - le carillon
 Xbox 360 que tout le monde reconnaît) était présent dans `public/audio/` mais le
 clic sur la console déclenchait `snd_transitioninto.wav`. C'est maintenant
 `intro.wav`, et il déborde volontairement sur le dashboard : c'est ce que fait
@@ -712,7 +712,7 @@ la vraie console, le carillon continue pendant que le tableau de bord apparaît.
 Le clic étant un geste utilisateur, la lecture automatique est autorisée.
 
 **Le changement de section n'avait en pratique aucun son.**
-`snd_channelup.wav` dure **20 ms** — lu dans son en-tête WAV, c'est un fichier
+`snd_channelup.wav` dure **20 ms** - lu dans son en-tête WAV, c'est un fichier
 tronqué, inaudible. Remplacé par `btn_Select.wav` (0.53 s).
 
 Durées relevées sur les en-têtes, pour mémoire : `intro` 7.02 s ·
@@ -738,10 +738,10 @@ apparaît en fondu (console sur 1100 ms, indication sur 800 ms après 500 ms de 
 Faire le fondu sur le panneau lui-même laissait voir le vert du `body` au travers.
 
 **Indication.** « Cliquer pour continuer », non cliquable (`pointer-events: none`), en
-respiration lente de 3.2 s entre 28 % et 100 % d'opacité — les consoles de l'époque
+respiration lente de 3.2 s entre 28 % et 100 % d'opacité - les consoles de l'époque
 respiraient, elles ne clignotaient pas comme un avertissement. Elle s'efface au clic.
 
-**Séquence au clic** — une seule interpolation, pas d'étapes. `fadeStart` (840 ms) vient
+**Séquence au clic** - une seule interpolation, pas d'étapes. `fadeStart` (840 ms) vient
 **après** la fin de `turn` (880 ms, à 40 ms près) : quand le fondu partait à 620 ms pour une
 rotation de 1150 ms, le blanc recouvrait la console avant son arrivée. Invisible depuis le
 repos, où le trajet est court ; flagrant après avoir tourné la console à l'opposé.
@@ -759,13 +759,13 @@ repos, où le trajet est court ; flagrant après avoir tourné la console à l'o
 
    **Le zoom est interpolé en géométrique, pas en linéaire.** La taille apparente varie en
    1/distance : interpoler le rayon linéairement fait accélérer le grossissement vers la fin
-   (l'échelle passait par 1×, 1.15×, 1.4×, 1.8×, 2.3× — les écarts se creusent). En
+   (l'échelle passait par 1×, 1.15×, 1.4×, 1.8×, 2.3× - les écarts se creusent). En
    géométrique (`from · (to/from)^e`), le taux de grossissement est constant, ce qui est la
    définition d'un zoom régulier.
 
    L'assouplissement est **sinusoïdal et non cubique** : une cubique in-out a une pente
    maximale de 3 à mi-course contre π/2 ≈ 1.57 ici. C'est ce pic de vitesse qui donnait
-   l'impression que « d'un coup ça zoome » — il ne se passait presque rien, puis tout arrivait
+   l'impression que « d'un coup ça zoome » - il ne se passait presque rien, puis tout arrivait
    d'un bloc. Avec en plus la durée portée de 880 à 1500 ms et la profondeur ramenée de 2.29×
    à 2.09×, l'échelle apparente mesurée progresse par paliers de +0.07, +0.14, +0.24, +0.25,
    +0.14 : montée régulière et décélération franche, au lieu d'un pic ;
@@ -782,14 +782,14 @@ Durée totale 1240 ms. `FRONT_POSE` a été relevée en balayant `?pose=` avec `
 **Matériaux.** Le `.glb` arrive en `metalness: 1, roughness: 1`. Un métal parfaitement
 rugueux n'a aucune composante diffuse : sans environment map il ne peut rendre que du gris
 terne, ce qui ressortait mal sur le fond blanc. On repasse en diélectrique
-(`metalness: 0, roughness: 0.42`) et la texture d'albédo redevient visible — luminance
+(`metalness: 0, roughness: 0.42`) et la texture d'albédo redevient visible - luminance
 moyenne mesurée sur les pixels du modèle : **229/255**, contre un gris franc auparavant.
 
 **Interaction.** Trois niveaux, du plus discret au plus direct :
 
-1. **Survol** — parallaxe interpolée (`lerp` 0.06) de ±14° en lacet et ±8° en tangage.
-2. **Rotation libre** — 0.07 rad/s en continu, suspendue pendant un glissé et reprise au relâché.
-3. **Glissé** — maintenir le bouton gauche *ou* droit et bouger fait tourner la console dans
+1. **Survol** - parallaxe interpolée (`lerp` 0.06) de ±14° en lacet et ±8° en tangage.
+2. **Rotation libre** - 0.07 rad/s en continu, suspendue pendant un glissé et reprise au relâché.
+3. **Glissé** - maintenir le bouton gauche *ou* droit et bouger fait tourner la console dans
    le sens du geste. Capture du pointeur pour que le glissé survive à une sortie de fenêtre,
    menu contextuel neutralisé sur le bouton droit.
 
@@ -800,7 +800,7 @@ moyenne mesurée sur les pixels du modèle : **229/255**, contre un gris franc a
    dampingFactor: 0.05, rotateSpeed: 0.5, autoRotate: true, autoRotateSpeed: 0.5
    ```
 
-   Les deux valeurs qui font la sensation : `dampingFactor: 0.05` — le geste alimente une
+   Les deux valeurs qui font la sensation : `dampingFactor: 0.05` - le geste alimente une
    réserve dont on ne consomme que 5 % par frame, donc la console suit la main de loin et
    continue de glisser au relâché ; et `rotateSpeed: 0.5`, la moitié du défaut. Ma première
    version appliquait le geste directement avec un `lerp` à 0.3 et le gain plein : la console
@@ -812,14 +812,14 @@ moyenne mesurée sur les pixels du modèle : **229/255**, contre un gris franc a
    **C'est la caméra qui orbite, pas la console qui tourne.** Point structurel, et la dernière
    chose corrigée : faire tourner l'objet en angles d'Euler ne respecte pas le geste. Dès que
    l'objet est incliné, un glissé horizontal ne tourne plus autour de la verticale de l'écran
-   mais autour d'un axe penché — un cercle à la souris ne rend pas un cercle, et la conversion
+   mais autour d'un axe penché - un cercle à la souris ne rend pas un cercle, et la conversion
    `Rz(−roll)` calculée une fois pour toutes ne peut pas corriger ça, puisqu'elle ne dépend
    pas de l'orientation courante. En coordonnées sphériques (`theta` azimut, `phi` polaire),
    le lacet reste toujours l'axe vertical de l'écran.
 
    **Test objectif** : `theta` et `phi` sont des sommes de `dx` et `dy`, donc un cercle fermé
    à la souris doit ramener exactement à la pose de départ. Mesuré sur un cercle de 70 px de
-   rayon en 40 pas : **0.54 / 255 d'écart moyen** entre le départ et l'arrivée — c'est du
+   rayon en 40 pas : **0.54 / 255 d'écart moyen** entre le départ et l'arrivée - c'est du
    bruit d'anticrénelage. En Euler, la composition n'étant pas commutative, la pose dérivait.
 
    L'orientation de repos est figée dans deux groupes imbriqués et ne bouge plus jamais ; le
@@ -836,7 +836,7 @@ moyenne mesurée sur les pixels du modèle : **229/255**, contre un gris franc a
 
 **Cible du clic.** C'est la console qui démarre la séquence, pas la légende du bas. Le clic
 est validé par un raycast, contre une boîte englobante invisible (`colorWrite: false`) plutôt
-que contre la géométrie complète — la 360 est un parallélépipède, et raycaster 50 000
+que contre la géométrie complète - la 360 est un parallélépipède, et raycaster 50 000
 triangles à chaque `pointermove` pour un retour de curseur serait absurde. Le curseur passe à
 `pointer` au survol du modèle, à `grabbing` pendant le glissé. Un appui qui bouge de plus de
 5 px est un glissé, pas un clic : on ne démarre pas.
@@ -846,7 +846,7 @@ affiche un liseré de focus en incrustation. Les clics souris y sont ignorés (`
 distingue l'activation clavier) puisqu'ils passent par le raycast.
 
 Sous `prefers-reduced-motion` : pas de rotation continue, pas de flash, transition en fondu
-simple. Le glissé reste disponible — c'est une action de l'utilisateur, pas une animation.
+simple. Le glissé reste disponible - c'est une action de l'utilisateur, pas une animation.
 
 ---
 
@@ -865,7 +865,7 @@ référence l'obtient avec deux PNG que je reprends : `CRT_Scanlines_Colored.png
 | `.crt-frame` | coins arrondis, bord noir, vignette | `background-size: 100% 100%` |
 
 **Calibration vérifiée.** Le motif source a une période de 3 px (cyan `#00ffc0`, rouge
-`#f30032`, noir). Étiré en `cover`, il donne 12 px sur une capture de 2530 de large — et la
+`#f30032`, noir). Étiré en `cover`, il donne 12 px sur une capture de 2530 de large - et la
 période relevée sur `reference/image2.png` est exactement de 12 px. L'amplitude de teinte
 (R−B) vaut 11.6 sur la référence contre 12.7 sur mon rendu : même effet, à 10 % près.
 
@@ -873,12 +873,12 @@ période relevée sur `reference/image2.png` est exactement de 12 px. L'amplitud
 l'application dans un `filter` force la ré-rastérisation de tout l'arbre à chaque frame
 d'animation : mesuré, les sons partaient 83 ms après le début de l'animation au lieu des
 38 ms programmés, parce que le `setTimeout` attendait le thread principal. Le
-`backdrop-filter` travaille sur le résultat déjà rastérisé — retour à 49 ms.
+`backdrop-filter` travaille sur le résultat déjà rastérisé - retour à 49 ms.
 
 Les rayures et le cadre ne sont pas floutés : sur un vrai tube, c'est l'image qui est molle,
 pas la grille d'ouverture.
 
-**L'écran d'accueil ne reçoit que le flou** — ni rayures ni cadre, comme demandé.
+**L'écran d'accueil ne reçoit que le flou** - ni rayures ni cadre, comme demandé.
 Le cadre disparaît en plein écran (`:fullscreen`), sinon on encadre un cadre.
 
 ---
@@ -888,7 +888,7 @@ Le cadre disparaît en plein écran (`:fullscreen`), sinon on encadre un cadre.
 Un personnage se tient devant la rangée sur image2. Le nôtre est fabriqué avec Meshy
 (image → 3D → rig → animation) à partir d'un rendu de style avatar Xbox 360.
 
-### Cadrage — relevé sur image2
+### Cadrage - relevé sur image2
 
 | | valeur |
 |---|---|
@@ -904,13 +904,13 @@ selon la distance, alors qu'on veut une hauteur à l'écran fixée par le relev�
 (1.70 unité pour un cadre de 2.0, donc 85 %). C'est faux : dans sa pose **animée**, le
 personnage n'a ni les pieds à `y = 0` ni la tête à 1.70. Mesuré au rendu, il occupe 77.8 %
 du canevas et ses pieds flottent à 7 % de la hauteur au-dessus du bord bas. Les cotes du
-composant sont donc calées sur le rendu, pas sur la géométrie de repos — et vérifiées
+composant sont donc calées sur le rendu, pas sur la géométrie de repos - et vérifiées
 stables à trois instants différents de l'animation (44.1 à 44.7 % pour 44.9 visés).
 
 ### Poids et chargement
 
 Le modèle sorti de Meshy pesait **5,7 Mo**, dont **4 382 Ko pour une seule texture PNG
-2048²** — 77 % du fichier. L'atlas UV est très fragmenté (des centaines d'îlots), ce qui
+2048²** - 77 % du fichier. L'atlas UV est très fragmenté (des centaines d'îlots), ce qui
 compresse atrocement mal en PNG. Réencodé en JPEG 1024² qualité 92 : **1,64 Mo**, soit
 71 % de moins, pour un rendu indiscernable (vérifié en chargeant les deux versions et en
 comparant au cadrage buste, bien plus près que ce que le dashboard montre).
@@ -927,7 +927,7 @@ FCP médian sur cinq mesures reste à 196 ms.
 
 ### Le piège de la sonde
 
-`firstAvailable` teste les assets avec `new Image()` — inutilisable pour un `.glb`. Mais
+`firstAvailable` teste les assets avec `new Image()` - inutilisable pour un `.glb`. Mais
 la sonde `fetch` qui l'a remplacée avait son propre piège : **un code 200 ne prouve pas
 que le fichier existe.** Le serveur de dev de Vite comme le `try_files $uri $uri/
 /index.html` de nginx renvoient la page HTML de l'application pour tout chemin inconnu.
@@ -939,7 +939,7 @@ HTML. Il faut contrôler le `content-type` et rejeter `text/html`.
 Maintenir le clic sur lui et glisser le fait pivoter de gauche à droite, sur 360° sans
 butée. **Lacet uniquement** : pas de tangage, on ne veut ni le voir basculer ni découvrir
 le dessous de ses semelles. Le modèle est centré en X et Z avec les pieds à `y = 0`, donc
-une rotation autour de son axe vertical les laisse plantés — c'est le personnage qui
+une rotation autour de son axe vertical les laisse plantés - c'est le personnage qui
 tourne, pas la caméra, contrairement à la console de l'écran d'accueil où il fallait une
 orbite sphérique. Un `Group` intermédiaire porte la rotation pour ne pas perturber
 l'animation qui joue en dessous.
@@ -947,7 +947,7 @@ l'animation qui joue en dessous.
 Amortissement et gain repris d'`OrbitControls` comme pour la console (`dampingFactor`
 0.05, `rotateSpeed` 0.5), mais **indexés sur la largeur du canevas, pas sa hauteur**. Le
 canevas fait 160 × 384 px : indexé sur la hauteur, un tour complet demandait 766 px de
-glissement, soit sept fois la largeur visible du personnage — on pousse beaucoup pour peu.
+glissement, soit sept fois la largeur visible du personnage - on pousse beaucoup pour peu.
 Sur la largeur, un tour se fait en 320 px. Le mapping physique « j'attrape la surface et
 je pousse » (arc = r·θ, demi-largeur ≈ 55 px) donne 346 px indépendamment : les deux
 convergent à 8 % près.
@@ -958,18 +958,18 @@ Deux contraintes ont façonné l'implémentation, toutes deux vérifiées par la
 au-dessus de la rangée ; le rendre cliquable créerait une zone morte devant la tuile 2. Le
 conteneur reste donc `pointer-events: none`, l'écoute se fait au niveau de la fenêtre, et
 un raycast sur une boîte de sélection décide si le curseur est réellement sur la
-silhouette — seulement alors le conteneur devient cliquable. La boîte est en
+silhouette - seulement alors le conteneur devient cliquable. La boîte est en
 `visible = false` : `Raycaster` ne teste que les calques, jamais la visibilité, elle reste
 donc détectable sans être dessinée.
 
 **Le geste ne doit pas déplacer la sélection.** Un tour fait 320 px et sort largement de
 la boîte de l'avatar ; sans précaution, le curseur survole les tuiles traversées et la
-sélection change en plein glissement — mesuré, elle passait de la tuile 0 à la 2. Un
+sélection change en plein glissement - mesuré, elle passait de la tuile 0 à la 2. Un
 bouclier `position: fixed` n'intercepte le survol que pendant la rotation.
 
 En `prefers-reduced-motion`, la boucle de rendu est à l'arrêt : le geste est appliqué
 immédiatement et la scène redessinée à la demande. Faire tourner le personnage est une
-manipulation directe, pas une animation d'ambiance — la couper reviendrait à ignorer
+manipulation directe, pas une animation d'ambiance - la couper reviendrait à ignorer
 l'utilisateur. Ce qu'on lui retire, c'est l'inertie, pas la réponse.
 
 ---
@@ -978,7 +978,7 @@ l'utilisateur. Ce qu'on lui retire, c'est l'inertie, pas la réponse.
 
 Il n'est pas un décor planté à une position fixe : **il est arrimé à la tuile
 d'indice 1** et suit sa profondeur. Les deux captures qui le montrent disent la
-même chose, à des états de sélection différents — c'est ce qui rend le modèle
+même chose, à des états de sélection différents - c'est ce qui rend le modèle
 sûr plutôt que deviné :
 
 | | image6 (« 1 of 5 », tuile 1 au fond) | image2 (« 2 of 5 », tuile 1 devant) |
@@ -998,13 +998,13 @@ serait faux chez nous. Vérification du modèle : il prédit le centre de l'avat
 d'image6 à 98.9 vh, mesuré 99.3.
 
 Le canevas garde une taille en pixels constante (celle de la profondeur 0) et
-c'est un `scale` CSS qui le fait avancer — redimensionner un canevas WebGL à
+c'est un `scale` CSS qui le fait avancer - redimensionner un canevas WebGL à
 chaque image d'une transition coûterait une réallocation par image. L'origine de
 la transformation est le point de contact des pieds au sol, donc une mise à
 l'échelle ne les décolle jamais.
 
 **Lame ouverte** (image10) : il quitte la rangée et fait un pas en avant à
-droite — centre à 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écran,
+droite - centre à 33.1 vh du bord droit, pieds à 87.9 % de la hauteur d'écran,
 taille × 1.04. Il passe aussi **devant** le panneau, sinon son bras se fait
 manger par le bord.
 
@@ -1017,7 +1017,7 @@ du bloc. Pour une ellipse haute de 15 %, `bottom = 3.46 − 7.5 = −4 %`.
 Deux erreurs faites avant d'y arriver, opposées :
 
 - centrée trop **haut**, les deux tiers de l'ellipse passent derrière les
-  jambes. Elle assombrit pourtant bien le sol — mesuré 68 unités — mais on n'en
+  jambes. Elle assombrit pourtant bien le sol - mesuré 68 unités - mais on n'en
   voit que les bords, et elle paraît absente ;
 - descendue **sous** la ligne des semelles « pour qu'on la voie mieux », le
   personnage se met à flotter au-dessus de son ombre.
@@ -1029,14 +1029,14 @@ décalage.
 
 Mesuré au rendu sur 12 instants d'animation : **14 à 15 px sur 405, soit 3.5 %
 de la hauteur du bloc**. Dans sa pose animée le personnage ne pose pas ses
-pieds à `y = 0` — je le supposais, donc il flottait de cette hauteur au-dessus
+pieds à `y = 0` - je le supposais, donc il flottait de cette hauteur au-dessus
 du sol et son ombre tombait sous ses semelles.
 
 Le bloc est descendu de cet écart, et l'ombre remontée d'autant. Vérification :
 dans la référence les pieds dépassent le bas de la tuile de 6.4 % de sa
 hauteur, chez nous de 6.0 %.
 
-L'ombre reste discrète — image6 n'en montre pas de marquée non plus.
+L'ombre reste discrète - image6 n'en montre pas de marquée non plus.
 
 ### 8 quinquies. Le cadrage qui coupait les mains
 
@@ -1051,14 +1051,14 @@ champ de la caméra pour ne pas saturer la mesure :
 | sommet du crâne | 1.736 unité au-dessus du sol |
 
 D'où un cadre de 1.80 unité de haut (juste ce qu'il faut au-dessus du crâne) et
-un rapport largeur/hauteur de 0.56 — le minimum strict serait 0.522. Avant, le
+un rapport largeur/hauteur de 0.56 - le minimum strict serait 0.522. Avant, le
 cadre valait 24 vh pour 228 px nécessaires : les mains sortaient et se
 faisaient couper net.
 
 **La rotation tourne à plein régime pendant le geste.** Le plafond à 30 i/s ne
 se voit pas sur une respiration lente, mais très bien sur un objet qui suit la
 souris : c'est le décalage curseur/personnage qui devient saccadé. Le plafond ne
-protège l'ordonnancement des sons que pendant la navigation au clavier — or on
+protège l'ordonnancement des sons que pendant la navigation au clavier - or on
 ne navigue pas au clavier en faisant tourner l'avatar à la souris.
 
 ---
@@ -1087,24 +1087,24 @@ n'est pas un mouvement d'ensemble mais le fait que chaque anneau naisse,
 grandisse et meure avec ses propres valeurs.
 
 Chaque anneau porte sa trajectoire dans des variables CSS et une animation qui
-dure toute sa vie — aucune boucle JS par image, seul l'ajout et le retrait
+dure toute sa vie - aucune boucle JS par image, seul l'ajout et le retrait
 passent par un timer. Une vingtaine d'anneaux vivent à un instant donné.
 
 ### 2 ter. Rayon des coins
 
 Mesuré au zoom 4× sur le coin de la tuile 0 d'image6 : **15 à 16 px sur une
 tuile haute de 561**, soit 1.15 vh, ou 2.76 % de la hauteur de tuile. La valeur
-en place était 0.45 vh — deux fois et demie trop peu, et les cartes paraissaient
+en place était 0.45 vh - deux fois et demie trop peu, et les cartes paraissaient
 presque carrées.
 
 La détection automatique échoue ici : au coin haut-gauche la tuile et le fond
 sont tous deux verts et clairs, le saut de luminance ne dépasse pas 2 unités.
-Le coin bas-gauche, contre le sol gris, est en revanche parfaitement net — et
+Le coin bas-gauche, contre le sol gris, est en revanche parfaitement net - et
 un agrandissement au plus proche voisin donne la lecture directement.
 
 ### 2 bis. Chaque carte a son motif, pas sa couleur
 
-Le thème NPE embarque **huit fonds de carte** en 420 × 320 — le format exact de
+Le thème NPE embarque **huit fonds de carte** en 420 × 320 - le format exact de
 nos tuiles. Leurs couleurs moyennes tiennent en 5 unités les unes des autres
 (#a0cb28 à #add02a) : c'est bien le **motif de ronds** qui change d'une carte à
 l'autre, pas la teinte. J'avais fait varier la teinte, ce qui n'était pas
@@ -1120,7 +1120,7 @@ Trois points où j'ai relevé plutôt qu'inventé, en lisant son CSS et ses chun
 images fixes, sans `animation` ni `transition` en CSS. Ce qu'on prend pour un
 fond animé est une **mise en scène d'entrée** : le sol est un composant piloté
 par un état, `transform: translateY(100vh) → translateY(0)`, avec quatre
-durées selon le sens et la vitesse —
+durées selon le sens et la vitesse -
 
 | sens | transition |
 |---|---|
@@ -1141,11 +1141,11 @@ fichiers : **#a6ff00 cerné de noir**.
 
 **Piège payé dessus.** Masquer le curseur natif avec `cursor: none !important`
 écrase la valeur calculée de *tous* les éléments. Or je lisais justement cette
-valeur pour choisir la forme — la variante « pointer » ne pouvait donc jamais
+valeur pour choisir la forme - la variante « pointer » ne pouvait donc jamais
 s'afficher, et le test de parcours, qui localisait la console de la même façon,
 échouait. La forme se déduit maintenant de la nature de l'élément survolé, et
 les deux cas 3D (console, silhouette de l'avatar) exposent leur état de raycast
-sous forme de classe — un raycast ne se lit pas dans le DOM.
+sous forme de classe - un raycast ne se lit pas dans le DOM.
 
 ---
 
@@ -1169,7 +1169,7 @@ sous forme de classe — un raycast ne se lit pas dans le DOM.
 | `ZivvoZ/dashx360` | idem |
 
 Aucun code n'en est repris. Sans licence explicite, le droit d'auteur par défaut s'applique.
-Le seul intérêt qu'ils auraient eu — les assets — est de toute façon couvert par §9.1,
+Le seul intérêt qu'ils auraient eu - les assets - est de toute façon couvert par §9.1,
 et à la source.
 
 ### 9.3 Dossier `public/assets/` optionnel
@@ -1189,7 +1189,7 @@ sur chaque chemin, avec repli silencieux.
 
 ---
 
-## 10. Mobile — proposition (à valider, mais je code celle-ci)
+## 10. Mobile - proposition (à valider, mais je code celle-ci)
 
 Le brief demande d'adapter plutôt que de dégrader, et de proposer la solution ici avant de
 la coder. Voici le raisonnement et la décision.
@@ -1197,7 +1197,7 @@ la coder. Voici le raisonnement et la décision.
 Une rangée en perspective repose sur trois choses qui disparaissent toutes sur un écran de
 6 pouces : de la largeur, un curseur qui n'est pas un doigt, et une distance de lecture de
 2 mètres. Rétrécir la rangée donne quatre timbres-poste illisibles. **Mais** le NXE possède
-déjà, dans son propre langage, une forme verticale : la lame de détail (image3, image5) —
+déjà, dans son propre langage, une forme verticale : la lame de détail (image3, image5) -
 liste de lignes pleine largeur, ligne active en dégradé vert brillant, séparateurs fins.
 
 **Décision : sous 820 px de large (ou en portrait), on passe de l'idiome « rangée de tuiles »
@@ -1211,7 +1211,7 @@ liste de lignes pleine largeur, ligne active en dégradé vert brillant, sépara
 - Le reflet au sol est conservé, réduit à 0.16 de la hauteur de carte.
 - L'en-tête passe de trois lignes à deux (nom + section courante), corps à 0.055 H.
   Le bloc profil garde pseudo + vignette, perd la ligne de score.
-- Le pied de page conserve les pastilles A et B — c'est une signature visuelle forte — mais
+- Le pied de page conserve les pastilles A et B - c'est une signature visuelle forte - mais
   elles deviennent de vrais boutons tactiles de 44 px (A = ouvrir, B = revenir).
 - Le panneau de détail passe en plein écran et monte depuis le bas, avec le même dépliage.
 - Balayage horizontal = changement de section ; balayage vertical = liste. Les flèches et la
@@ -1243,21 +1243,21 @@ les sections précédentes, et que les captures ont démenti :
 **Le reflet au sol n'est pas un miroir.** J'avais dupliqué la tuile entière,
 retournée et atténuée. Résultat : une bande verte sombre sous la tuile, alors que
 la référence n'en a aucune. Relevé au pixel sur image4, juste sous la tuile :
-`#8f969d` contre `#8c929e` en sol nu — **+3 seulement**. Et à l'endroit du titre
+`#8f969d` contre `#8c929e` en sol nu - **+3 seulement**. Et à l'endroit du titre
 inversé : +6 à +12. Le NXE ne renvoie que *la lumière*, pas la matière. La copie
 ne contient donc plus que le texte, par-dessus un halo blanc à 7.5 %.
 Gain mesuré sur la bande sous les tuiles : 12/13/11 → 11/9/7.
 
 **L'inclinaison des glyphes est déjà dans les fichiers.** J'appliquais
 `rotate(-13deg)` par-dessus des PNG où l'appareil photo de `icon_picturelib` est
-*déjà* penché — donc deux fois. Supprimé pour les PNG, conservé (−9°) pour les
+*déjà* penché - donc deux fois. Supprimé pour les PNG, conservé (−9°) pour les
 glyphes SVG maison, qui eux sont dessinés droits.
 
 **Les glyphes SVG sortaient deux fois trop petits.** Un `<svg width:auto;
 height:100%>` dans un conteneur en largeur « shrink-to-fit » se replie sur une
 taille arbitraire au lieu d'utiliser le ratio de son `viewBox`. Corrigé avec
-`aspect-ratio: 207 / 288` sur le conteneur — le format des PNG NXE — et un
-canevas SVG recalé sur les mêmes proportions (glyphe dans la bande 7 %–65 %).
+`aspect-ratio: 207 / 288` sur le conteneur - le format des PNG NXE - et un
+canevas SVG recalé sur les mêmes proportions (glyphe dans la bande 7 %-65 %).
 
 **`evenodd` ne perce pas entre `<path>` distincts.** Les touches du clavier et
 les œillets du serveur ne se découpaient pas : chaque sous-chemin était un
@@ -1270,12 +1270,12 @@ n'existe nulle part dans les références.
 **Le corps de texte se déduit de la hauteur de capitale, pas de la largeur.**
 Les deux méthodes divergeaient de ~19 %. En mesurant le « 1 » de « mopo1o »
 (37 px de haut) et les hampes du « m » (27 px d'x-height), on obtient un corps de
-53.6 px — et l'écart de largeur restant s'explique par **0.09 em d'interlettrage**,
+53.6 px - et l'écart de largeur restant s'explique par **0.09 em d'interlettrage**,
 valeur retrouvée indépendamment sur « Projects » (0.092) et « Gabriel's Portfolio »
 (0.092). Les titres de tuiles, eux, n'en ont pas.
 
 **Le pas horizontal n'est pas géométrique.** Un facteur unique de 0.79 laissait
-15 px d'erreur sur la deuxième tuile — visible. Les décalages cumulés sont donc
+15 px d'erreur sur la deuxième tuile - visible. Les décalages cumulés sont donc
 codés en dur pour les quatre premières tuiles (0, 0.748, 1.461, 2.013), et
 prolongés géométriquement au-delà.
 
@@ -1294,7 +1294,7 @@ Ni image3 ni image5 ne les montrent.
 
 Ces chiffres sont à lire avec précaution, et surtout pas comme une note : les
 références montrent le contenu d'un *autre* portfolio. Là où image4 a une photo
-de Pepe plein cadre, ce site a une tuile verte unie avec une note de musique — la
+de Pepe plein cadre, ce site a une tuile verte unie avec une note de musique - la
 différence de pixels est énorme et parfaitement souhaitable. Le score de `blade`
 monte justement parce qu'assombrir le bandeau du panneau arrière (correction
 juste) l'éloigne du logo blanc de la référence. Les indicateurs qui comptent sont
@@ -1314,6 +1314,177 @@ la grille de blocs de `compare.mjs`, les planches côte à côte, et `measure.mj
 
 Tout est dans ±2 px sauf `tile2.right` (−5.1 px), résidu de la non-uniformité du
 pas décrite plus haut.
+
+---
+
+## 11 ter. Passe de nettoyage et d'audit complet (28/08)
+
+Nettoyage du code mort puis relecture de chaque écran, capture à l'appui, contre
+les références. Ce que l'audit a trouvé et ce qui a été corrigé.
+
+**Retiré, parce que plus rien ne s'en servait :** le glyphe `search`, l'export
+`siteName` (mort depuis que le fil d'Ariane est une roue), les trois blocs `.hint`
+de `mobile.css` sans aucun élément derrière, l'alias `music` (doublon de
+`musiclib`), les `export` inutiles des quatre listes `*_CANDIDATES`, les 155
+captures de travail `shots/_*.png` (62 Mo) et les deux `redstar.png` des étoiles
+Rep supprimées. Les ~800 Ko d'assets NXE inutilisés restent : c'est une réserve
+documentée dans `CREDITS.md`, pas du déchet.
+
+**La légende annonçait « Ouvrir » sur les 23 tuiles, dont 12 sans aucune action.**
+Appuyer sur A n'y faisait rien. La touche A ne s'affiche plus que si la tuile a
+au moins une ligne - et chaque tuile en a maintenant au moins une, choisie pour
+elle (une compétence renvoie vers les projets qui s'en servent, une étape du
+parcours vers ce qu'on y a appris, un canal de contact vers un autre canal).
+
+**Le panneau gauche était vide jusqu'à 62 % de sa hauteur** (Compétences, Parcours)
+contre 19 % sur image10. Mesuré en cherchant la dernière ligne de pixels portant
+de l'encre. Après ajout des lignes d'action : 15 à 27 %, moyenne 26 %.
+
+**Le titre du bandeau orange était en capitales sur les cinq tuiles de Parcours**
+et en casse normale partout ailleurs. La référence affiche « mopo1o » et
+« TTS.Mom » dans leur casse d'origine : tout est repassé en casse normale.
+
+**La valeur de la barre de progression était illisible sur le remplissage.**
+Le centrage sur toute la piste est bien le relevé d'image10 (piste 1664→2022,
+texte centré sur 1850, centre de piste 1843) - mais la référence ne montre que
+des remplissages courts, où le texte tombe toujours sur le fond sombre. À 62 %,
+le blanc passait sur le vert : **2.53:1**, sous le minimum de 3:1. Deux copies
+superposées, l'une sombre découpée à la largeur exacte du remplissage
+(`clip-path: inset(0 calc(100% - var(--plein)) 0 0)`) : **5.90:1** sur le vert,
+17.32:1 sur la piste, et pas un pixel de décalage entre les deux.
+
+**Sur mobile, la fin du texte était inatteignable.** Sur 390 × 844, le corps
+débordait de 53 px sous l'écran et 131 px passaient sous la légende ; même en
+fin de course, 62 px restaient cachés. `padding-bottom: 15vh` sur `.blade-sheet`
+rend au défilement la hauteur du fondu de la légende. Mesuré après correction :
+0 px de texte sous la légende.
+
+**Quatre tuiles tombaient sur la même maison** si les dossiers d'assets étaient
+vidés - cas que le projet doit tenir. `picturelib`, `gamelib`, `settings` et
+`film` n'existaient qu'en PNG, et `SHAPES[id] ?? SHAPES.home` renvoyait la
+maison pour les quatre. Quatre tracés SVG de repli ajoutés (appareil photo,
+manette, curseurs, pellicule), vérifiés en interceptant `/nxe/**` et
+`/assets/**` en 404.
+
+**Le glyphe `terminal` se lisait comme une carte bancaire** : bande pleine
+largeur = piste magnétique, chevron = puce, tiret = numéro gravé. Vérifié au
+rendu, sans appel. Trois pastilles à la place de la bande, invite et curseur
+agrandis et posés sur la même ligne de base.
+
+**« Cliquer pour continuer » était à 2.75:1** sur le blanc de l'écran
+d'allumage, sous le minimum de 3:1 - et c'est la seule consigne de tout l'écran.
+Passé à `#767676`, soit 4.54:1.
+
+**L'avatar recouvrait l'orbe Xbox.** `CADRE_LAME.droiteVh` avait été ramené de
+33.1 (le relevé) à 21.5 pour que la silhouette ne recouvre pas la ligne de pied
+du panneau - mais cette ligne ne se rend que sur une tuile AVEC image, et plus
+aucune n'en a. Le contournement ne protégeait plus rien. Retour à 33.1.
+
+Deux mesures fausses en chemin, toutes les deux corrigées :
+
+- j'ai d'abord annoncé « l'orbe est 2.7 fois trop gros » en comparant notre
+  boîte CSS (15.07 vh, dont beaucoup de vide autour du glyphe de
+  `Legend_Menu.png`) à la sphère visible de la référence. Remesuré avec **la même
+  méthode des deux côtés** : diamètre 5.36 vh contre 5.48-5.56 sur image4/5/6/8,
+  décalage droit 15.48 contre 14.59-15.44, bas 7.86 contre 7.14-8.07. L'orbe est
+  conforme ;
+- j'ai cru le reflet au sol trop faible sur une comparaison mal recalée. Aligné
+  sur le bas de tuile de chaque côté : amplitude +7/+20/+5/+4 en référence contre
+  +10/+12/+5/+4 chez nous. Conforme aussi.
+
+**L'avatar volait les clics de la barre de défilement.** Une fois revenu à sa
+cote, sa silhouette couvrait le pouce ; son `onDown` est posé sur la fenêtre en
+phase de CAPTURE, donc son `stopPropagation` s'exécutait avant le gestionnaire
+du pouce et le glissement ne démarrait plus. Le personnage cède maintenant à la
+lame : `elementFromPoint` renvoie ce qu'il y a dessous (`.avatar3d` est en
+`pointer-events: none`), et s'il y a `.blade-layer`, c'est elle qui décide.
+
+**Et cette cession était trop large.** Je visais `.blade-layer`, qui contient
+`.blade-scrim` - un bouton de fermeture qui fait tout l'écran (mesuré 1600 × 840).
+`elementFromPoint` renvoyant le voile partout, « la lame est dessous » était vrai
+sur chaque pixel : le personnage devenait **insaisissable dès qu'une lame était
+ouverte**, alors qu'il tournait toujours dans la rangée. Corrigé en visant
+`.blade`, les panneaux eux-mêmes ; c'est au voile de céder au personnage. Le test
+du parcours ne couvrait que la rotation dans la rangée - c'est ce trou qui a
+laissé passer la régression. Trois assertions ajoutées (il tourne sous une lame,
+la lame reste ouverte, le pouce reste tirable), et vérifiées en remettant la faute :
+elles rougissent toutes les trois.
+
+**L'avatar coupait les fins de ligne du panneau de détail** - 47 px. Dans la
+référence il chevauche aussi le panneau, mais le contenu d'image10 (titre et deux
+barres) n'occupe pas toute la largeur, donc rien n'y est caché ; notre corps de
+texte, lui, allait jusqu'au bord. `padding-right: 8.6vh` sur `.blade.is-secondary`
+réserve la bande occupée par la silhouette. Déplacer le personnage n'était pas
+possible : il fait 180 px et il n'y a que 151 px entre la fin du texte et l'orbe.
+Vérifié à 1600 × 840, 1920 × 1080 et 1366 × 768 : 5 à 8 px de dégagement, orbe
+libre aux trois.
+
+## 11 quater. En-tête : ordre, pastilles, molette (28/08)
+
+**La page courante est passée EN HAUT**, les deux suivantes en dessous en corps
+décroissant. C'est l'inverse d'image4, qui met le titre courant en bas et en
+gros : divergence demandée, consignée en § 12. Les trois corps restent les
+relevés ; seules les hauteurs sont recalculées, sinon la grande ligne mordait sur
+la suivante. L'écart entre deux lignes vaut 2.01 fois la hauteur de capitale de
+celle du dessus - le rapport relevé sur image4 (3.44 / 1.70 et 4.86 / 2.42), donc
+le rythme d'origine est conservé, seulement retourné. `.crumb-3` reste la classe
+de la page courante, pour que `measure.mjs` et le test du parcours gardent leur
+prise. Après retournement, sa capitale tombait 4.1 px trop bas (le grand corps
+démarre plus bas dans sa boîte) : boîte remontée de 0.61 vh, écart ramené à 0.0.
+
+**La roue enroule, et la molette boucle** - les deux ensemble. J'avais d'abord
+retiré le modulo, trouvant bizarre de lire « Parcours / Contact / Accueil » sur
+la première page. Ce qui était bizarre, c'était de l'afficher alors que la
+navigation, elle, s'arrêtait au bout. Maintenant remonter depuis l'Accueil mène
+vraiment à Contact, comme les flèches l'ont toujours fait (`moveSection` est en
+modulo), et la roue montre exactement ce que le geste ira chercher.
+
+**Pastilles de position.** Une par section, à gauche des titres, la courante
+allumée. La COLONNE NE BOUGE PAS : seule la lumière change de pastille. J'avais
+fait coulisser la colonne pour aligner l'allumée sur le titre courant - c'était
+plus joli et c'était faux : un repère de position qui se déplace lui-même ne
+repère plus rien. Pas resserré à 2.1 vh pour que la colonne se lise comme un seul
+objet ; au pas de l'interligne, l'œil appariait pastille et ligne et croyait à
+une correspondance qui n'existe pas.
+
+Elles sont creusées et non posées : ombre interne en haut, arête claire en bas -
+le vocabulaire des encarts de la lame. Amplitude mesurée sur le rendu : 58 à 62
+unités de luminance pour une éteinte, 126 pour l'allumée, sur un fond local à
+130. (Un premier relevé au CENTRE de la pastille donnait -2 et laissait croire
+qu'elles étaient invisibles : au centre, le fond et la pastille coïncident, tout
+le contraste est sur le pourtour. Échantillon unique, mesure fausse.)
+
+**Molette au-dessus de l'en-tête = changement de section.** `.header` mesure
+0 × 0 - ses trois lignes et la colonne de pastilles sont toutes en
+`position: absolute` - donc `closest('.header')` ne trouvait jamais rien et la
+molette continuait de faire défiler les cartes. Un rectangle `.header-zone` lui
+donne une surface, posé en `z-index: -1` pour ne pas voler les clics des lignes,
+et borné à 21 vh alors que la rangée commence à 37 vh. Verrou de 520 ms au lieu
+de 320 : le dépilement dure 970 ms et une salve de pavé tactile traversait la
+moitié du site.
+
+**Sur mobile les pastilles passent en rangée sous le titre** : en colonne à
+gauche elles sortaient de l'écran (marge à 5 vw contre un décalage de 3.4 vh,
+soit x = -9), et la zone de molette mordait sur la première carte (bas à 177 pour
+une carte à 160). Vérifié à 390 × 844, 820 × 1180 et 1600 × 840.
+
+**Aucun anneau de focus sur les tuiles.** L'anneau générique se posait à 5 px à
+côté de la carte, avec un rayon de 3 px qui ne suivait pas ses coins (1.15 vh),
+dans un jaune-vert presque identique au sien : il se lisait comme un défaut
+d'affichage. Il n'apparaissait que dans un cas - ouvrir à la souris, fermer au
+clavier - le seul où le navigateur rend la main à la tuile en modalité clavier.
+Le plancher de qualité est tenu autrement : focus et sélection sont toujours sur
+la MÊME tuile (vérifié, Tab enchaîne 0/0, 1/1, 2/2), et la tuile sélectionnée est
+la grande carte de devant, éclairée, avec « N sur M » dessous. `test-flow.mjs`
+protège cet invariant : s'il tombe, l'absence d'anneau redevient un défaut.
+
+**Nom et favicon.** Titre d'onglet « Nolan Lemaitre 360 ». Favicon tiré de la
+sphère Xbox de `Legend_Menu.png`, recadrée sur son glyphe : l'asset a 28 px de
+vide de chaque côté sur 108, une mise à l'échelle directe aurait donné une sphère
+minuscule au milieu d'un carré transparent. Généré en 16, 32, 48 (`.ico`) et 180
+(`apple-touch-icon`). Les quatre fichiers sont servis avec le bon `content-type`,
+vérifié - un 200 ne prouve rien, Vite comme nginx renvoient la page HTML pour
+tout chemin inconnu.
 
 ---
 
@@ -1360,8 +1531,8 @@ pas décrite plus haut.
   contaminées : par l'avatar qui recouvre la tuile porteuse sur image2 et image6, par la
   tache lumineuse de la tuile (dont le bleu monte à 160, au-dessus d'un seuil « blanc »
   naïf), et par le dégradé blanc → vert-jaune des icônes elles-mêmes, qui met en échec
-  tout seuil de luminance. La seule comparaison propre — même icône forcée, même taille de
-  tuile — donne des largeurs à 5 % près et un centre horizontal à 0.493 contre 0.502.
+  tout seuil de luminance. La seule comparaison propre - même icône forcée, même taille de
+  tuile - donne des largeurs à 5 % près et un centre horizontal à 0.493 contre 0.502.
   **Je n'ai donc rien changé** : la règle du projet est de remesurer, jamais de corriger à
   l'œil. À reprendre avec une capture de référence où une tuile à glyphe est entièrement
   dégagée.
@@ -1371,10 +1542,28 @@ pas décrite plus haut.
 - **Le bandeau de notification (image7) et le lecteur audio (image9) ne sont pas
   implémentés.** Ils n'ont pas d'équivalent dans le contenu du portfolio.
 - **Le son part plus tard qu'avant les ajouts du 26/08** : médiane ~75 ms depuis la frappe
-  contre 50–60 auparavant, pour un plafond de 110. Les calques animés (onde, anneaux du
+  contre 50-60 auparavant, pour un plafond de 110. Les calques animés (onde, anneaux du
   fond) et la boucle de l'avatar coûtent réellement du fil principal. Deux corrections ont
   déjà récupéré du budget (respiration du ciel passée en `transform`, anneaux promus sur
   leur propre calque) ; le reste est assumé et reste dans la borne.
+- **Le fil d'Ariane met la page courante EN HAUT**, alors qu'image4 la met en bas et en
+  gros (« Testimonials / Gabriel's Portfolio / Projects », la section courante au dernier
+  rang). Demandé explicitement. Les trois corps de texte et le rapport d'interligne restent
+  les relevés ; seul l'ordre vertical est retourné. C'est la seule cote du projet dont la
+  cible dans `measure.mjs` n'est pas un relevé brut mais sa transposition.
+- **Le panneau gauche reste plus vide que la référence** : 26 % en moyenne contre 19 % sur
+  image10. Le panneau de la référence porte quatre entrées de menu ; nos tuiles en portent
+  une ou deux, parce qu'une carte de portfolio a moins de destinations qu'un profil Xbox.
+  Ramené de 62 % au pire, mais l'écart subsiste.
+- **Trois corps de texte coupent au milieu d'une phrase** et demandent de défiler (Carrefour,
+  Ce portfolio, Automatisation & IA). La barre dessinée les rend atteignables ; les
+  raccourcir est un arbitrage éditorial qui appartient à Nolan.
+- **La console de l'écran d'allumage est à 1.11:1 de contraste** sur le fond blanc (#f3f3f3
+  sur #ffffff) : seule la grille d'aération la détache. C'est probablement fidèle au site de
+  référence, mais je ne peux plus le vérifier - `reference/Site` n'est qu'un fichier texte
+  listant le site et les quatre dépôts, ils ne sont pas clonés dans le projet.
+- **Les caractères chinois de la carte Email** (« 中文 ») tombent sur une police système :
+  Convection n'a pas de jeu CJK. La graisse et le dessin y sont visiblement différents.
 - **La console de l'écran d'accueil est plus grosse que sur image1** (échelle 2.1 au lieu de
   1.75) et sa zone cliquable déborde nettement de sa silhouette : demandé explicitement, pour
   qu'on puisse cliquer à côté sans avoir à viser une forme fine.

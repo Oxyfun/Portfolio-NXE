@@ -1,31 +1,12 @@
 /**
- * Panneau de détail — la « lame » NXE (cf. image3, image5).
+ * Panneau de détail - la « lame » NXE (cf. image3, image5).
  * Elle ne glisse pas depuis le côté : elle se déplie depuis son bandeau titre.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { firstAvailable } from "../lib/assets";
+import { useEffect, useRef } from "react";
 import { GlyphMark } from "../lib/glyphs";
 import { Defilement } from "./Defilement";
 import type { Tile } from "../data/content";
-
-function Stars({ n = 5 }: { n?: number }) {
-  const [src, setSrc] = useState<string | null>(null);
-  useEffect(() => {
-    let alive = true;
-    firstAvailable("/nxe/redstar.png").then((r) => alive && setSrc(r));
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return (
-    <div className="blade-stars" aria-hidden>
-      {Array.from({ length: n }, (_, i) =>
-        src ? <img key={i} src={src} alt="" /> : <span key={i}>★</span>,
-      )}
-    </div>
-  );
-}
 
 interface Props {
   tile: Tile;
@@ -52,7 +33,7 @@ export function DetailBlade({
 }: Props) {
   const corps = useRef<HTMLDivElement>(null);
 
-  /* La liste défile quand elle est plus longue que la lame — cinq entrées et
+  /* La liste défile quand elle est plus longue que la lame - cinq entrées et
      quatre stats ne tiennent pas dans les proportions du NXE. On ramène alors
      l'entrée sélectionnée dans la vue : sans ça, la navigation au clavier
      sortait de l'écran sans que rien ne suive. */
@@ -101,10 +82,6 @@ export function DetailBlade({
                 <GlyphMark glyph={tile.glyph} />
               </div>
               <dl className="blade-stat-list">
-                <dt>Rep</dt>
-                <dd>
-                  <Stars />
-                </dd>
                 {detail.stats.map((s) => (
                   <div key={s.label} style={{ display: "contents" }}>
                     <dt>{s.label}</dt>
@@ -127,6 +104,16 @@ export function DetailBlade({
                         href={row.href}
                         target={
                           row.href.startsWith("http") ? "_blank" : undefined
+                        }
+                        /* Un fichier servi par le site (le CV) se TÉLÉCHARGE au
+                           lieu de remplacer la page : sans ça on quittait le
+                           portfolio pour afficher un PDF, et « Télécharger mon
+                           CV » ne téléchargeait rien. Les `mailto:` et `tel:`
+                           n'ont évidemment rien à faire ici. */
+                        download={
+                          row.href.startsWith("/") && /\.[a-z0-9]{2,4}$/i.test(row.href)
+                            ? ""
+                            : undefined
                         }
                         rel="noreferrer"
                         onMouseEnter={() => onRowChange(i)}
@@ -160,7 +147,7 @@ export function DetailBlade({
         >
           <div className="blade-inner">
             {/* Avec image : bandeau visuel, titre posé dessus (image8).
-              Sans image : titre seul (image10 — son panneau arrière commence
+              Sans image : titre seul (image10 - son panneau arrière commence
               directement par « Achievement Progress », sans bandeau). On rendait
               le bandeau dans les deux cas, ce qui donnait une bande noire vide
               surmontée d'un titre qui semblait mal placé. */}
@@ -177,7 +164,7 @@ export function DetailBlade({
 
             {/* Le bloc « À propos » encastré n'existe que lorsqu'il y a une image
               (image8). Sans image, la référence pose le titre et son sous-titre
-              directement sur la surface du panneau (image10) — c'est cette
+              directement sur la surface du panneau (image10) - c'est cette
               boîte plus sombre que la nôtre qui donnait l'impression d'un trou
               noir au milieu du détail. */}
             {tile.image ? (
@@ -186,7 +173,7 @@ export function DetailBlade({
                   <GlyphMark glyph={tile.glyph} />
                 </span>
                 <span>
-                  <strong>À propos — {tile.title}</strong>
+                  <strong>À propos de {tile.title}</strong>
                   <em>{tile.subtitle}</em>
                 </span>
               </div>
@@ -197,6 +184,38 @@ export function DetailBlade({
             {/* `tabIndex` pour que le corps soit atteignable au clavier : une
               fois focalisé, les flèches le font défiler nativement, et la
               molette marche déjà grâce à `overflow-y: auto`. */}
+            {detail.bars && detail.bars.length > 0 && (
+              <div className="blade-bars">
+                {detail.bars.map((bar) => {
+                  const plein = `${Math.max(0, Math.min(1, bar.ratio)) * 100}%`;
+                  return (
+                    <div className="blade-bar" key={bar.label}>
+                      <span className="blade-bar-label">{bar.label}</span>
+                      <span
+                        className="blade-bar-piste"
+                        style={{ ["--plein" as string]: plein }}
+                      >
+                        <span className="blade-bar-plein" style={{ width: plein }} />
+                        {/* La valeur est centrée sur TOUTE la piste - c'est le
+                            relevé d'image10 (piste 1664→2022, texte centré sur
+                            1850, centre de piste 1843). Mais la référence ne
+                            montre que des remplissages courts : à 62 % le blanc
+                            passe sur le vert et tombe à 2.53:1 de contraste,
+                            illisible. On en dessine donc deux exemplaires
+                            superposés, l'un sombre découpé à la largeur du
+                            remplissage. Le centrage relevé est conservé et le
+                            texte reste lisible quel que soit le ratio. */}
+                        <span className="blade-bar-valeur">{bar.value}</span>
+                        <span className="blade-bar-valeur is-sur-plein" aria-hidden>
+                          {bar.value}
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="defil-zone">
               <div className="blade-body" tabIndex={0} ref={corps}>
                 {detail.body.map((p, i) => (
@@ -205,14 +224,15 @@ export function DetailBlade({
               </div>
               <Defilement cible={corps} />
             </div>
-
-            {/* Le pied affichait `stats[0].value`, ce qui donnait des paires
-                absurdes du genre « Section — Massy (91) ». Il affiche la vraie
-                section, ce que son libellé annonçait déjà. */}
-            <div className="blade-foot">
-              <span>Section</span>
-              <span>{section}</span>
-            </div>
+            {/* Pied présent seulement AVEC une image, comme sur image8 ;
+                image10, qui n'en a pas, n'en montre aucun. Il affichait la
+                section, redondant avec le fil d'Ariane juste au-dessus. */}
+            {tile.image && (
+              <div className="blade-foot">
+                <span>Section</span>
+                <span>{section}</span>
+              </div>
+            )}
           </div>
         </section>
       </div>

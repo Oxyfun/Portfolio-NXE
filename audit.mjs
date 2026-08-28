@@ -1,5 +1,5 @@
 /**
- * audit.mjs — plancher de qualité : erreurs console, temps de chargement,
+ * audit.mjs - plancher de qualité : erreurs console, temps de chargement,
  * focus clavier visible, prefers-reduced-motion, et captures mobile/tablette.
  *   node audit.mjs [--url http://localhost:4173]
  */

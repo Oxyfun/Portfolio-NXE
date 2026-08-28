@@ -25,7 +25,7 @@ const cursorAt = async (x, y) => {
   /* On lit la classe posée par le raycast et non le `cursor` calculé : le
      curseur vert personnalisé masque le curseur natif, ce qui rendait cette
      valeur inutilisable. La classe est de toute façon le signal le plus
-     direct — c'est le résultat du raycast, pas un effet de style. */
+     direct - c'est le résultat du raycast, pas un effet de style. */
   return (await p.locator('.boot-stage').evaluate((e) => e.classList.contains('is-over')))
     ? 'pointer'
     : 'default'
@@ -121,7 +121,7 @@ step('le fil d\'Ariane disparaît quand la lame est ouverte', (await p.locator('
 step('le compteur disparaît aussi', (await p.locator('.counter').count()) === 0)
 step('la légende passe à Ouvrir / Retour', (await p.locator('.legend-item').count()) === 2)
 
-/* Rayon des coins : mesuré au zoom 4× sur image6 (15–16 px sur 561), soit
+/* Rayon des coins : mesuré au zoom 4× sur image6 (15-16 px sur 561), soit
    1.15 vh. Il valait 0.45 et les cartes paraissaient carrées. */
 const rayon = parseFloat(
   await p.locator('.tile-face').first().evaluate((e) => getComputedStyle(e).borderRadius),
@@ -211,7 +211,7 @@ await p.waitForTimeout(300)
 step('← rend la main à la liste', !(await estActif()))
 
 /* La mise en scène d'entrée se rejoue à la fermeture d'une lame et à chaque
-   changement de section — pas seulement à l'arrivée depuis l'écran d'accueil. */
+   changement de section - pas seulement à l'arrivée depuis l'écran d'accueil. */
 await p.evaluate(() => {
   window.__entrees = 0
   window.__retours = 0
@@ -241,7 +241,7 @@ await p.evaluate(() => {
 })
 await p.keyboard.press('ArrowDown')
 await p.waitForTimeout(1400)
-/* Changement de section : DÉPILEMENT, comme à l'arrivée sur le site — les
+/* Changement de section : DÉPILEMENT, comme à l'arrivée sur le site - les
    cartes partent empilées sur la première et s'étalent vers la droite. Il ne
    produit plus de flash depuis qu'il n'anime plus l'opacité : c'était elle qui
    laissait le fond nu pendant le décalage. Seul le retour d'une lame utilise
@@ -325,14 +325,14 @@ step('rayures CRT présentes dans le dashboard', (await p.locator('.crt-scanline
 step('cadre CRT présent dans le dashboard', (await p.locator('.crt-frame').count()) === 1)
 step('flou CRT actif', /blur/.test(await p.locator('.crt-soft').evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter)))
 
-/* Sons : on vérifie qu'ils partent bien, et peu après l'action — jamais
+/* Sons : on vérifie qu'ils partent bien, et peu après l'action - jamais
    simultanément. La mesure part de la frappe et inclut donc le rendu React ;
    38 ms sont programmés dans `useSounds`, le reste est de la gigue de
    `setTimeout` sous charge.
 
    J'ai essayé de mesurer depuis le `transitionstart` de la tuile pour exclure
    ce coût de rendu : abandonné, l'événement se déclenche 200 à 300 ms après la
-   frappe — y compris avec l'avatar retiré — ce qui ne correspond pas au moment
+   frappe - y compris avec l'avatar retiré - ce qui ne correspond pas au moment
    où la tuile commence visiblement à bouger. La mesure depuis la frappe est
    moins pure mais elle, au moins, mesure ce qu'elle prétend mesurer. */
 await p.waitForTimeout(600)
@@ -347,7 +347,7 @@ await p.evaluate(() => {
 })
 /* Cinq mesures, on retient la médiane. Un échantillon unique d'une grandeur
    aussi bruitée que l'ordonnancement d'un `setTimeout` sous charge donnait un
-   test instable — vu jusqu'à 115 ms pour une médiane réelle de 50. La borne
+   test instable - vu jusqu'à 115 ms pour une médiane réelle de 50. La borne
    reste la même : c'est la mesure qu'on fiabilise, pas l'exigence qu'on
    relâche. */
 const delais = []
@@ -370,7 +370,7 @@ if (delais.length) {
   const tri = [...delais].sort((a, b) => a - b)
   const median = tri[Math.floor(tri.length / 2)]
   step(`son à ${median} ms de la frappe en médiane (38 programmés)`, median >= 20 && median <= 110)
-  console.log(`  · fichier joué : ${premierSon} — mesures : ${delais.join(', ')} ms`)
+  console.log(`  · fichier joué : ${premierSon} - mesures : ${delais.join(', ')} ms`)
 }
 
 /* ── Interactions signalées comme cassées, désormais couvertes ───────────── */
@@ -387,7 +387,7 @@ step("↑ ramène à l'accueil", (await p.locator('.crumb-3').innerText()).trim(
 
 /* Le fil d'Ariane est une ROUE de sections : la ligne du bas est la page
    courante, les deux au-dessus celles qui la précèdent, dans l'ordre. Cliquer
-   une ligne mène à la section qu'elle nomme — on va où c'est écrit.
+   une ligne mène à la section qu'elle nomme - on va où c'est écrit.
    Avant, la ligne du milieu portait le nom du site : mélangée à deux sections,
    cliquer dedans n'avait aucune logique. */
 const roue = () =>
@@ -402,8 +402,80 @@ step(
 )
 step(
   'la ligne du bas est la section courante',
-  (await roue())[2] === (await sectionCourante()).trim(),
+  (await roue()).at(-1) === (await sectionCourante()).trim(),
 )
+
+/* La roue N'ENROULE PAS. Avec un modulo, la première section affichait les deux
+   DERNIÈRES au-dessus d'elle : sur Accueil on lisait « Parcours / Contact /
+   Accueil », et la fin du site se retrouvait en évidence au-dessus de son début.
+   Sur la première section il ne doit donc y avoir qu'une ligne. */
+step('la roue affiche trois lignes', (await roue()).length === 3)
+
+/* La page courante est la ligne du HAUT, les deux suivantes en dessous en corps
+   décroissant. Divergence assumée avec image4, qui la met en bas (SPEC § 12) :
+   `.crumb-3` reste la classe de la page courante, seule sa position a changé. */
+step(
+  'la ligne de la page courante est la plus haute',
+  await p.evaluate(() => {
+    const y = (s) => document.querySelector(s).getBoundingClientRect().top
+    return y('.crumb-3') < y('.crumb-2') && y('.crumb-2') < y('.crumb-1')
+  }),
+)
+
+/* Pastilles de position : une par section, celle de la page courante allumée.
+   La COLONNE ne bouge pas - seule la lumière change de pastille. Un repère de
+   position qui se déplace lui-même ne repère plus rien. */
+const pastilles = () =>
+  p.evaluate(() => {
+    const pts = [...document.querySelectorAll('.page-point')]
+    const allumee = pts.find((e) => e.classList.contains('is-courante'))
+    return { total: pts.length, index: pts.indexOf(allumee) }
+  })
+const yColonne = () =>
+  p.evaluate(() => Math.round(document.querySelector('.pages').getBoundingClientRect().top))
+const nbSections = await p.evaluate(() => document.querySelectorAll('.page-point').length)
+const yAvant = await yColonne()
+step(`une pastille par section (${nbSections})`, nbSections >= 2)
+step('la pastille allumée est la première sur la première section', (await pastilles()).index === 0)
+
+/* Molette AU-DESSUS DE L'EN-TÊTE : elle change de section, pas de carte.
+   `.header` mesure 0 × 0 (toutes ses lignes sont en absolu), d'où le rectangle
+   `.header-zone` posé derrière elles pour lui donner une surface. Sans lui,
+   `closest('.header')` ne trouvait rien et la molette continuait de faire
+   défiler les cartes. */
+const zoneEntete = await p.locator('.header-zone').boundingBox()
+const hautTuile = (await p.locator('.tile').first().boundingBox()).y
+step(
+  "la zone de molette de l'en-tête ne mord pas sur la rangée",
+  zoneEntete.y + zoneEntete.height < hautTuile,
+)
+const surEntete = async (sens) => {
+  await p.mouse.move(zoneEntete.x + zoneEntete.width / 2, zoneEntete.y + zoneEntete.height / 2)
+  await p.mouse.wheel(0, sens * 120)
+  await p.waitForTimeout(800)
+}
+await surEntete(1)
+step(
+  `molette sur l'en-tête : section suivante (${(await sectionCourante()).trim()})`,
+  (await pastilles()).index === 1,
+)
+await surEntete(-1)
+step('molette inverse : section précédente', (await pastilles()).index === 0)
+
+step('la colonne de pastilles ne bouge pas', (await yColonne()) === yAvant)
+
+/* Elle BOUCLE, comme les flèches : depuis l'Accueil, remonter mène à la
+   dernière section. Deux gestes de navigation qui ne répondraient pas pareil au
+   même mouvement, ce serait une incohérence - et c'est pour ça que la roue de
+   titres enroule elle aussi. */
+await surEntete(-1)
+step(
+  `molette vers le haut depuis la première : on boucle sur la dernière (${(await sectionCourante()).trim()})`,
+  (await pastilles()).index === nbSections - 1,
+)
+await surEntete(1)
+step('molette vers le bas depuis la dernière : retour à la première', (await pastilles()).index === 0)
+step('la colonne est au même endroit après la boucle', (await yColonne()) === yAvant)
 
 // Cliquer une ligne mène EXACTEMENT à la section qu'elle nomme.
 for (const rang of [1, 2]) {
@@ -411,15 +483,52 @@ for (const rang of [1, 2]) {
   await p.locator(`.crumb-${rang}`).click()
   await p.waitForTimeout(900)
   const apres = await roue()
-  step(`cliquer « ${avant[rang - 1]} » y mène (bas → ${apres[2]})`, apres[2] === avant[rang - 1])
+  step(`cliquer « ${avant[rang - 1]} » y mène (bas → ${apres.at(-1)})`, apres.at(-1) === avant[rang - 1])
 }
 
 // On repasse sur l'accueil pour la suite du parcours.
 while ((await sectionCourante()).trim() !== 'Accueil') {
-  await p.locator('.crumb-2').click()
-  await p.waitForTimeout(800)
+  await surEntete(-1)
 }
-step("retour à l'accueil par le fil d'Ariane", (await sectionCourante()).trim() === 'Accueil')
+step("retour à l'accueil par la molette", (await sectionCourante()).trim() === 'Accueil')
+
+/* Les tuiles n'ont AUCUN anneau de focus, et c'est délibéré : le focus et la
+   sélection sont toujours sur la même tuile, et la tuile sélectionnée est la
+   grande carte de devant, éclairée, avec « N sur M » dessous. Si cette règle
+   tombait, l'absence d'anneau deviendrait un vrai défaut d'accessibilité - d'où
+   ce test. */
+await p.keyboard.press('Tab')
+await p.waitForTimeout(200)
+let solidaires = true
+for (let i = 0; i < 8; i++) {
+  const r = await p.evaluate(() => {
+    const t = [...document.querySelectorAll('.tile')]
+    const f = t.indexOf(document.activeElement)
+    if (f < 0) return null
+    return { f, s: t.findIndex((e) => e.getAttribute('aria-current') === 'true') }
+  })
+  if (r && r.f !== r.s) solidaires = false
+  await p.keyboard.press('Tab')
+  await p.waitForTimeout(160)
+}
+step('focus et sélection restent sur la même tuile (aucun anneau nécessaire)', solidaires)
+
+/* Tabuler a promené la sélection jusqu'à la dernière carte. On la ramène au
+   début : le test suivant vérifie que la molette AVANCE d'une carte, et depuis
+   la dernière il n'y a plus rien devant - il échouait sans qu'aucun code de
+   l'application n'ait changé. */
+for (let i = 0; i < 6; i++) {
+  await p.keyboard.press('ArrowLeft')
+  await p.waitForTimeout(90)
+}
+step(
+  'sélection ramenée sur la première carte',
+  (await p.evaluate(() =>
+    [...document.querySelectorAll('.tile')].findIndex(
+      (e) => e.getAttribute('aria-current') === 'true',
+    ),
+  )) === 0,
+)
 
 
 /* Le survol ne doit plus sélectionner : passer la souris au-dessus de la rangée
@@ -429,7 +538,7 @@ await p.waitForTimeout(500)
 const avantSurvol = await selTuile()
 /* On vise une tuile ENCORE À L'ÉCRAN. Les tuiles dépassées sortent par la
    gauche : à la sélection 1, la tuile 0 a une abscisse négative et y déplacer
-   la souris la mettait hors de la page — la molette ne partait donc nulle
+   la souris la mettait hors de la page - la molette ne partait donc nulle
    part, ce qui ressemblait à une régression alors que le test visait le vide. */
 const boiteVoisine = await p.evaluate(() => {
   const tuiles = [...document.querySelectorAll('.tile')]
@@ -451,14 +560,14 @@ step(`la molette change de tuile (${avantSurvol} → ${apresMolette})`, apresMol
    sens : une souris qui envoie beaucoup d'un coup sautait une carte, un pavé
    tactile qui envoie peu n'en franchissait aucune. */
 /* On revient sur la première carte : sinon la sélection est déjà au bout de la
-   rangée, la salve ne peut plus avancer et l'écart mesuré vaut 0 — le test
+   rangée, la salve ne peut plus avancer et l'écart mesuré vaut 0 - le test
    échouerait sans que rien ne soit cassé. */
 await p.keyboard.press('ArrowLeft')
 await p.keyboard.press('ArrowLeft')
 await p.waitForTimeout(700)
 const avantSalve = await selTuile()
 /* Vraie salve : six événements dans la MÊME milliseconde, ce que produit une
-   molette crantée. Les envoyer via `p.mouse.wheel` en boucle ne marche pas —
+   molette crantée. Les envoyer via `p.mouse.wheel` en boucle ne marche pas -
    chaque aller-retour CDP coûte quelques dizaines de ms et la salve s'étale
    au-delà du verrou, ce qui faisait constater deux crans à juste titre. */
 await p.evaluate(() => {
@@ -497,15 +606,46 @@ step(
 
 /* Les trois boutons de légende faisaient tous la même chose : ils n'étaient pas
    cliquables et le clic atteignait le voile de la lame, qui fermait. */
+/* La section se lit AVANT d'ouvrir : le fil d'Ariane disparaît dès qu'une lame
+   est ouverte (image3, image5), `.crumb-3` n'existe donc plus. */
+const sectionAvantOuvrir = (await p.locator('.crumb-3').innerText()).trim()
 await p.locator('.legend-item').first().click()
 await p.waitForTimeout(800)
 step('« Sélectionner » ouvre la lame', await lameOuverte())
+/* « Ouvrir » doit EXÉCUTER l'action de la ligne sélectionnée, pas se contenter
+   de fermer comme « Retour » - c'était le bug d'origine, les deux boutons
+   atteignaient le voile. Sur la carte d'accueil la première ligne mène aux
+   Projets : l'action referme donc la lame ET change de section. C'est cette
+   navigation qui prouve que le bouton fait son travail. */
 await p.locator('.legend-item').first().click()
-await p.waitForTimeout(700)
-step('« Ouvrir » ne referme PAS la lame', await lameOuverte())
+await p.waitForTimeout(1400)
+const sectionApresOuvrir = (await p.locator('.crumb-3').innerText()).trim()
+step(
+  `« Ouvrir » exécute l'action de la ligne (${sectionAvantOuvrir} → ${sectionApresOuvrir})`,
+  sectionApresOuvrir !== sectionAvantOuvrir,
+)
+
+// « Retour » ferme sans rien exécuter.
+await p.evaluate(() => document.querySelectorAll('.tile')[0].click())
+await p.waitForTimeout(400)
+await p.keyboard.press('Enter')
+await p.waitForTimeout(800)
+const sectionAvantRetour = sectionApresOuvrir
 await p.locator('.legend-item').nth(1).click()
 await p.waitForTimeout(700)
 step('« Retour » referme la lame', !(await lameOuverte()))
+step(
+  '« Retour » ne change pas de section',
+  (await p.locator('.crumb-3').innerText()).trim() === sectionAvantRetour,
+)
+
+/* On revient sur l'accueil : « Ouvrir » a navigué, et la suite du parcours
+   teste l'avatar, qui n'y est arrimé que là. */
+while ((await p.locator('.crumb-3').innerText()).trim() !== 'Accueil') {
+  await p.keyboard.press('ArrowDown')
+  await p.waitForTimeout(900)
+}
+await p.waitForTimeout(500)
 
 /* Le panneau de détail ne doit plus contenir de bloc encastré plus sombre :
    sans image, la référence pose le titre à même la surface. */
@@ -536,7 +676,7 @@ step(
    320 px et sort largement de sa boîte). */
 const avatar = await p.$('.avatar3d.is-visible')
 if (!avatar) {
-  console.log("  · avatar absent (public/avatar.glb non fourni) — rotation non testée")
+  console.log("  · avatar absent (public/avatar.glb non fourni) - rotation non testée")
 } else {
   const g = await p.evaluate(() => {
     const a = document.querySelector('.avatar3d-stage').getBoundingClientRect()
@@ -560,7 +700,7 @@ if (!avatar) {
   const vueAvant = await rendu()
   /* On RE-localise l'avatar : le survol à côté de lui a changé la tuile
      sélectionnée, et comme il est arrimé à la tuile 1 il a bougé et changé de
-     taille. Réutiliser les coordonnées d'avant visait le vide — le clic partait
+     taille. Réutiliser les coordonnées d'avant visait le vide - le clic partait
      alors sur une tuile et le « glissement » ne faisait que la survoler. */
   const g2 = await p.evaluate(() => {
     const a = document.querySelector('.avatar3d-stage').getBoundingClientRect()
@@ -569,8 +709,8 @@ if (!avatar) {
   await p.mouse.move(g2.cx, g2.cy)
   await p.waitForTimeout(250)
   /* Référence prise une fois le pointeur EN PLACE. Le trajet jusqu'à l'avatar
-     survole la tuile qu'il recouvre et la sélectionne — comportement voulu, on
-     ne bloque pas les tuiles — mais mesurer avant ce trajet ferait constater ce
+     survole la tuile qu'il recouvre et la sélectionne - comportement voulu, on
+     ne bloque pas les tuiles - mais mesurer avant ce trajet ferait constater ce
      survol au lieu de l'effet du glissement. */
   const selAvant = await selection()
   await p.mouse.down()
@@ -590,6 +730,40 @@ if (!avatar) {
   await p.mouse.click(200, 420)
   await p.waitForTimeout(800)
   step("le bouclier de glissement se retire après le geste", await p.evaluate(() => !!document.querySelector('.blade')))
+
+  /* Régression : le personnage doit AUSSI tourner quand une lame est ouverte.
+     Il cède les clics aux panneaux qu'il recouvre - sinon il neutralisait la
+     barre de défilement - mais j'avais visé `.blade-layer`, qui contient un
+     voile de fermeture plein écran : « la lame est dessous » était donc vrai
+     partout et le personnage devenait insaisissable dès qu'une lame s'ouvrait.
+     Les trois assertions tiennent ensemble : il tourne, la lame reste ouverte,
+     et le pouce de défilement reste tirable. */
+  const lacet = () => p.evaluate(() => window.__avatar?.pivot.rotation.y ?? null)
+  if ((await lacet()) === null) {
+    console.log('  · window.__avatar absent (build de prod) - rotation sous lame non testée')
+  } else {
+    const c = await p.evaluate(() => {
+      const a = document.querySelector('.avatar3d-stage').getBoundingClientRect()
+      return { x: Math.round(a.left + a.width / 2), y: Math.round(a.top + a.height * 0.45) }
+    })
+    const lacetAvant = await lacet()
+    await p.mouse.move(c.x, c.y)
+    await p.waitForTimeout(200)
+    step('lame ouverte, le personnage est signalé saisissable',
+      await p.evaluate(() => document.querySelector('.avatar3d').classList.contains('is-hot')))
+    await p.mouse.down()
+    for (let i = 1; i <= 24; i++) {
+      await p.mouse.move(c.x + i * 10, c.y)
+      await p.waitForTimeout(8)
+    }
+    await p.mouse.up()
+    await p.waitForTimeout(800)
+    step('lame ouverte, le glissé fait tourner le personnage',
+      Math.abs((await lacet()) - lacetAvant) > 0.2)
+    step('faire tourner le personnage ne referme pas la lame',
+      await p.evaluate(() => !!document.querySelector('.blade')))
+  }
+
   await p.keyboard.press('Escape')
   await p.waitForTimeout(500)
 }

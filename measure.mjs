@@ -1,5 +1,5 @@
 /**
- * measure.mjs — relève la géométrie réelle du DOM et la confronte aux cibles
+ * measure.mjs - relève la géométrie réelle du DOM et la confronte aux cibles
  * mesurées sur reference/image4.png. Complément de compare.mjs : la carte de
  * différence dit « ça ne colle pas », celle-ci dit « de combien, et où ».
  *
@@ -29,10 +29,17 @@ const TARGETS = {
   'tile1.height': 461 * S,
   'tile1.right': (1329 / 2526) * VW,
   'tile2.right': (1759 / 2526) * VW,
-  // les y ci-dessous sont relevés sur l'image brute : -34 px de barre navigateur
-  'crumb1.capTop': (121 - 34) * S,
-  'crumb2.capTop': (171 - 34) * S,
-  'crumb3.capTop': (239 - 34) * S,
+  /* Fil d'Ariane : la page courante est passée EN HAUT à la demande, alors
+     qu'image4 la met en bas. Les trois corps restent les relevés d'origine
+     (hauteurs de capitale 121, 171 et 239 px sur l'image brute, -34 px de barre
+     navigateur) ; seul leur ORDRE vertical est retourné, en conservant le
+     rapport d'interligne relevé. Ces trois cibles ne sont donc plus des
+     relevés bruts mais la transposition du relevé - c'est la seule cote du
+     projet dans ce cas, et c'est écrit en SPEC § 12. */
+  'crumb3.capTop': (121 - 34) * S,
+  'crumb2.capTop': (121 - 34) * S + 2.01 * 0.72 * 4.38 * (VH / 100),
+  'crumb1.capTop':
+    (121 - 34) * S + 2.01 * 0.72 * 4.38 * (VH / 100) + 2.01 * 0.72 * 3.36 * (VH / 100),
   'avatar.size': 123 * S,
   'avatar.right': (2440 / 2526) * VW,
   'avatar.top': (89 - 34) * S,
@@ -165,14 +172,14 @@ const got = await page.evaluate(() => {
 
 await browser.close()
 
-console.log(`\n  viewport ${VW}×${VH} — cibles issues de reference/image4.png\n`)
+console.log(`\n  viewport ${VW}×${VH} - cibles issues de reference/image4.png\n`)
 console.log('  ' + 'mesure'.padEnd(22) + 'cible'.padStart(9) + 'obtenu'.padStart(10) + 'écart'.padStart(9))
 console.log('  ' + '─'.repeat(50))
 let worst = []
 for (const [k, target] of Object.entries(TARGETS)) {
   const v = got[k]
   if (v == null) {
-    console.log(`  ${k.padEnd(22)}${target.toFixed(1).padStart(9)}${'—'.padStart(10)}`)
+    console.log(`  ${k.padEnd(22)}${target.toFixed(1).padStart(9)}${'-'.padStart(10)}`)
     continue
   }
   const d = v - target

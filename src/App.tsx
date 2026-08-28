@@ -17,7 +17,7 @@ import { CrtOverlay, CrtSoftness } from "./components/Crt";
 import { Avatar3D } from "./components/Avatar3D";
 import { Cursor } from "./components/Cursor";
 
-/** `?boot=0` saute l'écran d'accueil — utilisé par compare.mjs. */
+/** `?boot=0` saute l'écran d'accueil - utilisé par compare.mjs. */
 function skipBoot(): boolean {
   if (typeof location === "undefined") return false;
   const v = new URLSearchParams(location.search).get("boot");
@@ -52,7 +52,7 @@ export default function App() {
 
   /* Dépilement : les cartes partent empilées sur la première et s'étalent vers
      la droite. Sert à l'arrivée depuis l'écran d'accueil ET à chaque changement
-     de section — c'est un nouveau jeu de cartes à chaque fois. Il ne fait plus
+     de section - c'est un nouveau jeu de cartes à chaque fois. Il ne fait plus
      de flash depuis qu'il n'anime plus l'opacité. */
   const entreeTimer = useRef(0);
   const rejouerEntree = useCallback(() => {
@@ -61,7 +61,7 @@ export default function App() {
        animation CSS sur un élément qui reste en place. Ici il est inutile :
        chaque section a ses propres identifiants de tuiles, donc React les
        remonte et l'animation repart d'elle-même sur des éléments neufs.
-       Pire, il cassait le switch rapide — l'image sans la classe faisait sauter
+       Pire, il cassait le switch rapide - l'image sans la classe faisait sauter
        les cartes à leur position finale avant que l'animation ne reprenne
        depuis la pile. */
     window.clearTimeout(entreeTimer.current);
@@ -145,9 +145,23 @@ export default function App() {
       const tile = tiles[openIdx ?? 0];
       const row = tile?.detail.rows[i];
       play("select");
-      if (row?.href) window.open(row.href, "_blank", "noopener");
+      if (row?.href) {
+        window.open(row.href, "_blank", "noopener");
+        return;
+      }
+      /* Une ligne peut aussi mener à une section : la lame se ferme et on y va.
+         Sans `href` ni `section` elle ne faisait absolument rien - c'était le
+         cas des trois lignes de la carte d'accueil. */
+      if (row?.section) {
+        const cible = sections.findIndex((sec) => sec.id === row.section);
+        if (cible >= 0) {
+          setOpenIdx(null);
+          setZone("liste");
+          allerSection(cible);
+        }
+      }
     },
-    [tiles, openIdx, play],
+    [tiles, openIdx, play, allerSection],
   );
 
   const selectTile = useCallback(
@@ -161,7 +175,7 @@ export default function App() {
     [play],
   );
 
-  /* Molette : un cran = une tuile. Le survol ne sélectionne plus — passer la
+  /* Molette : un cran = une tuile. Le survol ne sélectionne plus - passer la
      souris au-dessus de la rangée faisait défiler les cartes sans qu'on ait
      rien demandé. On accumule le delta plutôt que de réagir à chaque
      événement : un pavé tactile en émet des dizaines par geste, et sans seuil
@@ -181,11 +195,15 @@ export default function App() {
        retrouvait entièrement ignoré. Le verrou temporel suffit seul à éviter
        les crans multiples, le seuil ne sert qu'à écarter le bruit. */
     const MINI = 1;
+    /* Le dépilement des cartes dure 970 ms. On ne verrouille pas aussi long -
+       ce serait vécu comme une molette qui ne répond pas - mais assez pour
+       qu'une salve de pavé tactile ne franchisse qu'une section à la fois. */
+    const VERROU_SECTION = 520;
     const onWheel = (e: WheelEvent) => {
       /* Une zone qui peut défiler d'elle-même (le corps de la lame) garde la
          molette. `instanceof Element` et non un simple `?.` : la cible d'un
          événement peut être `window` ou `document`, qui n'ont pas de
-         `closest` — l'appeler y lève une exception et le gestionnaire ne fait
+         `closest` - l'appeler y lève une exception et le gestionnaire ne fait
          plus rien du tout. */
       const cible = e.target;
       if (cible instanceof Element && cible.closest(".blade-body")) return;
@@ -195,12 +213,33 @@ export default function App() {
       if (Math.abs(d) < MINI) return;
       const now = performance.now();
       if (now < wheelLock.current) return;
+
+      /* Molette AU-DESSUS DE L'EN-TÊTE : on change de section, pas de carte.
+         La zone qui nomme les pages est celle où on s'attend à en changer, et
+         c'était jusqu'ici le seul endroit du site sans geste à la souris - il
+         fallait la flèche du haut ou viser un titre au pixel.
+         Verrou plus long que pour les cartes : un changement de section rejoue
+         le dépilement complet, et à 320 ms un seul geste de pavé tactile
+         traversait la moitié du site. */
+      if (cible instanceof Element && cible.closest(".header")) {
+        wheelLock.current = now + VERROU_SECTION;
+        /* Elle BOUCLE : depuis l'Accueil, remonter mène à la dernière section.
+           C'est déjà ce que font les flèches haut et bas (`moveSection` est en
+           modulo) ; s'arrêter net à la molette aurait donné deux navigations qui
+           ne répondent pas pareil au même geste.
+           À ne pas confondre avec la roue de titres, qui elle n'enroule pas :
+           on peut aller d'Accueil à Contact, mais on n'écrit pas « Contact »
+           au-dessus d'« Accueil » comme s'il le précédait. */
+        moveSection(Math.sign(d));
+        return;
+      }
+
       wheelLock.current = now + VERROU;
       moveTile(Math.sign(d));
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [booted, openIdx, moveTile]);
+  }, [booted, openIdx, moveTile, moveSection]);
 
   // ── Clavier ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -316,7 +355,7 @@ export default function App() {
   // ── Rendu ──────────────────────────────────────────────────────────────
   /* `CrtScreen` floute son contenu : il enveloppe TOUT, y compris l'écran
      d'accueil. `CrtOverlay` (rayures + cadre arrondi) n'apparaît qu'une fois
-     dans le dashboard — sur l'accueil on ne veut que le flou. */
+     dans le dashboard - sur l'accueil on ne veut que le flou. */
   if (!booted) {
     return (
       <>
@@ -372,10 +411,16 @@ export default function App() {
           index={tileIdx}
           total={tiles.length}
           showCounter={!openTile}
+          /* « Ouvrir » n'apparaît que si la tuile a une action. La légende
+             l'annonçait sur les 23 tuiles alors que 12 n'ont aucune ligne :
+             appuyer sur A ne faisait rien, et une légende qui ment sur ce
+             qu'elle propose est pire que pas de légende. */
           actions={
             openTile
               ? {
-                  a: { label: "Ouvrir", onPress: () => activateRow(rowIdx) },
+                  ...(openTile.detail.rows.length > 0
+                    ? { a: { label: "Ouvrir", onPress: () => activateRow(rowIdx) } }
+                    : {}),
                   b: { label: "Retour", onPress: close },
                 }
               : { a: { label: "Sélectionner", onPress: () => open(tileIdx) } }
