@@ -500,6 +500,21 @@ cartes de la position de la première, donc on voyait la grande carte de gauche
 pendant toute l'animation — ce qui n'a aucun sens au retour, puisqu'elles n'ont
 jamais quitté leur place.
 
+### 5 octies. Cinq lignes d'actions ne tiennent pas
+
+La section Contact en demande cinq. Mesuré à 1600 × 840 : le bandeau titre fait
+51 px, l'encart de stats **219** (quatre paires plus les étoiles), il reste
+248 px pour une liste qui en demande 344. Il faudrait une lame de 82.5 vh
+commençant à 15.6 : elle finirait à 98 vh, hors écran.
+
+Ce n'est donc pas un défaut mais une contrainte de proportions — image10 en
+montre quatre, et quatre tiennent. La lame est plafonnée à 73 vh pour rester
+au-dessus de la légende, et c'est la LISTE qui défile, pas la lame qui déborde.
+
+**Ce qui manquait vraiment** : la navigation au clavier sortait de l'écran sans
+que rien ne suive. L'entrée sélectionnée est maintenant ramenée dans la vue.
+Les cinq sont atteignables et visibles à leur tour.
+
 ### 5 septies. Marge du panneau de détail
 
 Le panneau commence **19 px derrière la lame de gauche** (bord gauche à 776,

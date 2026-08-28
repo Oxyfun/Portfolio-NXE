@@ -35,6 +35,8 @@ interface Props {
   /** Colonne qui a la main : la liste d'actions ou le panneau de détail. */
   zone: "liste" | "detail";
   onZone(z: "liste" | "detail"): void;
+  /** Libellé de la section, affiché en pied du panneau de détail. */
+  section: string;
 }
 
 export function DetailBlade({
@@ -45,8 +47,21 @@ export function DetailBlade({
   onClose,
   zone,
   onZone,
+  section,
 }: Props) {
   const corps = useRef<HTMLDivElement>(null);
+
+  /* La liste défile quand elle est plus longue que la lame — cinq entrées et
+     quatre stats ne tiennent pas dans les proportions du NXE. On ramène alors
+     l'entrée sélectionnée dans la vue : sans ça, la navigation au clavier
+     sortait de l'écran sans que rien ne suive. */
+  const liste = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const ul = liste.current;
+    if (!ul || ul.scrollHeight <= ul.clientHeight + 1) return;
+    const actif = ul.querySelector(".blade-row.is-active");
+    actif?.scrollIntoView({ block: "nearest" });
+  }, [activeRow]);
 
   /* Quand le panneau prend la main, on lui donne le focus : les flèches le font
      alors défiler nativement, sans qu'on ait à réimplémenter le défilement. */
@@ -99,7 +114,7 @@ export function DetailBlade({
             </div>
 
             {detail.rows.length > 0 && (
-              <ul className="blade-rows" onClick={() => onZone("liste")}>
+              <ul className="blade-rows" ref={liste} onClick={() => onZone("liste")}>
                 {detail.rows.map((row, i) => (
                   <li key={row.label}>
                     {row.href ? (
@@ -182,9 +197,12 @@ export function DetailBlade({
               ))}
             </div>
 
+            {/* Le pied affichait `stats[0].value`, ce qui donnait des paires
+                absurdes du genre « Section — Massy (91) ». Il affiche la vraie
+                section, ce que son libellé annonçait déjà. */}
             <div className="blade-foot">
               <span>Section</span>
-              <span>{detail.stats[0]?.value ?? tile.subtitle}</span>
+              <span>{section}</span>
             </div>
           </div>
         </section>

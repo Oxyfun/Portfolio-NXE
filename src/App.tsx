@@ -392,6 +392,7 @@ export default function App() {
             onClose={close}
             zone={zone}
             onZone={setZone}
+            section={section.label}
           />
         )}
       </main>

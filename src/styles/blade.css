@@ -28,9 +28,15 @@
   }
 }
 
+/* `max-height` : la lame grandit avec son contenu, mais s'arrête avant la
+   légende du pied de page. Avec cinq lignes d'actions — la section Contact —
+   elle passait dessous et la dernière ligne devenait illisible. Au-delà, c'est
+   la LISTE qui défile, pas la lame qui déborde. */
 .blade {
   position: absolute;
   z-index: 2;
+  display: flex;
+  max-height: 73vh;
   left: 7.9%;
   top: 15.6vh;
   width: 41.8%;
@@ -120,6 +126,22 @@
 
 .blade-inner {
   animation: fade-in 220ms ease-out 90ms backwards;
+  /* Colonne : le bandeau et l'encart gardent leur taille, seule la liste cède.
+     `min-height: 0` est indispensable — sans lui un enfant flex refuse de
+     rétrécir sous sa hauteur de contenu et rien ne défile. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  /* Remplit la lame : sans ça il se dimensionne sur son contenu, la liste
+     hérite d'une hauteur trop petite et défile alors qu'il reste de la place
+     visible en dessous. */
+  flex: 1;
+}
+
+.blade-title,
+.blade-stats {
+  flex: none;
 }
 
 .blade-title {
@@ -223,6 +245,19 @@
   margin-top: 2vh;
   list-style: none;
   padding: 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+
+.blade-rows::-webkit-scrollbar {
+  width: 1vh;
+}
+
+.blade-rows::-webkit-scrollbar-thumb {
+  border-radius: 0.5vh;
+  background: rgba(255, 255, 255, 0.38);
 }
 
 .blade-row {
