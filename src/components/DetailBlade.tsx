@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { firstAvailable } from "../lib/assets";
 import { GlyphMark } from "../lib/glyphs";
+import { Defilement } from "./Defilement";
 import type { Tile } from "../data/content";
 
 function Stars({ n = 5 }: { n?: number }) {
@@ -114,7 +115,10 @@ export function DetailBlade({
             </div>
 
             {detail.rows.length > 0 && (
-              <ul className="blade-rows" ref={liste} onClick={() => onZone("liste")}>
+              /* Conteneur positionné : la piste de défilement se cale dessus,
+                 pas sur toute la lame. */
+              <div className="defil-zone">
+                <ul className="blade-rows" ref={liste} onClick={() => onZone("liste")}>
                 {detail.rows.map((row, i) => (
                   <li key={row.label}>
                     {row.href ? (
@@ -141,7 +145,9 @@ export function DetailBlade({
                     )}
                   </li>
                 ))}
-              </ul>
+                </ul>
+                <Defilement cible={liste} />
+              </div>
             )}
           </div>
         </section>
@@ -191,10 +197,13 @@ export function DetailBlade({
             {/* `tabIndex` pour que le corps soit atteignable au clavier : une
               fois focalisé, les flèches le font défiler nativement, et la
               molette marche déjà grâce à `overflow-y: auto`. */}
-            <div className="blade-body" tabIndex={0} ref={corps}>
-              {detail.body.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
+            <div className="defil-zone">
+              <div className="blade-body" tabIndex={0} ref={corps}>
+                {detail.body.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+              <Defilement cible={corps} />
             </div>
 
             {/* Le pied affichait `stats[0].value`, ce qui donnait des paires

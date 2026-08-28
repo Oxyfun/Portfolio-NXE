@@ -71,6 +71,7 @@ export function Cursor() {
         'is-pointer',
         Boolean(
           sous?.closest('button, a, [role="button"], input, select, textarea') ||
+            sous?.closest('.defil-pouce') ||
             sous?.closest('.boot-stage.is-over') ||
             sous?.closest('.avatar3d.is-hot'),
         ),

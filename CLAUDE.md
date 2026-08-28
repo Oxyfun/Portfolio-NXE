@@ -99,6 +99,9 @@ Chacun a coûté au moins une itération. Ne les repaie pas.
 - **Un voile plein écran vole les clics de tout ce qui passe dessous.** Deux causes empilées
   sur la légende (`<span>` non cliquables ET `z-index` trop bas) : corriger une seule ne
   changeait rien. Playwright désigne ce coupable seul (« X intercepts pointer events »).
+- **`cursor` ne s'applique pas au chrome d'une barre de défilement native.** Même en
+  `!important` : la flèche système reprend la main dessus. Si tu masques le curseur natif,
+  il faut aussi dessiner la barre toi-même — et la garder tirable.
 - **Masquer le curseur natif efface la valeur qu'on voulait lire** : `cursor: none !important`
   écrase le `cursor` calculé partout. Et un raycast n'est pas dans le DOM — expose-le en classe.
 - **Avant d'inventer une animation, cherche-la dans les dépôts de `reference/Site`.** Le fond

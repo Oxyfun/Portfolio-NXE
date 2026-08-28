@@ -247,17 +247,13 @@
   padding: 0;
   min-height: 0;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  /* Barre native masquée : on dessine la nôtre (cf. Defilement.tsx). Le chrome
+     d'une barre native ignore `cursor`, donc le curseur vert y disparaissait. */
+  scrollbar-width: none;
 }
 
 .blade-rows::-webkit-scrollbar {
-  width: 1vh;
-}
-
-.blade-rows::-webkit-scrollbar-thumb {
-  border-radius: 0.5vh;
-  background: rgba(255, 255, 255, 0.38);
+  display: none;
 }
 
 .blade-row {
@@ -320,24 +316,11 @@
      rétrécir sous sa hauteur de contenu et l'`overflow` ne sert à rien. */
   min-height: 0;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  scrollbar-width: none;
 }
 
-/* Barre de défilement discrète, dans le langage du panneau : pas la barre
-   grise du navigateur au milieu d'un dashboard de 2008. */
 .blade-body::-webkit-scrollbar {
-  width: 0.8vh;
-}
-
-.blade-body::-webkit-scrollbar-thumb {
-  border-radius: 0.4vh;
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.blade-body::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.22);
-  border-radius: 0.4vh;
+  display: none;
 }
 
 .blade-body p {
@@ -490,3 +473,55 @@
   background: rgba(255, 255, 255, 0.38);
 }
 
+
+/* ── Barre de défilement dessinée ────────────────────────────────────────
+   Remplace la barre native, dont le chrome ignore `cursor` : le curseur vert
+   y disparaissait au profit de la flèche système. Elle reste tirable.
+   Elle se place dans le conteneur positionné le plus proche — la lame. */
+.defil {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0.6vh;
+  width: 0.9vh;
+  border-radius: 0.45vh;
+  background: rgba(0, 0, 0, 0.24);
+  pointer-events: none;
+}
+
+.defil-pouce {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 0.45vh;
+  background: rgba(255, 255, 255, 0.42);
+  pointer-events: auto;
+  cursor: grab;
+  transition: background 120ms linear;
+}
+
+.defil-pouce:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.defil-pouce:active {
+  cursor: grabbing;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* La piste se cale sur la zone qui défile, pas sur toute la lame. Le conteneur
+   reprend le comportement flex de l'élément qu'il enveloppe, sinon la liste
+   comme le corps cessent de céder de la place. */
+.defil-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.defil-zone > .blade-rows,
+.defil-zone > .blade-body {
+  flex: 1;
+  min-height: 0;
+}

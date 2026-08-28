@@ -500,6 +500,24 @@ cartes de la position de la première, donc on voyait la grande carte de gauche
 pendant toute l'animation — ce qui n'a aucun sens au retour, puisqu'elles n'ont
 jamais quitté leur place.
 
+### 5 nonies. La barre de défilement est dessinée
+
+Le curseur vert disparaissait dès qu'on passait sur une barre de défilement.
+Vérifié : le nôtre continue bien de la suivre (opacité 1, position à jour) —
+c'est la flèche système qui se dessine par-dessus. Dans Blink, `cursor` ne
+s'applique pas au chrome d'une barre native ; même `cursor: none !important`
+est ignoré là.
+
+Les barres natives sont donc masquées et remplacées par les nôtres
+(`Defilement.tsx`). C'est aussi plus juste : une barre Windows au milieu d'un
+dashboard de 2008, ça se voit.
+
+Elle reste **tirable** — masquer la native sans la remplacer aurait retiré une
+façon légitime de faire défiler. Elle réserve sa place quand elle apparaît,
+sinon le pouce passait sur le bouton vert de la ligne sélectionnée, et le
+pouce ne descend pas sous 12 % de la piste, en dessous de quoi il devient
+impossible à viser.
+
 ### 5 octies. Cinq lignes d'actions ne tiennent pas
 
 La section Contact en demande cinq. Mesuré à 1600 × 840 : le bandeau titre fait

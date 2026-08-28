@@ -177,12 +177,34 @@ step(
   'la molette aussi',
   (await p.evaluate(() => document.querySelector('.blade-body').scrollTop)) > parFleches,
 )
+/* La barre native est masquée au profit de la nôtre : son chrome ignore
+   `cursor`, le curseur vert y disparaissait au profit de la flèche système. */
 step(
-  'la barre de défilement occupe de la place',
+  'la barre native est masquée',
   (await p.evaluate(() => {
     const c = document.querySelector('.blade-body')
     return c.offsetWidth - c.clientWidth
-  })) >= 6,
+  })) === 0,
+)
+step(
+  'une barre dessinée apparaît quand le texte déborde',
+  (await p.evaluate(() => document.querySelectorAll('.defil').length)) > 0,
+)
+/* Elle reste tirable : masquer la native sans la remplacer aurait retiré une
+   façon légitime de faire défiler. */
+const pouce = await p.evaluate(() => {
+  const r = document.querySelector('.defil-pouce').getBoundingClientRect()
+  return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }
+})
+const avantPouce = await p.evaluate(() => document.querySelector('.blade-body').scrollTop)
+await p.mouse.move(pouce.x, pouce.y)
+await p.mouse.down()
+await p.mouse.move(pouce.x, pouce.y + 70, { steps: 8 })
+await p.mouse.up()
+await p.waitForTimeout(300)
+step(
+  'tirer le pouce fait défiler',
+  (await p.evaluate(() => document.querySelector('.blade-body').scrollTop)) > avantPouce,
 )
 await p.keyboard.press('ArrowLeft')
 await p.waitForTimeout(300)
